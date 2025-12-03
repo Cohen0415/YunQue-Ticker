@@ -55,18 +55,27 @@ static int backlight_get(char *value)
     return 0;
 }
 
+
 int backlight_cmd_register(void)
 {
     int ret;
 
-    ret = register_command("CMD_SET_BRIGHTNESS", backlight_set);
+    command_t cmd_set_brightness, cmd_get_brightness;
+
+    cmd_set_brightness.name = "CMD_SET_BRIGHTNESS";
+    cmd_set_brightness.handler = backlight_set;
+
+    cmd_get_brightness.name = "CMD_GET_BRIGHTNESS";
+    cmd_get_brightness.handler = backlight_get;
+
+    ret = command_register(&cmd_set_brightness);
     if (ret != 0) 
     {
         printf("Failed to register CMD_SET_BRIGHTNESS\n");
         return -1;
     }
 
-    ret = register_command("CMD_GET_BRIGHTNESS", backlight_get);
+    ret = command_register(&cmd_get_brightness);
     if (ret != 0)
     {
         printf("Failed to register CMD_GET_BRIGHTNESS\n");

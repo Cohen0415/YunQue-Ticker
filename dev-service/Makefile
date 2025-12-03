@@ -1,6 +1,10 @@
 # 编译器设置
-CC      = arm-linux-gnueabi-gcc
-CFLAGS  = -I./include -Wall -Wextra -O2
+CC		= gcc
+#CC      = arm-linux-gnueabi-gcc
+CFLAGS  = -Wall -Wextra -O2 \
+          -I./include \
+		  -I./utils/linked_list \
+
 LDFLAGS = 
 
 # 目录设置
@@ -12,7 +16,7 @@ SRCS = \
     main.c \
     $(wildcard core/*.c) \
     $(wildcard modules/*/*.c) \
-    $(wildcard utils/*.c) \
+    $(wildcard utils/*/*.c) \
     $(wildcard third_party/*/*.c)
 
 # 根据源文件生成对应的目标文件路径 build/xxx.o

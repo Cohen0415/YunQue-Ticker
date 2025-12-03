@@ -1,16 +1,98 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "cmd_register.h"
+#include "linked_list.h"
 
-int register_command(const char *cmd_name, int (*handler)(char *value))
+static ll_list_t *command_list = NULL;
+
+int command_init()
 {
-    if (cmd_name == NULL || handler == NULL) 
+    command_list = ll_create();
+    if (command_list == NULL)
     {
-        return -1; // Return error if command name or handler is NULL
+        return -1; // Return error if linked list creation fails
     }
 
-    printf("Registered command: %s\n", cmd_name);
+    return 0;
+}
+
+int command_register(command_t *cmd)
+{
+    if (cmd == NULL || command_list == NULL) 
+    {
+        return -1; // Return error if command is NULL or command list is not initialized
+    }
+
+    // Allocate memory for command name and copy it
+    char *cmd_name_copy = strdup(cmd->name);
+    if (cmd_name_copy == NULL) 
+    {
+        return -1; // Return error if memory allocation fails
+    }
+
+    // Allocate memory for command structure
+    command_t *new_cmd = (command_t *)malloc(sizeof(command_t));
+    if (new_cmd == NULL) 
+    {
+        free(cmd_name_copy);
+        return -1; // Return error if memory allocation fails
+    }
+
+    new_cmd->name = cmd_name_copy;
+    new_cmd->handler = cmd->handler;
+
+    // Add the new command to the linked list
+    if (ll_add(command_list, (void *)new_cmd) != 0) 
+    {
+        free((void *)new_cmd->name);
+        free(new_cmd);
+        return -1; // Return error if adding to linked list fails
+    }
+
+    printf("Registered command: %s\n", new_cmd->name);
 
     return 0; // Return 0 on success
+}
+
+void command_free_all()
+{
+    if (command_list == NULL) 
+    {
+        return; // Nothing to free
+    }
+
+    ll_node_t *current = command_list->head;
+    while (current != NULL) 
+    {
+        command_t *cmd = (command_t *)current->data;
+        if (cmd != NULL) 
+        {
+            free((void *)cmd->name); // Free command name
+            free(cmd);               // Free command structure
+        }
+        current = current->next;
+    }
+
+    ll_free(command_list); // Free the linked list itself
+    command_list = NULL;   // Set to NULL after freeing
+}
+
+void command_print_list()
+{
+    if (command_list == NULL) 
+    {
+        printf("Command list is not initialized.\n");
+        return;
+    }
+
+    ll_node_t *current = command_list->head;
+    printf("Registered commands:\n");
+    while (current != NULL) 
+    {
+        command_t *cmd = (command_t *)current->data;
+        printf(" - %s\n", cmd->name);
+        current = current->next;
+    }
 }

@@ -19,9 +19,19 @@ int commands_register()
 }
 
 int main(int argc, char *argv[])
-{    
+{
+    // initialize command system
+    if (command_init() != 0)
+    {
+        printf("Failed to initialize command system\n");
+        return -1;
+    }
+
     // register commands
     commands_register();
+
+    // print registered commands
+    command_print_list();
 
     return 0;
 }

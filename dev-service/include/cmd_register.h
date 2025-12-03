@@ -1,6 +1,14 @@
 #ifndef CMD_REGISTER_H
 #define CMD_REGISTER_H
 
-int register_command(const char *cmd_name, int (*handler)(char *value));
+typedef struct command {
+    const char *name;
+    int (*handler)(char *value);
+} command_t;
+
+int command_register(command_t *cmd);
+void command_free_all(void);
+int command_init(void);
+void command_print_list(void);
 
 #endif // CMD_REGISTER_H
