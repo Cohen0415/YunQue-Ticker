@@ -1,0 +1,2 @@
+#! /bin/sh
+exec '/home/cohen/platform/t113/xiaozhi/tina5.0-v1.2/out/t113/xiaozhi/buildroot/buildroot/host/bin/bison' -y "$@"

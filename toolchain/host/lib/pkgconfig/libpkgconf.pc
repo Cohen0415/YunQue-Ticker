@@ -1,0 +1,11 @@
+prefix=/home/cohen/platform/t113/xiaozhi/tina5.0-v1.2/out/t113/xiaozhi/buildroot/buildroot/host
+exec_prefix=${prefix}
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib
+
+Name: libpkgconf
+Description: a library for accessing and manipulating development framework configuration
+URL: http://github.com/pkgconf/pkgconf
+Version: 1.5.3
+CFlags: -I${includedir}/pkgconf
+Libs: -L${libdir} -lpkgconf

@@ -1,0 +1,9 @@
+prefix='/home/cohen/platform/t113/xiaozhi/tina5.0-v1.2/out/t113/xiaozhi/buildroot/buildroot/host'
+exec_prefix="${prefix}"
+datarootdir="${prefix}/share"
+datadir="${datarootdir}"
+docdir="${datarootdir}/doc/gettext"
+ACLOCALDIR="${datadir}/aclocal"
+GETTEXTSRCDIR="${datarootdir}/gettext"
+GETTEXTSRCPODIR="${datarootdir}/gettext/po"
+EXAMPLESCONFIGDIR="${datarootdir}/doc/gettext/examples/config"

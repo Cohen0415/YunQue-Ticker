@@ -1,0 +1,36 @@
+#!/bin/sh
+
+prefix="/usr"
+exec_prefix="/usr"
+VERSION="1.7.0"
+CFLAGS="-Wunused-function -Wstrict-prototypes -Wwrite-strings -W -Wall -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64  -Os  "
+CPPFLAGS="-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64  -I/home/cohen/platform/t113/xiaozhi/tina5.0-v1.2/out/t113/xiaozhi/buildroot/buildroot/host/arm-buildroot-linux-gnueabi/sysroot/usr/include "
+LDFLAGS="  -L/home/cohen/platform/t113/xiaozhi/tina5.0-v1.2/out/t113/xiaozhi/buildroot/buildroot/host/arm-buildroot-linux-gnueabi/sysroot/usr/lib "
+LIBS="  -lcrypto"
+LIBDIR="${exec_prefix}/lib"
+INCLUDEDIR="${prefix}/include"
+LIBVERSION="2:0:0"
+
+for arg in $@
+do
+    if [ $arg = "--cflags" ]
+    then
+        echo "-I${INCLUDEDIR}"
+    fi
+    if [ $arg = "--libs" ]
+    then
+        echo "${LDFLAGS} -L${LIBDIR} ${LIBS} -lldns"
+    fi
+    if [ $arg = "-h" ] || [ $arg = "--help" ]
+    then
+        echo "Usage: $0 [--cflags] [--libs] [--version]"
+    fi
+    if [ $arg = "--version" ]
+    then
+        echo "${VERSION}"
+    fi
+    if [ $arg = "--libversion" ]
+    then
+        echo "${LIBVERSION}"
+    fi
+done
