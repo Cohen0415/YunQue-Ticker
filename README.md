@@ -44,4 +44,4 @@
 * 自动重启 / 看门狗
 
 # 项目框架图
-![alt text](share/frame.png)
+略
