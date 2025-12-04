@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "log.h"
+#include "cJSON.h"
 
 // core includes
 #include "cmd_register.h"
@@ -24,12 +25,36 @@ int commands_register()
 
 void on_msg(int client_fd, char **data, int len)
 {
-    LOGD("recv(%d bytes): %.*s\n", len, len, *data);
+    char *str = *data;
+    LOGD("recv(%d bytes): %.*s\n", len, len, str);
 
-    // change data to "ack"
-    *data = malloc(4);
-    snprintf(*data, 4, "ack"); 
-    len = 3;
+    /* parse JSON */
+    cJSON *root = cJSON_Parse(str);
+    if (!root)
+    {
+        LOGE("JSON parse failed");
+        return;
+    }
+
+    /* get cmd string */
+    cJSON *cmd_json = cJSON_GetObjectItem(root, "cmd");
+    if (!cJSON_IsString(cmd_json))
+    {
+        LOGE("Invalid or missing cmd field");
+        cJSON_Delete(root);
+        return;
+    }
+
+    const char *cmd_name = cmd_json->valuestring;
+
+    /* find the cmd */
+    command_t *cmd = command_find(cmd_name);
+    if (cmd)
+        LOGI("Found command: %s", cmd->name);
+    else
+        LOGW("Command not registered: %s", cmd_name);
+
+    cJSON_Delete(root);
 }
 
 int main(int argc, char *argv[])
