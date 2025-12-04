@@ -1,2 +1,12 @@
+# Ignore build directory
 build/
+
+#  Ignore all object files
+*.o
+*.obj
+client
 dev-service
+
+# Ignore log files and databases
+*.log
+*.db
