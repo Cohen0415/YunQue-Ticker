@@ -13,7 +13,7 @@ int command_init()
     command_list = ll_create();
     if (command_list == NULL)
     {
-        LOGE("Failed to create command list\n");
+        LOGE("Failed to create command list");
         return -1; // Return error if linked list creation fails
     }
 
@@ -24,7 +24,7 @@ int command_register(command_t *cmd)
 {
     if (cmd == NULL || command_list == NULL) 
     {
-        LOGE("Invalid command or command list not initialized\n");
+        LOGE("Invalid command or command list not initialized");
         return -1; // Return error if command is NULL or command list is not initialized
     }
 
@@ -32,7 +32,7 @@ int command_register(command_t *cmd)
     char *cmd_name_copy = strdup(cmd->name);
     if (cmd_name_copy == NULL) 
     {
-        LOGE("Failed to allocate memory for command name\n");
+        LOGE("Failed to allocate memory for command name");
         return -1; // Return error if memory allocation fails
     }
 
@@ -41,7 +41,7 @@ int command_register(command_t *cmd)
     if (new_cmd == NULL) 
     {
         free(cmd_name_copy);
-        LOGE("Failed to allocate memory for command structure\n");
+        LOGE("Failed to allocate memory for command structure");
         return -1; // Return error if memory allocation fails
     }
 
@@ -53,11 +53,11 @@ int command_register(command_t *cmd)
     {
         free((void *)new_cmd->name);
         free(new_cmd);
-        LOGE("Failed to add command to the command list\n");
+        LOGE("Failed to add command to the command list");
         return -1; // Return error if adding to linked list fails
     }
 
-    LOGI("Registered command: %s\n", new_cmd->name);
+    LOGI("Registered command: %s", new_cmd->name);
 
     return 0; // Return 0 on success
 }
@@ -89,7 +89,7 @@ void command_print_list()
 {
     if (command_list == NULL) 
     {
-        LOGE("Command list is not initialized.\n");
+        LOGE("Command list is not initialized.");
         return;
     }
 

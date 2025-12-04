@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
         printf("Failed to initialize logging system\n");
         return -1;
     }
-    LOGI("Logging system initialized\n");
+    LOGI("Logging system initialized");
     
     // initialize command system
     if (command_init() != 0)
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
         printf("Failed to initialize command system\n");
         return -1;
     }
-    LOGI("Command system initialized\n");
+    LOGI("Command system initialized");
 
     // initialize uds rpc server
     if (rpc_server_init_uds("/tmp/dev.sock") != 0)
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
         printf("Failed to initialize RPC server\n");
         return -1;
     }
-    LOGI("RPC server initialized\n");
+    LOGI("RPC server initialized");
 
     // register commands
     commands_register();

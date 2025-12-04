@@ -123,7 +123,7 @@ static void *send_thread(void *arg)
         if(!msg) 
             continue;
 
-        LOGD("send response to client_fd=%d: %s\n", msg->client_fd, msg->data);
+        LOGD("send response to client_fd=%d: %s", msg->client_fd, msg->data);
         write(msg->client_fd, msg->data, strlen(msg->data));
         close(msg->client_fd);
         free(msg->data);
@@ -139,7 +139,7 @@ int rpc_server_init_uds(const char *path)
     g_listen_fd = socket(AF_UNIX, SOCK_STREAM, 0);
     if(g_listen_fd < 0) 
     {
-        LOGE("socket error: %s\n", strerror(errno));
+        LOGE("socket error: %s", strerror(errno));
         return -1;
     }
 
@@ -150,12 +150,12 @@ int rpc_server_init_uds(const char *path)
 
     if(bind(g_listen_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) 
     {
-        LOGE("bind error: %s\n", strerror(errno));
+        LOGE("bind error: %s", strerror(errno));
         return -1;
     }
     if(listen(g_listen_fd, 8) < 0) 
     {
-        LOGE("listen error: %s\n", strerror(errno));
+        LOGE("listen error: %s", strerror(errno));
         return -1;
     }
 
