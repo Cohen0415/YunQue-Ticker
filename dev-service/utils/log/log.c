@@ -44,7 +44,7 @@ void log_close(void)
     }
 }
 
-void log_print(log_level_t level, const char *file, int line, const char *fmt, ...)
+void log_print(log_level_t level, const char *file, int line, const char *func, const char *fmt, ...)
 {
     if(level < LOG_DEBUG || level > LOG_ERROR) 
         return;
@@ -58,15 +58,15 @@ void log_print(log_level_t level, const char *file, int line, const char *fmt, .
     va_list args;
     va_start(args, fmt);
 
-    // 先打印到终端（带颜色）
-    printf("%s[%s] [%s] [%s:%d] ", level_color[level], time_buf, level_str[level], file, line);
+    // 打印到终端（带颜色）
+    printf("%s[%s] [%s] [%s:%d:%s] ", level_color[level], time_buf, level_str[level], file, line, func);
     vprintf(fmt, args);
     printf("\033[0m\n"); // 重置颜色
 
     // 打印到文件（不带颜色）
     if(log_fp) 
     {
-        fprintf(log_fp, "[%s] [%s] [%s:%d] ", time_buf, level_str[level], file, line);
+        fprintf(log_fp, "[%s] [%s] [%s:%d:%s] ", time_buf, level_str[level], file, line, func);
         va_list args_copy;
         va_copy(args_copy, args);
         vfprintf(log_fp, fmt, args_copy);
@@ -77,3 +77,4 @@ void log_print(log_level_t level, const char *file, int line, const char *fmt, .
 
     va_end(args);
 }
+
