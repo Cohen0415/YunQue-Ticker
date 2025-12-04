@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "log.h"
 
 // core includes
@@ -20,11 +22,14 @@ int commands_register()
     return ret;
 }
 
-void on_msg(int client_fd, const char *data, int len)
+void on_msg(int client_fd, char **data, int len)
 {
-    LOGD("recv(%d bytes): %.*s\n", len, len, data);
+    LOGD("recv(%d bytes): %.*s\n", len, len, *data);
 
-    rpc_server_send_response(client_fd, "OK");
+    // change data to "ack"
+    *data = malloc(4);
+    snprintf(*data, 4, "ack"); 
+    len = 3;
 }
 
 int main(int argc, char *argv[])
