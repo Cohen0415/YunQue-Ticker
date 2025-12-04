@@ -3,7 +3,7 @@
 
 typedef struct command {
     const char *name;
-    int (*handler)(char *value);
+    int (*handler)(const char *request, char **response);
 } command_t;
 
 int command_register(command_t *cmd);

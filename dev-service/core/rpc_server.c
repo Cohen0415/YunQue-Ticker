@@ -19,7 +19,8 @@ static queue_t *send_queue = NULL;
 
 typedef struct {
     int client_fd;
-    char *data;
+    char *request;
+    char *response;
 } rpc_msg_t;
 
 static char *read_all(int fd, int *out_len)
@@ -58,6 +59,7 @@ static char *read_all(int fd, int *out_len)
         }
     }
 
+    buf[len] = '\0';
     *out_len = len;
     return buf;
 }
@@ -70,7 +72,8 @@ static void *recv_thread(void *arg)
     while(g_running)
     {
         int client_fd = accept(g_listen_fd, NULL, NULL);
-        if(client_fd < 0) continue;
+        if(client_fd < 0) 
+            continue;
 
         int len = 0;
         char *data = read_all(client_fd, &len);
@@ -78,7 +81,8 @@ static void *recv_thread(void *arg)
         {
             rpc_msg_t *msg = malloc(sizeof(rpc_msg_t));
             msg->client_fd = client_fd;
-            msg->data = data;
+            msg->request = data;
+            msg->response = NULL;
             queue_push(recv_queue, msg); // 放到接收队列
         } 
         else 
@@ -102,11 +106,9 @@ static void *process_thread(void *arg)
             continue;
 
         // 执行回调
-        cb(msg->client_fd, &(msg->data), strlen(msg->data));
+        cb(msg->client_fd, msg->request, &(msg->response), strlen(msg->request));
 
-        // 处理完的数据直接入发送队列（这里可包装成响应）
         queue_push(send_queue, msg); 
-        // 注意：发送后释放 msg 以及 msg->data 在发送线程完成
     }
 
     return NULL;
@@ -123,10 +125,11 @@ static void *send_thread(void *arg)
         if(!msg) 
             continue;
 
-        LOGD("send response to client_fd=%d: %s", msg->client_fd, msg->data);
-        write(msg->client_fd, msg->data, strlen(msg->data));
+        LOGD("send response to client_fd=%d: %s", msg->client_fd, msg->response);
+        write(msg->client_fd, msg->response, strlen(msg->response));
         close(msg->client_fd);
-        free(msg->data);
+        free(msg->request);
+        free(msg->response);
         free(msg);
     }
 

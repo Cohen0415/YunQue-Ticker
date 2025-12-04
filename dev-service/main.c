@@ -23,13 +23,12 @@ int commands_register()
     return ret;
 }
 
-void on_msg(int client_fd, char **data, int len)
+void on_msg(int client_fd, const char *request, char **response, int len)
 {
-    char *str = *data;
-    LOGD("recv(%d bytes): %.*s\n", len, len, str);
+    LOGD("recv(%d bytes): %s", len, request);
 
     /* parse JSON */
-    cJSON *root = cJSON_Parse(str);
+    cJSON *root = cJSON_Parse(request);
     if (!root)
     {
         LOGE("JSON parse failed");
@@ -53,6 +52,18 @@ void on_msg(int client_fd, char **data, int len)
         LOGI("Found command: %s", cmd->name);
     else
         LOGW("Command not registered: %s", cmd_name);
+
+    /* execute modules function */
+    int ret = -1;
+    if (cmd && cmd->handler)
+    {
+        ret = cmd->handler(request, response);
+        LOGI("Command %s executed with return code: %d", cmd_name, ret);
+    }
+    else
+    {
+        LOGW("No handler for command: %s", cmd_name);
+    }
 
     cJSON_Delete(root);
 }
