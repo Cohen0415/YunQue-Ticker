@@ -10,5 +10,6 @@ int command_register(command_t *cmd);
 void command_free_all(void);
 int command_init(void);
 void command_print_list(void);
+command_t *command_find(const char *name);
 
 #endif // CMD_REGISTER_H

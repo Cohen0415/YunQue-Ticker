@@ -102,3 +102,24 @@ void command_print_list()
         current = current->next;
     }
 }
+
+command_t *command_find(const char *name)
+{
+    if (command_list == NULL || name == NULL) 
+    {
+        return NULL; // Command list not initialized or name is NULL
+    }
+
+    ll_node_t *current = command_list->head;
+    while (current != NULL) 
+    {
+        command_t *cmd = (command_t *)current->data;
+        if (strcmp(cmd->name, name) == 0) 
+        {
+            return cmd; // Found the command
+        }
+        current = current->next;
+    }
+
+    return NULL; // Command not found
+}
