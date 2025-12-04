@@ -4,6 +4,7 @@
 
 #include "cmd_register.h"
 #include "linked_list.h"
+#include "log.h"
 
 static ll_list_t *command_list = NULL;
 
@@ -12,6 +13,7 @@ int command_init()
     command_list = ll_create();
     if (command_list == NULL)
     {
+        LOGE("Failed to create command list\n");
         return -1; // Return error if linked list creation fails
     }
 
@@ -22,6 +24,7 @@ int command_register(command_t *cmd)
 {
     if (cmd == NULL || command_list == NULL) 
     {
+        LOGE("Invalid command or command list not initialized\n");
         return -1; // Return error if command is NULL or command list is not initialized
     }
 
@@ -29,6 +32,7 @@ int command_register(command_t *cmd)
     char *cmd_name_copy = strdup(cmd->name);
     if (cmd_name_copy == NULL) 
     {
+        LOGE("Failed to allocate memory for command name\n");
         return -1; // Return error if memory allocation fails
     }
 
@@ -37,6 +41,7 @@ int command_register(command_t *cmd)
     if (new_cmd == NULL) 
     {
         free(cmd_name_copy);
+        LOGE("Failed to allocate memory for command structure\n");
         return -1; // Return error if memory allocation fails
     }
 
@@ -48,6 +53,7 @@ int command_register(command_t *cmd)
     {
         free((void *)new_cmd->name);
         free(new_cmd);
+        LOGE("Failed to add command to the command list\n");
         return -1; // Return error if adding to linked list fails
     }
 
