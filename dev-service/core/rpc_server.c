@@ -1,4 +1,6 @@
 #include "rpc_server.h"
+#include "log.h"
+
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
@@ -55,7 +57,10 @@ int rpc_server_init_uds(const char *path)
     unlink(path);
     g_listen_fd = socket(AF_UNIX, SOCK_STREAM, 0);
     if(g_listen_fd < 0) 
+    {
+        LOGE("socket error: %s\n", strerror(errno));
         return -1;
+    }
 
     struct sockaddr_un addr;
     memset(&addr, 0, sizeof(addr));
@@ -64,12 +69,12 @@ int rpc_server_init_uds(const char *path)
 
     if(bind(g_listen_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) 
     {
-        printf("bind error: %s\n", strerror(errno));
+        LOGE("bind error: %s\n", strerror(errno));
         return -1;
     }
     if(listen(g_listen_fd, 8) < 0) 
     {
-        printf("listen error: %s\n", strerror(errno));
+        LOGE("listen error: %s\n", strerror(errno));
         return -1;
     }
 
@@ -114,7 +119,7 @@ int rpc_server_send_response(int client_fd, const char *data)
 {
     if (!data)
     {
-        printf("rpc_server_send_response: data is NULL\n");
+        LOGE("rpc_server_send_response: data is NULL\n");
         return -1;
     }
 
