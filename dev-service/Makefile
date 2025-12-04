@@ -6,7 +6,8 @@ CFLAGS  = -Wall -Wextra -O2 \
 		  -I./core \
 		  -I./utils/linked_list \
 		  -I./utils/log \
-		  -I./utils/queue 
+		  -I./utils/queue \
+		  -I./third_party/cJSON
 LDFLAGS = -lpthread
 
 # 目录设置
