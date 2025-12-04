@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include "log.h"
 
 // core includes
 #include "cmd_register.h"
+#include "rpc_server.h"
 
 // module includes
 #include "modules/backlight/backlight.h"
@@ -20,20 +22,28 @@ int commands_register()
 
 void on_msg(int client_fd, const char *data, int len)
 {
-    printf("recv(%d bytes): %.*s\n", len, len, data);
+    LOGD("recv(%d bytes): %.*s\n", len, len, data);
 
-    // 先做简单回显
     rpc_server_send_response(client_fd, "OK");
 }
 
 int main(int argc, char *argv[])
 {
+    // initialize logging system
+    if (log_init("dev-service.log") != 0)
+    {
+        printf("Failed to initialize logging system\n");
+        return -1;
+    }
+    LOGI("Logging system initialized\n");
+    
     // initialize command system
     if (command_init() != 0)
     {
         printf("Failed to initialize command system\n");
         return -1;
     }
+    LOGI("Command system initialized\n");
 
     // initialize uds rpc server
     if (rpc_server_init_uds("/tmp/dev.sock") != 0)
@@ -41,15 +51,16 @@ int main(int argc, char *argv[])
         printf("Failed to initialize RPC server\n");
         return -1;
     }
+    LOGI("RPC server initialized\n");
 
     // register commands
     commands_register();
 
-    // print registered commands
-    command_print_list();
-
     // run rpc server
     rpc_server_run(on_msg);
+
+    // log close
+    log_close();
 
     return 0;
 }
