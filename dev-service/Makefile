@@ -5,7 +5,8 @@ CFLAGS  = -Wall -Wextra -O2 \
           -I./include \
 		  -I./core \
 		  -I./utils/linked_list \
-		  -I./utils/log 
+		  -I./utils/log \
+		  -I./utils/queue 
 LDFLAGS = 
 
 # 目录设置
