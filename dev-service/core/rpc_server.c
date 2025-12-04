@@ -36,7 +36,7 @@ static char *read_all(int fd, int *out_len)
             }
         }
         else if(n == 0) 
-            break;       // 读完
+            break;       
         else if(errno == EINTR) 
             continue;
         else 
@@ -63,9 +63,15 @@ int rpc_server_init_uds(const char *path)
     strncpy(addr.sun_path, path, sizeof(addr.sun_path)-1);
 
     if(bind(g_listen_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) 
+    {
+        printf("bind error: %s\n", strerror(errno));
         return -1;
+    }
     if(listen(g_listen_fd, 8) < 0) 
+    {
+        printf("listen error: %s\n", strerror(errno));
         return -1;
+    }
 
     g_running = 1;
     return 0;
@@ -86,7 +92,7 @@ void rpc_server_run(rpc_on_message_cb cb)
         char *data = read_all(client_fd, &len);
         if(data && len > 0)
         {
-            cb(client_fd, data, len); // 重点：传回 client_fd
+            cb(client_fd, data, len);
             free(data);
         }
 
@@ -106,7 +112,11 @@ void rpc_server_stop(void)
 
 int rpc_server_send_response(int client_fd, const char *data)
 {
-    if (!data) return -1;
+    if (!data)
+    {
+        printf("rpc_server_send_response: data is NULL\n");
+        return -1;
+    }
 
     int sent = write(client_fd, data, strlen(data));
     return sent;
