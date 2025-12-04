@@ -1,9 +1,10 @@
+#include "cmd_register.h"
+#include "backlight.h"
+#include "log.h"
+
 #include <stdio.h>     
 #include <stdlib.h>     
 #include <string.h>
-
-#include "cmd_register.h"
-#include "backlight.h"
 
 static int write_int(const char *path, int value)
 {
@@ -55,7 +56,6 @@ static int backlight_get(char *value)
     return 0;
 }
 
-
 int backlight_cmd_register(void)
 {
     int ret;
@@ -71,14 +71,14 @@ int backlight_cmd_register(void)
     ret = command_register(&cmd_set_brightness);
     if (ret != 0) 
     {
-        printf("Failed to register CMD_SET_BRIGHTNESS\n");
+        LOGE("Failed to register CMD_SET_BRIGHTNESS\n");
         return -1;
     }
 
     ret = command_register(&cmd_get_brightness);
     if (ret != 0)
     {
-        printf("Failed to register CMD_GET_BRIGHTNESS\n");
+        LOGE("Failed to register CMD_GET_BRIGHTNESS\n");
         return -1;
     }
 
