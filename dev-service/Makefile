@@ -7,7 +7,7 @@ CFLAGS  = -Wall -Wextra -O2 \
 		  -I./utils/linked_list \
 		  -I./utils/log \
 		  -I./utils/queue 
-LDFLAGS = 
+LDFLAGS = -lpthread
 
 # 目录设置
 BUILD_DIR   = build
