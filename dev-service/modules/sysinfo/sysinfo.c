@@ -2,6 +2,7 @@
 #include "cJSON.h"
 #include "log.h"
 #include "cmd_register.h"
+#include "rpc_server.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,7 +38,7 @@ static int sysinfo_get_cpu_temp(void)
     return temp;   // 示例返回 45493
 }
 
-static int rpc_sysinfo_get_bjtime(cJSON *params, char **data_json) 
+static rpc_result_t rpc_sysinfo_get_bjtime(cJSON *params)
 {   
     // 请求
     /* 
@@ -54,26 +55,32 @@ static int rpc_sysinfo_get_bjtime(cJSON *params, char **data_json)
     | - time：string；ISO 8601 标准格式
     */
 
+    rpc_result_t res = { 
+        .status = -1, 
+        .msg = "get Beijing time failed, inspect log for details", 
+        .data_json = NULL 
+    };
+
     char time_buf[32];
-    int ret = sysinfo_get_bjtime(time_buf, sizeof(time_buf));
-    if (ret != 0)
+    if (sysinfo_get_bjtime(time_buf, sizeof(time_buf)) != 0)
     {
         LOGE("Failed to get Beijing time");
-        return -1;  // rpc层会自动构造错误返回
+        return res;
     }
-    LOGI("Beijing time: %s", time_buf);
+    LOGI("Beijing Time: %s", time_buf);
 
     cJSON *data = cJSON_CreateObject();
-
     cJSON_AddStringToObject(data, "time", time_buf);
-    *data_json = cJSON_PrintUnformatted(data);
+
+    res.status = 0;
+    res.msg = "ok";
+    res.data_json = cJSON_PrintUnformatted(data);
 
     cJSON_Delete(data);
-
-    return 0;
+    return res;
 }
 
-static int rpc_sysinfo_get_cpu_temp(cJSON *params, char **data_json) 
+static rpc_result_t rpc_sysinfo_get_cpu_temp(cJSON *params)
 {
     // 请求
     /* 
@@ -90,19 +97,29 @@ static int rpc_sysinfo_get_cpu_temp(cJSON *params, char **data_json)
     | - temp：int；45493；除100就是当前温度，例如45.493℃
     */
 
+    rpc_result_t res = { 
+        .status = -1, 
+        .msg = "get CPU temperature failed, inspect log for details", 
+        .data_json = NULL 
+    };
+
     int temp = sysinfo_get_cpu_temp();
-    if (temp < 0) 
+    if (temp < 0)
     {
         LOGE("Failed to get CPU temperature");
-        return -1;  // rpc层会自动构造错误返回
+        return res;
     }
     LOGI("CPU Temperature: %d", temp);
 
     cJSON *data = cJSON_CreateObject();
     cJSON_AddNumberToObject(data, "temp", temp);
-    *data_json = cJSON_PrintUnformatted(data);
+    
+    res.status = 0;
+    res.msg = "ok";
+    res.data_json = cJSON_PrintUnformatted(data);
+
     cJSON_Delete(data);
-    return 0;
+    return res;
 }
 
 int sysinfo_cmd_register()

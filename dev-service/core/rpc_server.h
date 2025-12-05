@@ -1,6 +1,14 @@
 #ifndef RPC_SERVER_H
 #define RPC_SERVER_H
 
+#include "cJSON.h"
+
+typedef struct {
+    int status;
+    char *msg;
+    char *data_json;
+} rpc_result_t;
+
 typedef int (*rpc_on_message_cb)(const char *request, int request_len, char **response);
 
 int rpc_server_init_uds(const char *path);

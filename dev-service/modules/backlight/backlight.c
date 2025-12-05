@@ -3,6 +3,7 @@
 #include "log.h"
 #include "cJSON.h"
 #include "cmd_table.h"
+#include "rpc_server.h"
 
 #include <stdio.h>     
 #include <stdlib.h>     
@@ -38,7 +39,7 @@ static int backlight_get(const char *path)
     return v;
 }
 
-static int rpc_backlight_set(cJSON *params, char **data_json) 
+static rpc_result_t rpc_backlight_set(cJSON *params) 
 {   
     // 请求
     /* 
@@ -55,26 +56,42 @@ static int rpc_backlight_set(cJSON *params, char **data_json)
     | - NULL
     */
 
-    cJSON *v = cJSON_GetObjectItem(params, "value");
-    if (!cJSON_IsNumber(v))
-        return -1;  // rpc层会自动构造错误返回
+    rpc_result_t res = { 
+        .status = -1, 
+        .msg = "read brightness failed, inspect log for details", 
+        .data_json = NULL 
+    };
 
-    int level = v->valueint;
-    if (level < 0 || level > 255) 
+    cJSON *value_item = cJSON_GetObjectItem(params, "value");
+    if (!cJSON_IsNumber(value_item)) 
     {
-        LOGE("Brightness value out of range (0-255)");
-        return -1;
+        LOGE("Invalid or missing 'value' parameter");
+        res.msg = "value parameter missing or invalid";
+        return res;
     }
 
-    /* set level */
-    int ret = backlight_set(BRIGHTNESS_PATH, level);
-    LOGD("Set brightness to %d, ret=%d", level, ret);
+    int value = value_item->valueint;
+    if (value < 0 || value > 255) 
+    {
+        LOGE("'value' parameter out of range: %d", value);
+        res.msg = "value parameter out of range (0-255)";
+        return res;
+    }
+    LOGI("Setting brightness to %d", value);
 
-    *data_json = strdup("{}"); 
-    return ret;
+    int ret = backlight_set(BRIGHTNESS_PATH, value);
+    if (ret != 0) 
+    {
+        LOGE("Failed to set brightness value");
+        return res;
+    }
+
+    res.status = 0;
+    res.msg = "ok";
+    return res;
 }
 
-static int rpc_backlight_get(cJSON *params, char **data_json)  
+static rpc_result_t rpc_backlight_get(cJSON *params)  
 {
     // 请求
     /* 
@@ -91,19 +108,28 @@ static int rpc_backlight_get(cJSON *params, char **data_json)
     | - value：int；0~255；当前亮度值
     */
 
+    rpc_result_t res = { 
+        .status = -1, 
+        .msg = "read brightness failed, inspect log for details", 
+        .data_json = NULL 
+    };
+
     int ret = backlight_get(BRIGHTNESS_PATH);
-    if (ret < 0)
+    if (ret < 0) 
     {
         LOGE("Failed to read brightness value");
-        return -1;  // rpc层会自动构造错误返回
+        return res; 
     }
 
     cJSON *data = cJSON_CreateObject();
     cJSON_AddNumberToObject(data, "value", ret);
 
-    *data_json = cJSON_PrintUnformatted(data);
+    res.status = 0;
+    res.msg = "ok";
+    res.data_json = cJSON_PrintUnformatted(data);
+
     cJSON_Delete(data);
-    return 0;
+    return res;
 }
 
 int backlight_cmd_register(void)

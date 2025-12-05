@@ -57,15 +57,17 @@ int rpc_on_msg(const char *request, int request_len, char **response)
     }
     LOGI("Found command: %s", c->name);
 
-    char *data_json = NULL;
-    int ret = c->handler(params, &data_json);
+    rpc_result_t res = c->handler(params);
+    const char *msg = res.msg ? res.msg : (res.status==0 ? "ok" : "fail");
 
-    int status = (ret == 0 ? 0 : ret);
-    rpc_make_response(status, status==0?"ok":"fail", data_json, response);
+    rpc_make_response(res.status, msg, res.data_json, response);
 
-    free(data_json);
+    if (res.data_json) 
+        free(res.data_json);
+        
     cJSON_Delete(root);
-    return status;
+
+    return res.status;
 }
 
 int main(int argc, char *argv[])

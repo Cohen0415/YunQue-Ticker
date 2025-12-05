@@ -2,10 +2,11 @@
 #define CMD_REGISTER_H
 
 #include "cJSON.h"
+#include "rpc_server.h"
 
 typedef struct command {
     const char *name;
-    int (*handler)(cJSON *params, char **data_json);
+    rpc_result_t (*handler)(cJSON *params);
 } command_t;
 
 int command_register(command_t *cmd);
