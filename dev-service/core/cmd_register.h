@@ -1,9 +1,11 @@
 #ifndef CMD_REGISTER_H
 #define CMD_REGISTER_H
 
+#include "cJSON.h"
+
 typedef struct command {
     const char *name;
-    int (*handler)(const char *request, char **response);
+    int (*handler)(cJSON *params, char **data_json);
 } command_t;
 
 int command_register(command_t *cmd);

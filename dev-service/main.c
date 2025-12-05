@@ -23,49 +23,45 @@ int commands_register()
     return ret;
 }
 
-void on_msg(int client_fd, const char *request, char **response, int len)
+int rpc_on_msg(const char *request, int request_len, char **response)
 {
-    LOGD("recv(%d bytes): %s", len, request);
+    LOGD("recv(%d bytes): %s", request_len, request);
 
     /* parse JSON */
     cJSON *root = cJSON_Parse(request);
     if (!root)
     {
         LOGE("JSON parse failed");
-        return;
+        return rpc_make_error(response, -1, "JSON parse error");
     }
 
-    /* get cmd string */
-    cJSON *cmd_json = cJSON_GetObjectItem(root, "cmd");
-    if (!cJSON_IsString(cmd_json))
+    cJSON *cmd = cJSON_GetObjectItem(root, "cmd");
+    cJSON *params = cJSON_GetObjectItem(root, "params");
+
+    if (!cJSON_IsString(cmd))
     {
         LOGE("Invalid or missing cmd field");
         cJSON_Delete(root);
-        return;
+        return rpc_make_error(response, -2, "cmd missing or invalid");
     }
 
-    const char *cmd_name = cmd_json->valuestring;
-
-    /* find the cmd */
-    command_t *cmd = command_find(cmd_name);
-    if (cmd)
-        LOGI("Found command: %s", cmd->name);
-    else
-        LOGW("Command not registered: %s", cmd_name);
-
-    /* execute modules function */
-    int ret = -1;
-    if (cmd && cmd->handler)
+    command_t *c = command_find(cmd->valuestring);
+    if (!c) 
     {
-        ret = cmd->handler(request, response);
-        LOGI("Command %s executed with return code: %d", cmd_name, ret);
+        cJSON_Delete(root);
+        return rpc_make_error(response, -3, "unknown command");
     }
-    else
-    {
-        LOGW("No handler for command: %s", cmd_name);
-    }
+    LOGI("Found command: %s", c->name);
 
+    char *data_json = NULL;
+    int ret = c->handler(params, &data_json);
+
+    int status = (ret == 0 ? 0 : ret);
+    rpc_make_response(status, status==0?"ok":"fail", data_json, response);
+
+    free(data_json);
     cJSON_Delete(root);
+    return status;
 }
 
 int main(int argc, char *argv[])
@@ -98,7 +94,7 @@ int main(int argc, char *argv[])
     commands_register();
 
     // run rpc server
-    rpc_server_run(on_msg);
+    rpc_server_run(rpc_on_msg);
 
     // log close
     log_close();

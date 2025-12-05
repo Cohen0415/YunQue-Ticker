@@ -1,6 +1,7 @@
 #include "rpc_server.h"
 #include "log.h"
 #include "queue.h"
+#include "cJSON.h"
 
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -106,7 +107,7 @@ static void *process_thread(void *arg)
             continue;
 
         // 执行回调
-        cb(msg->client_fd, msg->request, &(msg->response), strlen(msg->request));
+        cb(msg->request, strlen(msg->request), &(msg->response));
 
         queue_push(send_queue, msg); 
     }
@@ -195,4 +196,34 @@ void rpc_server_stop(void)
         queue_destroy(recv_queue);
     if(send_queue) 
         queue_destroy(send_queue);
+}
+
+int rpc_make_response(int status, const char *msg, const char *data_json, char **resp)
+{
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddNumberToObject(root, "status", status);
+    cJSON_AddStringToObject(root, "msg", msg);
+
+    if (data_json) 
+    {
+        cJSON *data = cJSON_Parse(data_json);
+        if (data) 
+            cJSON_AddItemToObject(root, "data", data);
+        else      
+            cJSON_AddObjectToObject(root, "data");
+    } 
+    else 
+    {
+        cJSON_AddObjectToObject(root, "data");
+    }
+
+    *resp = cJSON_PrintUnformatted(root);
+    cJSON_Delete(root);
+
+    return 0;
+}
+
+int rpc_make_error(char **resp, int status, const char *msg)
+{
+    return rpc_make_response(status, msg, NULL, resp);
 }
