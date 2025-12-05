@@ -1,0 +1,9 @@
+#ifndef CMD_TABLE_H
+#define CMD_TABLE_H
+
+/* COMMAND LIST */
+/* BACKLIGHT */
+#define CMD_SET_BRIGHTNESS       "CMD_SET_BRIGHTNESS"
+#define CMD_GET_BRIGHTNESS       "CMD_GET_BRIGHTNESS"
+
+#endif // CMD_TABLE_H

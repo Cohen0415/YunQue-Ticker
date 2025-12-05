@@ -2,6 +2,7 @@
 #include "backlight.h"
 #include "log.h"
 #include "cJSON.h"
+#include "cmd_table.h"
 
 #include <stdio.h>     
 #include <stdlib.h>     
@@ -61,7 +62,7 @@ static int backlight_set(const char *request, char **response)
     }
 
     const char *cmd_name = cmd->valuestring;
-    if (strcmp(cmd_name, "CMD_SET_BRIGHTNESS") != 0) 
+    if (strcmp(cmd_name, CMD_SET_BRIGHTNESS) != 0) 
     {
         LOGE("Unexpected cmd name in backlight_set: %s", cmd_name);
         cJSON_Delete(root);
@@ -143,7 +144,7 @@ static int backlight_get(const char *request, char **response)
     }
 
     const char *cmd_name = cmd->valuestring;
-    if (strcmp(cmd_name, "CMD_GET_BRIGHTNESS") != 0) 
+    if (strcmp(cmd_name, CMD_GET_BRIGHTNESS) != 0) 
     {
         LOGE("Unexpected cmd name in backlight_get: %s", cmd_name);
         cJSON_Delete(root);     
@@ -178,23 +179,23 @@ int backlight_cmd_register(void)
 
     command_t cmd_set_brightness, cmd_get_brightness;
 
-    cmd_set_brightness.name = "CMD_SET_BRIGHTNESS";
+    cmd_set_brightness.name = CMD_SET_BRIGHTNESS;
     cmd_set_brightness.handler = backlight_set;
 
-    cmd_get_brightness.name = "CMD_GET_BRIGHTNESS";
+    cmd_get_brightness.name = CMD_GET_BRIGHTNESS;
     cmd_get_brightness.handler = backlight_get;
 
     ret = command_register(&cmd_set_brightness);
     if (ret != 0) 
     {
-        LOGE("Failed to register CMD_SET_BRIGHTNESS\n");
+        LOGE("Failed to register %s\n", CMD_SET_BRIGHTNESS);
         return -1;
     }
 
     ret = command_register(&cmd_get_brightness);
     if (ret != 0)
     {
-        LOGE("Failed to register CMD_GET_BRIGHTNESS\n");
+        LOGE("Failed to register %s\n", CMD_GET_BRIGHTNESS);
         return -1;
     }
 
