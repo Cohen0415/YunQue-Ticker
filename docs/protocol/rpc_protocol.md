@@ -120,3 +120,65 @@
   }
 }
 ```
+
+## 模块：Sysinfo（系统信息）
+
+### 获取北京时间（sysinfo.bjtime.get）
+
+```json
+// 请求
+/* 
+  cmd：string；sysinfo.bjtime.get；命令名称
+  params
+  | - NULL
+*/
+{
+  "cmd": "sysinfo.bjtime.get",
+  "params": {}
+}
+
+// 响应
+/* 
+  status：int；0 表示成功，其它表示失败
+  msg：string；提示信息
+  data
+  | - time：string；ISO 8601 标准格式
+*/
+{
+  "status": 0,
+  "msg": "ok",
+  "data": {
+    "time": "2025-12-05T09:26:25+08:00"
+  }
+}
+```
+
+### 获取 CPU 温度（sysinfo.temp.get）
+
+```json
+// 请求
+/* 
+  cmd：string；sysinfo.temp.get；命令名称
+  params
+  | - NULL
+*/
+{
+  "cmd": "sysinfo.temp.get",
+  "params": {}
+}
+
+// 响应
+/* 
+  status：int；0 表示成功，其它表示失败
+  msg：string；提示信息
+  data
+  | - temp：int；45493；除100就是当前温度，例如45.493℃
+*/
+{
+  "status": 0,
+  "msg": "ok",
+  "data": {
+    "temp": 45493
+  }
+}
+```
