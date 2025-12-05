@@ -40,9 +40,19 @@ static int backlight_get(const char *path)
 
 static int rpc_backlight_set(cJSON *params, char **data_json) 
 {   
-    /* Just need to construct the "data" data. */
-    /*
-        "data": {}
+    // 请求
+    /* 
+    cmd：string；brightness.set；命令名称
+    params
+    | - value：int；0~255；要设置的亮度值
+    */
+
+    // 响应
+    /* 
+    status：int；0 表示成功，其它表示失败
+    msg：string；提示信息
+    data
+    | - NULL
     */
 
     cJSON *v = cJSON_GetObjectItem(params, "value");
@@ -66,15 +76,22 @@ static int rpc_backlight_set(cJSON *params, char **data_json)
 
 static int rpc_backlight_get(cJSON *params, char **data_json)  
 {
-    /* Just need to construct the "data" data. */
-    /*
-        "data": {
-            "value": 200
-        }
+    // 请求
+    /* 
+    cmd：string；brightness.get；命令名称
+    params：
+    | - NULL
+    */
+
+    // 响应
+    /* 
+    status：int；0 表示成功，其它表示失败
+    msg：string；提示信息
+    data
+    | - value：int；0~255；当前亮度值
     */
 
     int ret = backlight_get(BRIGHTNESS_PATH);
-    //int ret = -1;
     if (ret < 0)
     {
         LOGE("Failed to read brightness value");
