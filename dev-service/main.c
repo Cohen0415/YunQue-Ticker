@@ -10,6 +10,7 @@
 
 // module includes
 #include "modules/backlight/backlight.h"
+#include "modules/sysinfo/sysinfo.h"
 
 int commands_register()
 {
@@ -17,6 +18,9 @@ int commands_register()
 
     // register backlight commands
     ret = backlight_cmd_register();
+    
+    // register sysinfo commands
+    ret = sysinfo_cmd_register();
 
     // add other command registrations here
 
