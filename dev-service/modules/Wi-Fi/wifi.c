@@ -115,12 +115,18 @@ int wifi_status(wifi_status_t *st)
 
     while (fgets(line, sizeof(line), fp))
     {
-        if (strstr(line, "Connected"))
+        char *p;
+
+        if ((p = strstr(line, "SSID:"))) 
+        {
+            sscanf(p, "SSID: %63[^\n]", st->ssid);   // 读取整行SSID（支持含空格、特殊字符）
+        }
+        else if ((p = strstr(line, "signal:"))) 
+        {
+            sscanf(p, "signal: %d", &st->signal_level); // 读取 -69
+        }
+        else if (strstr(line, "Connected"))
             st->connected = true;
-        else if (strstr(line, "SSID:"))
-            sscanf(line, "SSID: %63s", st->ssid);
-        else if (strstr(line, "signal:"))
-            sscanf(line, "signal: %d", &st->signal_level);
     }
     pclose(fp);
 
