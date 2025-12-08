@@ -12,6 +12,7 @@
 #include "modules/backlight/backlight.h"
 #include "modules/sysinfo/sysinfo.h"
 #include "modules/audio/audio.h"
+#include "modules/Wi-Fi/wifi.h"
 
 int commands_register()
 {
@@ -25,6 +26,9 @@ int commands_register()
 
     // register audio commands
     ret = audio_cmd_register();
+
+    // register Wi-Fi commands
+    ret = wifi_cmd_register();
 
     // add other command registrations here
 
