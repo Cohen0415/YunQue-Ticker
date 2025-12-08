@@ -11,6 +11,7 @@
 // module includes
 #include "modules/backlight/backlight.h"
 #include "modules/sysinfo/sysinfo.h"
+#include "modules/audio/audio.h"
 
 int commands_register()
 {
@@ -21,6 +22,9 @@ int commands_register()
     
     // register sysinfo commands
     ret = sysinfo_cmd_register();
+
+    // register audio commands
+    ret = audio_cmd_register();
 
     // add other command registrations here
 
@@ -64,7 +68,7 @@ int rpc_on_msg(const char *request, int request_len, char **response)
 
     if (res.data_json) 
         free(res.data_json);
-        
+
     cJSON_Delete(root);
 
     return res.status;

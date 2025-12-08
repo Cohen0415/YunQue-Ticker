@@ -1,6 +1,6 @@
 # 编译器设置
-CC		= gcc
-#CC      = arm-linux-gnueabi-gcc
+#CC		= gcc
+CC      = arm-linux-gnueabi-gcc
 CFLAGS  = -Wall -Wextra -O2 \
           -I./include \
 		  -I./core \
@@ -8,7 +8,7 @@ CFLAGS  = -Wall -Wextra -O2 \
 		  -I./utils/log \
 		  -I./utils/queue \
 		  -I./third_party/cJSON
-LDFLAGS = -lpthread
+LDFLAGS = -lpthread -lasound
 
 # 目录设置
 BUILD_DIR   = build

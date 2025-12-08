@@ -8,5 +8,10 @@
 /* SYSINFO */
 #define CMD_GET_BJTIME           "sysinfo.bjtime.get"
 #define CMD_GET_CPU_TEMP         "sysinfo.temp.get"
+/* AUDIO */
+#define CMD_AUDIO_VOLUME_SET     "audio.volume.set"
+#define CMD_AUDIO_VOLUME_GET     "audio.volume.get"
+#define CMD_AUDIO_PLAY           "audio.play"
+#define CMD_AUDIO_STOP           "audio.stop"
 
 #endif // CMD_TABLE_H
