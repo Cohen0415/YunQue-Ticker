@@ -3,6 +3,7 @@
 #include "log.h"
 #include "cmd_register.h"
 #include "rpc_server.h"
+#include "cmd_table.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -128,10 +129,10 @@ int sysinfo_cmd_register()
 
     command_t cmd_get_bjtime, cmd_get_cpu_temp;
 
-    cmd_get_bjtime.name = "sysinfo.bjtime.get";
+    cmd_get_bjtime.name = CMD_GET_BJTIME;
     cmd_get_bjtime.handler = rpc_sysinfo_get_bjtime;
 
-    cmd_get_cpu_temp.name = "sysinfo.temp.get";
+    cmd_get_cpu_temp.name = CMD_GET_CPU_TEMP;
     cmd_get_cpu_temp.handler = rpc_sysinfo_get_cpu_temp;
 
     ret = command_register(&cmd_get_bjtime);
