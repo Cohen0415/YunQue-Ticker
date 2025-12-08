@@ -182,3 +182,123 @@
   }
 }
 ```
+
+## 模块：Audio（音频）
+
+### 播放指定音频文件（audio.play）
+
+```json
+// 请求
+/* 
+  cmd：string；audio.play；命令名称
+  params
+  | - name：string；音频文件的绝对路径
+*/
+{
+  "cmd": "audio.play",
+  "params": {
+    "name": "happy.wav"
+  }
+}
+
+// 响应
+/* 
+  status：int；0 表示成功，其它表示失败
+  msg：string；提示信息
+  data
+  | - NULL
+*/
+{
+  "status": 0,
+  "msg": "ok",
+  "data": {}
+}
+```
+
+### 停止播放（audio.stop）
+
+```json
+// 请求
+/* 
+  cmd：string；audio.stop；命令名称
+  params
+  | - NULL
+*/
+{
+  "cmd": "audio.stop",
+  "params": {}
+}
+
+// 响应
+/* 
+  status：int；0 表示成功，其它表示失败
+  msg：string；提示信息
+  data
+  | - NULL
+*/
+{
+  "status": 0,
+  "msg": "ok",
+  "data": {}
+}
+```
+
+### 设置音量（audio.volume.set）
+
+```json
+// 请求
+/* 
+  cmd：string；audio.volume.set；命令名称
+  params
+  | - volume：int；0~255；音量值（0静音，255最大）
+*/
+{
+  "cmd": "audio.volume.set",
+  "params": {
+    "volume": 200
+  }
+}
+
+// 响应
+/* 
+  status：int；0 表示成功，其它表示失败
+  msg：string；提示信息
+  data
+  | - NULL
+*/
+{
+  "status": 0,
+  "msg": "ok",
+  "data": {}
+}
+```
+
+### 获取音量（audio.volume.get）
+
+```json
+// 请求
+/* 
+  cmd：string；audio.volume.get；命令名称
+  params
+  | - NULL
+*/
+{
+  "cmd": "audio.volume.get",
+  "params": {}
+}
+
+// 响应
+/* 
+  status：int；0 表示成功，其它表示失败
+  msg：string；提示信息
+  data
+  | - volume：int；0~255；当前音量大小
+*/
+{
+  "status": 0,
+  "msg": "ok",
+  "data": {
+    "volume": 200
+  }
+}
+```
