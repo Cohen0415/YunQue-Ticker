@@ -302,3 +302,141 @@
   }
 }
 ```
+
+## 模块：Wi-Fi
+
+### 获取 Wi-Fi 列表（audio.play）
+
+```json
+// 请求
+/* 
+  cmd：string；wifi.scan；命令名称
+  params
+  | - NULL
+*/
+{
+  "cmd": "wifi.scan",
+  "params": {}
+}
+
+// 响应
+/* 
+  status：int；0 表示成功，其它表示失败
+  msg：string；提示信息
+  data
+  | - list：array；扫描到的 Wi-Fi 列表
+    | - ssid：string；Wi-Fi 名称
+    | - bssid：string；MAC 地址
+    | - signal：int；信号强度（0~100）
+    | - secure：bool；是否加密
+*/
+{
+  "status": 0,
+  "msg": "ok",
+  "data": {
+    "list": [
+      {
+        "ssid": "Home_Wifi",
+        "bssid": "A4:5E:60:12:34:56",
+        "signal": 88,
+        "secure": true
+      }
+    ]
+  }
+}
+```
+
+### 连接 Wi-Fi（wifi.connect）
+
+```json
+// 请求
+/* 
+  cmd：string；wifi.connect；命令名称
+  params
+  | - ssid：string；Wi-Fi 名称
+  | - password：string；密码（开放网络可为空）
+*/
+{
+  "cmd": "wifi.connect",
+  "params": {
+    "ssid": "Home_Wifi",
+    "password": "12345678"
+  }
+}
+
+// 响应
+/* 
+  status：int；0 表示成功，其它表示失败
+  msg：string；提示信息，如 "密码错误"、"网络不可用"
+  data
+  | - ip：string；分配到的 IP，连接失败时为空
+*/
+{
+  "status": 0,
+  "msg": "ok",
+  "data": {
+    "ip": "192.168.1.100"
+  }
+}
+```
+
+###  Wi-Fi（wifi.disconnect）
+
+```json
+// 请求
+/* 
+  cmd：string；wifi.disconnect；命令名称
+  params
+  | - NULL
+*/
+{
+  "cmd": "wifi.disconnect",
+  "params": {}
+}
+
+// 响应
+/* 
+  status：int；0 表示成功，其它表示失败
+  msg：string；提示信息
+*/
+{
+  "status": 0,
+  "msg": "ok"
+}
+```
+
+### 查询当前网络状态（wifi.status.get）
+
+```json
+// 请求
+/* 
+  cmd：string；wifi.status.get；命令名称
+  params
+  | - NULL
+*/
+{
+  "cmd": "wifi.status.get",
+  "params": {}
+}
+
+// 响应
+/* 
+  status：int；0 表示成功，其它表示失败
+  msg：string；提示信息
+  data
+  | - connected：bool；是否已连接
+  | - ssid：string；当前连接的 Wi-Fi 名称，无连接时为空
+  | - ip：string；当前 IP，无连接时为空
+  | - signal：int；信号强度（0~100）
+*/
+{
+  "status": 0,
+  "msg": "ok",
+  "data": {
+    "connected": true,
+    "ssid": "Home_Wifi",
+    "ip": "192.168.1.100",
+    "signal": 75
+  }
+}
+```
