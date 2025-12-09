@@ -4,7 +4,8 @@ build/
 #  Ignore all object files
 *.o
 *.obj
-client
+client-arm
+client-linux
 dev-service
 
 # Ignore log files and databases
