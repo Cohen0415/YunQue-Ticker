@@ -15,7 +15,16 @@ static int run_cmd(const char *cmd)
 
 int wifi_scan(wifi_ap_t *result, int max_result)
 {
-    FILE *fp = popen("iw dev wlan0 scan | grep -E 'SSID:|signal:'", "r");
+    if (!result) 
+        return -1;
+
+    // 确保网卡已开启
+    system("ifconfig wlan0 up");
+
+    // 停掉 wpa_supplicant 避免占用扫描
+    system("killall wpa_supplicant 2>/dev/null");
+
+    FILE *fp = popen("iw dev wlan0 scan 2>/dev/null", "r");
     if (!fp) 
     {
         LOGE("Failed to run iw scan command");
@@ -26,7 +35,7 @@ int wifi_scan(wifi_ap_t *result, int max_result)
     int count = 0;
     wifi_ap_t tmp = {0};
 
-    while (fgets(line, sizeof(line), fp) && count < max_result)
+    while (fgets(line, sizeof(line), fp) && count < max_result) 
     {
         if (strstr(line, "SSID:")) 
         {
@@ -35,11 +44,11 @@ int wifi_scan(wifi_ap_t *result, int max_result)
         else if (strstr(line, "signal:")) 
         {
             sscanf(line, "signal: %d", &tmp.signal_level);
-
             result[count++] = tmp;
             memset(&tmp, 0, sizeof(tmp));
         }
     }
+
     pclose(fp);
     return count;
 }
