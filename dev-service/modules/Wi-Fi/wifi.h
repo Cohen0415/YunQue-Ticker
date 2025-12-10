@@ -1,28 +1,38 @@
-#ifndef WIFI_H
-#define WIFI_H
+#ifndef _WIFI_H_
+#define _WIFI_H_
 
-#include <stdbool.h>
+#include <stddef.h> // For size_t
+#include "wpa_ctrl.h"
 
-#define WPA_CONF_PATH       "/etc/wpa_supplicant.conf"
+#define WIFI_DEV_IFNAME                 "wlan0"                                 // Wi-Fi interface name
+#define WIFI_CTRL_PATH_FORMAT           "/var/run/wpa_supplicant/%s"            // Control socket path format
+#define WIFI_WPA_SUPPLICANT_BIN         "wpa_supplicant"                        // wpa_supplicant binary
+#define WIFI_UDHCPC_CMD_FORMAT          "udhcpc -i %s -t 5 -T 2 -A 5 -q -n"     // DHCP client command format
 
-#define WIFI_MAX_SSID_LEN     64
-#define WIFI_MAX_PSK_LEN      64
-#define WIFI_SCAN_LIST_MAX    32
+#define WIFI_MAX_REPLY_LEN              2048        // Max length for wpa_supplicant replies
+#define WIFI_EVENT_BUF_SIZE             2048        // Buffer size for event messages
 
-// 扫描结果结构体
+// --- Enums ---
+typedef enum {
+    WPA_WIFI_CLOSE = 0,
+    WPA_WIFI_OPEN
+} wpa_wifi_status_t;
+
+typedef enum {
+    WPA_WIFI_INACTIVE = 0,
+    WPA_WIFI_SCANNING,
+    WPA_WIFI_CONNECT,
+    WPA_WIFI_DISCONNECT,
+    WPA_WIFI_WRONG_KEY, // Added for better feedback
+    WPA_WIFI_UNKNOWN
+} wpa_wifi_conn_status_t;
+
+// --- Data Structures ---
 typedef struct {
-    char ssid[WIFI_MAX_SSID_LEN];
-    int  signal_level;     // dBm
-    bool encrypted;        // 是否加密
-} wifi_ap_t;
+    char ssid[128]; // Adjust size as needed
+    char psw[128];  // Adjust size as needed
+} wpa_ctrl_wifi_info_t;
 
-typedef struct {
-    bool connected;                // 是否连接
-    char ssid[WIFI_MAX_SSID_LEN];  // 当前连接SSID
-    char ip[32];                   // IP地址
-    int  signal_level;             // 信号强度 dBm
-} wifi_status_t;
+int wifi_cmd_register(); 
 
-int wifi_cmd_register(void);
-
-#endif // WIFI_H
+#endif // _WIFI_H_

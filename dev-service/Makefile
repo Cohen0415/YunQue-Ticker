@@ -7,8 +7,9 @@ CFLAGS  = -Wall -Wextra -O2 \
 		  -I./utils/linked_list \
 		  -I./utils/log \
 		  -I./utils/queue \
-		  -I./third_party/cJSON
-LDFLAGS = -lpthread -lasound
+		  -I./third_party/cJSON \
+		  -I./third_party/wpa
+LDFLAGS = -lpthread -lasound -lwpa_client
 
 # 目录设置
 BUILD_DIR   = build
