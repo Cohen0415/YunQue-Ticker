@@ -427,7 +427,7 @@
   | - connected：bool；是否已连接
   | - ssid：string；当前连接的 Wi-Fi 名称，无连接时为空
   | - ip：string；当前 IP，无连接时为空
-  | - signal：int；信号强度（0~100）
+  | - rssi：string；信号强度
 */
 {
   "status": 0,
@@ -436,7 +436,7 @@
     "connected": true,
     "ssid": "Home_Wifi",
     "ip": "192.168.1.100",
-    "signal": 75
+    "rssi": "-50"
   }
 }
 ```
