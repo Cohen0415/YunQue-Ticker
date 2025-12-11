@@ -4,7 +4,8 @@ build/
 #  Ignore all object files
 *.o
 *.obj
-client-arm
+client-t113
+client-t527
 client-linux
 dev-service
 
