@@ -1,6 +1,7 @@
 # 编译器设置
-#CC		= gcc
-CC      = arm-linux-gnueabi-gcc
+CROSS_COMPILE ?=
+CC := $(CROSS_COMPILE)gcc
+
 CFLAGS  = -Wall -Wextra -O2 \
           -I./include \
 		  -I./core \
