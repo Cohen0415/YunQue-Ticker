@@ -29,7 +29,7 @@ build_c()
 
     export ARCH=arm
     export CROSS_COMPILE=arm-linux-gnueabi-
-    export PATH=$PATH:${TOPDIR}/toolchain/host/bin
+    export PATH=$PATH:${TOPDIR}/toolchain/t113/bin
 
     if [ ! -d ${CDIR} ]; then
         log_error "Source directory ${CDIR} not found!"
