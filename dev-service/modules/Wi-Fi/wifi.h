@@ -12,26 +12,26 @@
 #define WIFI_MAX_REPLY_LEN              2048        // Max length for wpa_supplicant replies
 #define WIFI_EVENT_BUF_SIZE             2048        // Buffer size for event messages
 
-// --- Enums ---
-typedef enum {
-    WPA_WIFI_CLOSE = 0,
-    WPA_WIFI_OPEN
-} wpa_wifi_status_t;
-
 typedef enum {
     WPA_WIFI_INACTIVE = 0,
     WPA_WIFI_SCANNING,
     WPA_WIFI_CONNECT,
     WPA_WIFI_DISCONNECT,
-    WPA_WIFI_WRONG_KEY, // Added for better feedback
+    WPA_WIFI_WRONG_KEY, 
     WPA_WIFI_UNKNOWN
 } wpa_wifi_conn_status_t;
 
-// --- Data Structures ---
 typedef struct {
-    char ssid[128]; // Adjust size as needed
-    char psw[128];  // Adjust size as needed
+    char ssid[128]; 
+    char psw[128];  
 } wpa_ctrl_wifi_info_t;
+
+typedef struct {
+    wpa_wifi_conn_status_t connected;
+    char ssid[128];
+    char ip_addr[64];
+    char rssi[256];
+} wpa_wifi_connected_info_t;
 
 int wifi_cmd_register(); 
 

@@ -20,16 +20,21 @@
 #include <pthread.h> 
 #include <poll.h>    
 
-static struct wpa_ctrl *g_wpa_ctrl = NULL;          // Control connection for commands
-static struct wpa_ctrl *g_wpa_ctrl_event = NULL;    // Separate connection for events
+static struct wpa_ctrl *g_wpa_ctrl = NULL;          
+static struct wpa_ctrl *g_wpa_ctrl_event = NULL;    
 
 static pthread_t g_event_thread = 0;
 static bool g_event_thread_running = false;
 static pthread_mutex_t g_wifi_mutex = PTHREAD_MUTEX_INITIALIZER; 
 
-static wpa_wifi_conn_status_t g_connect_status = WPA_WIFI_INACTIVE;
-
 static bool g_wifi_initialized = false;
+
+static wpa_wifi_connected_info_t g_connected_info = {
+    .connected = WPA_WIFI_INACTIVE,
+    .ssid = "",
+    .ip_addr = "",
+    .rssi = ""
+};
 
 static int wifi_open_connections(const char *ifname)
 {
@@ -102,29 +107,143 @@ static int wifi_send_cmd(const char *cmd, char *reply, size_t *reply_len)
 
 static void wifi_parse_status(const char *status_reply)
 {
+    /*  wpa_cli status :
+        Selected interface 'wlan0'
+        bssid=fc:d7:33:eb:fc:ea
+        freq=2412
+        ssid=15C-room
+        id=0
+        mode=station
+        pairwise_cipher=CCMP
+        group_cipher=CCMP
+        key_mgmt=WPA2-PSK
+        wpa_state=COMPLETED
+        ip_address=192.168.2.102
+        address=34:75:63:21:cd:36
+    */
+
     pthread_mutex_lock(&g_wifi_mutex);
 
     // 解析 Wi-Fi 连接状态
     if (strstr(status_reply, "wpa_state=COMPLETED") != NULL) 
     {
-        g_connect_status = WPA_WIFI_CONNECT;
+        g_connected_info.connected = WPA_WIFI_CONNECT;
     } 
     else if (strstr(status_reply, "wpa_state=DISCONNECTED") != NULL) 
     {
-        g_connect_status = WPA_WIFI_DISCONNECT;
+        g_connected_info.connected = WPA_WIFI_DISCONNECT;
     } 
     else if (strstr(status_reply, "wpa_state=SCANNING") != NULL) 
     {
-        g_connect_status = WPA_WIFI_SCANNING;
+        g_connected_info.connected = WPA_WIFI_SCANNING;
     } 
     else if (strstr(status_reply, "wpa_state=INACTIVE") != NULL) 
     {
-        g_connect_status = WPA_WIFI_INACTIVE;
+        g_connected_info.connected = WPA_WIFI_INACTIVE;
     } 
     else 
     {
-        g_connect_status = WPA_WIFI_UNKNOWN;
+        g_connected_info.connected = WPA_WIFI_UNKNOWN;
         LOGW("Unknown or unhandled wpa_state in STATUS reply: %s", status_reply);
+    }
+
+    // 解析 ssid
+    char *ssid_start = NULL;
+    char *newline_ssid = strstr(status_reply, "\nssid=");
+    if (newline_ssid) 
+    {
+        ssid_start = newline_ssid + 1; 
+    } 
+    else 
+    {
+        if (strncmp(status_reply, "ssid=", 5) == 0) 
+        {
+            ssid_start = status_reply; 
+        }
+    }
+    if (ssid_start)
+    {
+        ssid_start += 5; // 跳过 "ssid="
+        char *ssid_end = strchr(ssid_start, '\n');
+        if (ssid_end) 
+        {
+            size_t ssid_len = ssid_end - ssid_start;
+            if (ssid_len < sizeof(g_connected_info.ssid)) 
+            {
+                strncpy(g_connected_info.ssid, ssid_start, ssid_len);
+                g_connected_info.ssid[ssid_len] = '\0'; // 确保字符串结束
+            } 
+            else 
+            {
+                LOGW("SSID too long in STATUS reply.");
+            }
+        }
+    }
+
+    // 解析 IP 地址
+    char *ip_start = strstr(status_reply, "ip_address=");
+    if (ip_start)
+    {
+        ip_start += 11; // 跳过 "ip_address="
+        char *ip_end = strchr(ip_start, '\n');
+        if (ip_end)
+        {
+            size_t ip_len = ip_end - ip_start;
+            if (ip_len < sizeof(g_connected_info.ip_addr)) 
+            {
+                strncpy(g_connected_info.ip_addr, ip_start, ip_len);
+                g_connected_info.ip_addr[ip_len] = '\0';
+            } 
+            else
+            {
+                LOGW("IP address too long in STATUS reply.");
+            }
+        }
+    }
+
+    pthread_mutex_unlock(&g_wifi_mutex);
+}
+
+static void wifi_parese_rssi(const char *status_reply)
+{
+    /*  wpa_cli SIGNAL_POLL :
+        RSSI=-45
+        LINKSPEED=72
+        FREQUENCY=2412
+    */
+
+    pthread_mutex_lock(&g_wifi_mutex);
+
+    char *rssi_start = NULL;
+    char *newline_rssi = strstr(status_reply, "\nRSSI=");
+    if (newline_rssi) 
+    {
+        rssi_start = newline_rssi + 1; 
+    } 
+    else 
+    {
+        if (strncmp(status_reply, "RSSI=", 5) == 0) 
+        {
+            rssi_start = status_reply; 
+        }
+    }
+    if (rssi_start)
+    {
+        rssi_start += 5; // 跳过 "RSSI="
+        char *rssi_end = strchr(rssi_start, '\n');
+        if (rssi_end) 
+        {
+            size_t rssi_len = rssi_end - rssi_start;
+            if (rssi_len < sizeof(g_connected_info.rssi)) 
+            {
+                strncpy(g_connected_info.rssi, rssi_start, rssi_len);
+                g_connected_info.rssi[rssi_len] = '\0'; // 确保字符串结束
+            } 
+            else 
+            {
+                LOGW("RSSI too long in SIGNAL_POLL reply.");
+            }
+        }
     }
 
     pthread_mutex_unlock(&g_wifi_mutex);
@@ -143,6 +262,22 @@ static void wifi_update_status()
     else 
     {
         LOGE("Failed to get STATUS from wpa_supplicant.");
+    }
+}
+
+static void wifi_update_rssi()
+{
+    char reply_buf[WIFI_MAX_REPLY_LEN];
+    size_t reply_len = sizeof(reply_buf);
+
+    if (wifi_send_cmd("SIGNAL_POLL", reply_buf, &reply_len) == 0) 
+    {
+        wifi_parese_rssi(reply_buf);
+        LOGD("Updated Wi-Fi RSSI");
+    } 
+    else 
+    {
+        LOGE("Failed to get SIGNAL_POLL from wpa_supplicant.");
     }
 }
 
@@ -199,6 +334,9 @@ static void wifi_handle_event(const char *event)
 
     // 更新连接状态
     wifi_update_status();
+
+    // 更新信号强度
+    wifi_update_rssi();
 }
 
 static void *wifi_event_thread_func(void *arg)
@@ -516,7 +654,7 @@ static int wifi_deinit()
     }
 
     g_wifi_initialized = false;
-    g_connect_status = WPA_WIFI_INACTIVE;
+    g_connected_info.connected = WPA_WIFI_INACTIVE;
 
     pthread_mutex_unlock(&g_wifi_mutex);
     LOGI("Wi-Fi subsystem deinitialized.");
@@ -614,21 +752,8 @@ static rpc_result_t rpc_wifi_status_get(cJSON *params)
 
     (void)params;
 
-    pthread_mutex_lock(&g_wifi_mutex);
-    wpa_wifi_conn_status_t conn_status = g_connect_status;
-    pthread_mutex_unlock(&g_wifi_mutex);
-
-    const char *wifi_sta_str = "unknown";
-    switch (conn_status) 
-    {
-        case WPA_WIFI_CONNECT: wifi_sta_str = "connected"; break;
-        case WPA_WIFI_DISCONNECT: wifi_sta_str = "disconnected"; break;
-        case WPA_WIFI_SCANNING: wifi_sta_str = "scanning"; break;
-        case WPA_WIFI_INACTIVE: wifi_sta_str = "inactive"; break;
-        case WPA_WIFI_WRONG_KEY: wifi_sta_str = "wrong_key"; break;
-        case WPA_WIFI_UNKNOWN:
-        default: wifi_sta_str = "unknown"; break;
-    }
+    wifi_update_status();
+    wifi_update_rssi();
 
     cJSON *root = cJSON_CreateObject();
     if (!root) 
@@ -636,10 +761,23 @@ static rpc_result_t rpc_wifi_status_get(cJSON *params)
         res.msg = "internal error creating JSON";
         return res;
     }
-    cJSON_AddBoolToObject(root, "connected", (conn_status == WPA_WIFI_CONNECT) ? true : false);
+
+    pthread_mutex_lock(&g_wifi_mutex);
+    cJSON_AddBoolToObject(root, "connected", (g_connected_info.connected == WPA_WIFI_CONNECT) ? true : false);
+    cJSON_AddStringToObject(root, "ssid", (g_connected_info.ssid[0] != '\0') ? g_connected_info.ssid : "");
+    cJSON_AddStringToObject(root, "ip", (g_connected_info.ip_addr[0] != '\0') ? g_connected_info.ip_addr : "");
+    cJSON_AddStringToObject(root, "rssi", (g_connected_info.rssi[0] != '\0') ? g_connected_info.rssi : "");
+
+    // clean g_connected_info
+    g_connected_info.connected = WPA_WIFI_INACTIVE;
+    g_connected_info.ssid[0] = '\0';
+    g_connected_info.ip_addr[0] = '\0';
+    g_connected_info.rssi[0] = '\0';
+
+    pthread_mutex_unlock(&g_wifi_mutex);
 
     res.status = 0;
-    res.msg    = "ok";
+    res.msg = "ok";
     res.data_json = cJSON_PrintUnformatted(root);
     cJSON_Delete(root);
 
