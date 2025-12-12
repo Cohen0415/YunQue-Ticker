@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <errno.h>
+#include <endian.h>
 
 static int g_listen_fd = -1;
 static int g_running = 0;
@@ -24,45 +25,80 @@ typedef struct {
     char *response;
 } rpc_msg_t;
 
-static char *read_all(int fd, int *out_len)
+static ssize_t read_fully(int fd, void *buf, size_t count) 
 {
-    size_t cap = 4096, len = 0;
-    char *buf = malloc(cap);
-    if(!buf) 
-        return NULL;
-
-    for(;;)
+    char *p = buf;
+    size_t total = 0;
+    while (total < count) 
     {
-        ssize_t n = read(fd, buf+len, cap-len);
-        if(n > 0)
+        ssize_t n = read(fd, p + total, count - total);
+        if (n <= 0) 
         {
-            len += n;
-            if(len >= cap)
+            if (n == 0 || errno == ECONNRESET || errno == EPIPE) 
             {
-                cap *= 2;
-                char *tmp = realloc(buf, cap);
-                if(!tmp)
-                { 
-                    free(buf); 
-                    return NULL; 
-                }
-                buf = tmp;
+                return 0; // 对端关闭或重置
             }
+            if (errno == EINTR) 
+                continue;
+            return -1; // 错误
         }
-        else if(n == 0) 
-            break;       
-        else if(errno == EINTR) 
-            continue;
-        else 
-        { 
-            free(buf); 
-            return NULL; 
-        }
+        total += n;
     }
 
-    buf[len] = '\0';
-    *out_len = len;
-    return buf;
+    return total;
+}
+
+static void handle_client_connection(int client_fd) 
+{
+    while (g_running) 
+    {
+        // Step 1: 读取 4 字节长度头
+        unsigned int net_len;
+        ssize_t r = read_fully(client_fd, &net_len, sizeof(net_len));
+        if (r != sizeof(net_len)) 
+        {
+            break;
+        }
+
+        // 转为主机字节序（小端 → 主机）
+        unsigned int len = le32toh(net_len);
+        if (len == 0 || len > MAX_RPC_MSG_SIZE) 
+        {
+            LOGE("Invalid message length: %u", len);
+            break;
+        }
+
+        // Step 2: 读取 len 字节的 JSON 数据
+        char *json_str = malloc(len + 1);
+        if (!json_str) 
+        {
+            LOGE("malloc failed for message of size %u", len);
+            break;
+        }
+
+        r = read_fully(client_fd, json_str, len);
+        if (r != len) 
+        {
+            free(json_str);
+            break;
+        }
+        json_str[len] = '\0'; // 确保字符串结尾
+
+        // 构造消息并入队
+        rpc_msg_t *msg = malloc(sizeof(rpc_msg_t));
+        if (!msg) 
+        {
+            free(json_str);
+            break;
+        }
+
+        msg->client_fd = client_fd;
+        msg->request = json_str;      
+        msg->response = NULL;
+        queue_push(recv_queue, msg);
+    }
+
+    close(client_fd);
 }
 
 // 接收线程
@@ -70,26 +106,17 @@ static void *recv_thread(void *arg)
 {
     rpc_on_message_cb cb = (rpc_on_message_cb)arg;
 
-    while(g_running)
+    while (g_running) 
     {
         int client_fd = accept(g_listen_fd, NULL, NULL);
-        if(client_fd < 0) 
-            continue;
-
-        int len = 0;
-        char *data = read_all(client_fd, &len);
-        if(data && len > 0)
+        if (client_fd < 0) 
         {
-            rpc_msg_t *msg = malloc(sizeof(rpc_msg_t));
-            msg->client_fd = client_fd;
-            msg->request = data;
-            msg->response = NULL;
-            queue_push(recv_queue, msg); // 放到接收队列
-        } 
-        else 
-        {
-            close(client_fd);
+            if (errno == EINTR) 
+                continue;
+            break;
         }
+
+        handle_client_connection(client_fd);
     }
 
     return NULL;
@@ -126,9 +153,37 @@ static void *send_thread(void *arg)
         if(!msg) 
             continue;
 
-        LOGD("send response to client_fd=%d: %s", msg->client_fd, msg->response);
-        write(msg->client_fd, msg->response, strlen(msg->response));
-        close(msg->client_fd);
+        if (msg->response && msg->client_fd >= 0) 
+        {
+            unsigned int len = strlen(msg->response);
+            if (len > MAX_RPC_MSG_SIZE) 
+            {
+                LOGE("Response too long: %u", len);
+            } 
+            else 
+            {
+                unsigned int net_len = htole32(len);  // 主机序 → 小端
+
+                // 先发 4 字节长度头
+                ssize_t w1 = write(msg->client_fd, &net_len, sizeof(net_len));
+                // 再发 JSON 数据
+                ssize_t w2 = write(msg->client_fd, msg->response, len);
+
+                if (w1 != sizeof(net_len) || w2 != len) 
+                {
+                    LOGE("Failed to send response to client_fd=%d", msg->client_fd);
+                } 
+                else 
+                {
+                    LOGD("Sent response (%u bytes) to client_fd=%d", len, msg->client_fd);
+                }
+            }
+        }
+
+        if (msg->client_fd >= 0) 
+        {
+            close(msg->client_fd);
+        }
         free(msg->request);
         free(msg->response);
         free(msg);

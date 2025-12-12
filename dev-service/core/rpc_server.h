@@ -3,6 +3,8 @@
 
 #include "cJSON.h"
 
+#define MAX_RPC_MSG_SIZE 8192   // 最大 RPC 消息大小
+
 typedef struct {
     int status;
     char *msg;
