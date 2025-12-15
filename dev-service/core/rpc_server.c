@@ -180,10 +180,6 @@ static void *send_thread(void *arg)
             }
         }
 
-        if (msg->client_fd >= 0) 
-        {
-            close(msg->client_fd);
-        }
         free(msg->request);
         free(msg->response);
         free(msg);
