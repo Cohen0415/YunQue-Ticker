@@ -1,5 +1,6 @@
 # Ignore build directory
-build/
+build-t113/
+build-linux/
 
 # Ignore Qt Creator project files
 *.pro.user
