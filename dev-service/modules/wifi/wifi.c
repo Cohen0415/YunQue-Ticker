@@ -663,6 +663,22 @@ static int wifi_deinit()
 
 static rpc_result_t rpc_wifi_connect(cJSON *params)
 {
+    // 请求
+    /* 
+        cmd：string；wifi.connect；命令名称
+        params
+        | - ssid：string；Wi-Fi 名称
+        | - password：string；密码（开放网络可为空）
+    */
+
+    // 响应
+    /* 
+        status：int；0 表示成功，其它表示失败
+        msg：string；提示信息，如 "密码错误"、"网络不可用"
+        data
+        | - ip：string；分配到的 IP，连接失败时为空
+    */
+
     rpc_result_t res = {
         .status = -1,
         .msg = "connect failed",
@@ -721,6 +737,19 @@ static rpc_result_t rpc_wifi_connect(cJSON *params)
 
 static rpc_result_t rpc_wifi_disconnect(cJSON *params)
 {
+    // 请求
+    /* 
+        cmd：string；wifi.disconnect；命令名称
+        params
+        | - NULL
+    */
+
+    // 响应
+    /* 
+        status：int；0 表示成功，其它表示失败
+        msg：string；提示信息
+    */
+
     rpc_result_t res = { 
         .status = -1, 
         .msg = "disconnect failed", 
@@ -744,6 +773,24 @@ static rpc_result_t rpc_wifi_disconnect(cJSON *params)
 
 static rpc_result_t rpc_wifi_status_get(cJSON *params)
 {
+    // 请求
+    /* 
+        cmd：string；wifi.status.get；命令名称
+        params
+        | - NULL
+    */
+
+    // 响应
+    /* 
+        status：int；0 表示成功，其它表示失败
+        msg：string；提示信息
+        data
+        | - connected：bool；是否已连接
+        | - ssid：string；当前连接的 Wi-Fi 名称，无连接时为空
+        | - ip：string；当前 IP，无连接时为空
+        | - rssi：string；信号强度
+    */
+
     rpc_result_t res = {
         .status = -1,
         .msg = "status get failed",
