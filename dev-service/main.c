@@ -12,7 +12,7 @@
 #include "modules/backlight/backlight.h"
 #include "modules/sysinfo/sysinfo.h"
 #include "modules/audio/audio.h"
-#include "modules/Wi-Fi/wifi.h"
+#include "modules/wifi/wifi.h"
 
 int commands_register()
 {
