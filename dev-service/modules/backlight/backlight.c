@@ -53,7 +53,7 @@ static rpc_result_t rpc_backlight_set(cJSON *params)
     status：int；0 表示成功，其它表示失败
     msg：string；提示信息
     data
-    | - NULL
+    | - value：int；0~255；当前亮度值
     */
 
     rpc_result_t res = { 
@@ -86,8 +86,21 @@ static rpc_result_t rpc_backlight_set(cJSON *params)
         return res;
     }
 
+    ret = backlight_get(BRIGHTNESS_PATH);
+    if (ret < 0) 
+    {
+        LOGE("Failed to read brightness value");
+        return res; 
+    }
+
+    cJSON *data = cJSON_CreateObject();
+    cJSON_AddNumberToObject(data, "value", ret);
+
     res.status = 0;
     res.msg = "ok";
+    res.data_json = cJSON_PrintUnformatted(data);
+    
+    cJSON_Delete(data);
     return res;
 }
 
