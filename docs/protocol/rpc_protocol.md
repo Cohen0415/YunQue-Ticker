@@ -325,47 +325,6 @@
 
 ## 模块：Wi-Fi
 
-### 获取 Wi-Fi 列表（audio.play）
-
-```json
-// 请求
-/* 
-  cmd：string；wifi.scan；命令名称
-  params
-  | - NULL
-*/
-{
-  "cmd": "wifi.scan",
-  "params": {}
-}
-
-// 响应
-/* 
-  status：int；0 表示成功，其它表示失败
-  msg：string；提示信息
-  data
-  | - list：array；扫描到的 Wi-Fi 列表
-    | - ssid：string；Wi-Fi 名称
-    | - bssid：string；MAC 地址
-    | - signal：int；信号强度（0~100）
-    | - secure：bool；是否加密
-*/
-{
-  "status": 0,
-  "msg": "ok",
-  "data": {
-    "list": [
-      {
-        "ssid": "Home_Wifi",
-        "bssid": "A4:5E:60:12:34:56",
-        "signal": 88,
-        "secure": true
-      }
-    ]
-  }
-}
-```
-
 ### 连接 Wi-Fi（wifi.connect）
 
 ```json
