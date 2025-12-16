@@ -5,8 +5,9 @@
 #include <QLocalSocket>      
 #include <QAbstractSocket>   
 #include <QString>
+#include <QMutex>
 
-#define MAX_JSON_SIZE           8192        // 最大JSON消息大小（字节）
+#define MAX_MESSAGE_SIZE            8192
 
 class Network : public QObject
 {
@@ -26,16 +27,17 @@ public:
     // 检查当前连接状态
     bool isConnected() const;
 
-    // 发送JSON消息
-    bool sendMessage(const QJsonDocument &jsonDoc);
+public slots:
+
+    void sendData(const QByteArray &data);
 
 signals:
 
+    // 接收到数据的信号，接收到完整的一帧数据时发射
+    void dataReceived(const QByteArray &data);
+
     // 连接状态改变信号
     void connectionStatusChanged(bool isConnected);
-
-    // 收到消息信号
-    void messageReceived(const QJsonDocument &jsonDoc);
 
 private slots:
 
@@ -52,12 +54,17 @@ private slots:
     void onReadyRead();
 
 private:
+
+    void processData();             // 处理缓冲区中的数据，组装完整包
+
     QLocalSocket *m_socket;         // 本地套接字对象
     QString m_serverPath;           // 服务器路径
     bool m_isConnected;             // 当前连接状态
 
     QByteArray m_readBuffer;        // 用于存储接收的数据缓冲区
     qint32 m_expectedDataSize;      // 预期接收的数据大小
+
+    QMutex m_sendMutex;             // 互斥锁
 };
 
 #endif // NETWORK_H
