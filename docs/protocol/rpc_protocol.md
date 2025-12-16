@@ -53,12 +53,17 @@
 ```json
 // 响应
 {
+  "cmd": "brightness.set",
   "status": 0,
   "msg": "ok",
   "data": {}
 }
 ```
-响应报文由三个主要字段构成：
+响应报文由四个主要字段构成：
+
+`cmd`：
+
+* 返回请求时的命令
 
 `status`：
 
@@ -97,12 +102,14 @@
 
 // 响应
 /* 
+  cmd：string；返回请求时使用的命令
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
   | - value：int；0~255；当前的亮度值
 */
 {
+  "cmd": "brightness.set",
   "status": 0,
   "msg": "ok",
   "data": {
@@ -127,12 +134,14 @@
 
 // 响应
 /* 
+  cmd：string；返回请求时使用的命令
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
   | - value：int；0~255；当前亮度值
 */
 {
+  "cmd": "brightness.get",
   "status": 0,
   "msg": "ok",
   "data": {
@@ -159,12 +168,14 @@
 
 // 响应
 /* 
+  cmd：string；返回请求时使用的命令
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
   | - time：string；ISO 8601 标准格式
 */
 {
+  "cmd": "sysinfo.bjtime.get",
   "status": 0,
   "msg": "ok",
   "data": {
@@ -189,12 +200,14 @@
 
 // 响应
 /* 
+  cmd：string；返回请求时使用的命令
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
   | - temp：int；45493；除100就是当前温度，例如45.493℃
 */
 {
+  "cmd": "sysinfo.temp.get",
   "status": 0,
   "msg": "ok",
   "data": {
@@ -223,12 +236,14 @@
 
 // 响应
 /* 
+  cmd：string；返回请求时使用的命令
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
   | - NULL
 */
 {
+  "cmd": "audio.play",
   "status": 0,
   "msg": "ok",
   "data": {}
@@ -251,12 +266,14 @@
 
 // 响应
 /* 
+  cmd：string；返回请求时使用的命令
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
   | - NULL
 */
 {
+  "cmd": "audio.stop",
   "status": 0,
   "msg": "ok",
   "data": {}
@@ -281,12 +298,14 @@
 
 // 响应
 /* 
+  cmd：string；返回请求时使用的命令
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
   | - NULL
 */
 {
+  "cmd": "audio.volume.set",
   "status": 0,
   "msg": "ok",
   "data": {}
@@ -309,12 +328,14 @@
 
 // 响应
 /* 
+  cmd：string；返回请求时使用的命令
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
   | - volume：int；0~255；当前音量大小
 */
 {
+  "cmd": "audio.volume.get",
   "status": 0,
   "msg": "ok",
   "data": {
@@ -345,12 +366,14 @@
 
 // 响应
 /* 
+  cmd：string；返回请求时使用的命令
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息，如 "密码错误"、"网络不可用"
   data
   | - ip：string；分配到的 IP，连接失败时为空
 */
 {
+  "cmd": "wifi.connect",
   "status": 0,
   "msg": "ok",
   "data": {
@@ -375,10 +398,12 @@
 
 // 响应
 /* 
+  cmd：string；返回请求时使用的命令
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
 */
 {
+  "cmd": "wifi.disconnect",
   "status": 0,
   "msg": "ok"
 }
@@ -400,6 +425,7 @@
 
 // 响应
 /* 
+  cmd：string；返回请求时使用的命令
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
@@ -409,6 +435,7 @@
   | - rssi：string；信号强度
 */
 {
+  "cmd": "wifi.status.get",
   "status": 0,
   "msg": "ok",
   "data": {
