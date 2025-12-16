@@ -111,7 +111,7 @@
 }
 ```
 
-### 获取亮度（brightness.set）
+### 获取亮度（brightness.get）
 
 ```json
 // 请求
