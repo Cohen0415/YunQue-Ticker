@@ -175,6 +175,7 @@ static void *send_thread(void *arg)
                 } 
                 else 
                 {
+                    LOGD("Sent raw message = %s", msg->response);
                     LOGD("Sent response (%u bytes) to client_fd=%d", len, msg->client_fd);
                 }
             }
@@ -249,9 +250,10 @@ void rpc_server_stop(void)
         queue_destroy(send_queue);
 }
 
-int rpc_make_response(int status, const char *msg, const char *data_json, char **resp)
+int rpc_make_response(int status, const char *cmd, const char *msg, const char *data_json, char **resp)
 {
     cJSON *root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, "cmd", cmd);
     cJSON_AddNumberToObject(root, "status", status);
     cJSON_AddStringToObject(root, "msg", msg);
 
@@ -274,7 +276,7 @@ int rpc_make_response(int status, const char *msg, const char *data_json, char *
     return 0;
 }
 
-int rpc_make_error(char **resp, int status, const char *msg)
+int rpc_make_error(char **resp, int status, const char *cmd, const char *msg)
 {
-    return rpc_make_response(status, msg, NULL, resp);
+    return rpc_make_response(status, cmd, msg, NULL, resp);
 }

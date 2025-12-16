@@ -44,7 +44,7 @@ int rpc_on_msg(const char *request, int request_len, char **response)
     if (!root)
     {
         LOGE("JSON parse failed");
-        return rpc_make_error(response, -1, "JSON parse error");
+        return rpc_make_error(response, -1, "", "JSON parse error");
     }
 
     cJSON *cmd = cJSON_GetObjectItem(root, "cmd");
@@ -54,21 +54,22 @@ int rpc_on_msg(const char *request, int request_len, char **response)
     {
         LOGE("Invalid or missing cmd field");
         cJSON_Delete(root);
-        return rpc_make_error(response, -2, "cmd missing or invalid");
+        return rpc_make_error(response, -2, "", "cmd missing or invalid");
     }
 
     command_t *c = command_find(cmd->valuestring);
+    LOGD("Looking for command: %s", cmd->valuestring);
     if (!c) 
     {
         cJSON_Delete(root);
-        return rpc_make_error(response, -3, "unknown command");
+        return rpc_make_error(response, -3, cmd->valuestring, "unknown command");
     }
     LOGI("Found command: %s", c->name);
 
     rpc_result_t res = c->handler(params);
     const char *msg = res.msg ? res.msg : (res.status==0 ? "ok" : "fail");
 
-    rpc_make_response(res.status, msg, res.data_json, response);
+    rpc_make_response(res.status, cmd->valuestring, msg, res.data_json, response);
 
     if (res.data_json) 
         free(res.data_json);
