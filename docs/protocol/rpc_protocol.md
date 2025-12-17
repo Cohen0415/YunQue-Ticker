@@ -204,7 +204,7 @@
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
-  | - temp：int；45493；除100就是当前温度，例如45.493℃
+  | - temp：int；45493；除1000就是当前温度，例如45.493℃
 */
 {
   "cmd": "sysinfo.temp.get",
