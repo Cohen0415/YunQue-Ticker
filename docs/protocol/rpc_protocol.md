@@ -302,13 +302,15 @@
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
-  | - NULL
+  | - volume：int；0~255；当前音量大小
 */
 {
   "cmd": "audio.volume.set",
   "status": 0,
   "msg": "ok",
-  "data": {}
+  "data": {
+    "volume": 200
+  }
 }
 ```
 
