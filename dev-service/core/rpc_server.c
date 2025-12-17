@@ -175,8 +175,8 @@ static void *send_thread(void *arg)
                 } 
                 else 
                 {
-                    LOGD("Sent raw message = %s", msg->response);
-                    LOGD("Sent response (%u bytes) to client_fd=%d", len, msg->client_fd);
+                    LOGD("send raw message = %s", msg->response);
+                    LOGD("send response (%u bytes) to client_fd=%d", len, msg->client_fd);
                 }
             }
         }
