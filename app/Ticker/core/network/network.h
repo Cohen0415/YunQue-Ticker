@@ -29,6 +29,7 @@ public:
 
 public slots:
 
+    // 发送数据到服务器
     void sendData(const QByteArray &data);
 
 signals:

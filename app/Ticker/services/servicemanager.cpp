@@ -1,6 +1,7 @@
 #include "servicemanager.h"
 #include "core/network/network.h"
 #include "abstractservice.h"
+#include "utils/log/logger.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -12,20 +13,20 @@ ServiceManager::ServiceManager(QObject *parent)
     , m_network(nullptr)
 {
     // 构造函数
-    qDebug() << "[ServiceManager] Created.";
+    // LOG_DEBUG("ServiceManager Constructor called.");
 }
 
 ServiceManager::~ServiceManager()
 {
     // 析构函数
-    qDebug() << "[ServiceManager] Destroyed.";
+    // LOG_DEBUG("ServiceManager Destructor called, cleaning up.");
 }
 
 bool ServiceManager::initialize(const QString& socketPath)
 {
     if (m_network) 
     {
-        qWarning() << "[ServiceManager] Already initialized.";
+        LOG_WARN("ServiceManager Already initialized. Ignoring re-initialization.");
         return true;
     }
 
@@ -37,7 +38,7 @@ bool ServiceManager::initialize(const QString& socketPath)
     connect(m_network, &Network::dataReceived, this, &ServiceManager::onDataReceived);
     connect(m_network, &Network::connectionStatusChanged, this, &ServiceManager::onNetworkConnectionStatusChanged);
 
-    qDebug() << "[ServiceManager] Initialized with socket path:" << socketPath;
+    LOG_INFO("ServiceManager initialized with socket path: %s", socketPath.toLocal8Bit().constData());
     return true;
 }
 
@@ -45,13 +46,13 @@ void ServiceManager::addService(AbstractService* service)
 {
     if (!service) 
     {
-        qWarning() << "[ServiceManager] Attempted to add a null service.";
+        LOG_WARN("ServiceManager Tried to add null service pointer.");
         return;
     }
 
     if (!m_network) 
     {
-        qWarning() << "[ServiceManager] Cannot add service before initialization.";
+        LOG_WARN("ServiceManager Not initialized. Cannot add service.");
         return;
     }
 
@@ -61,8 +62,9 @@ void ServiceManager::addService(AbstractService* service)
     // 2. 获取服务能处理的命令列表
     QStringList commands = service->registeredCommands();
     QString serviceName = service->serviceName();
-    qDebug() << "[ServiceManager] Adding service" << serviceName
-             << "which handles commands:" << commands;
+    LOG_INFO("ServiceManager Adding service '%s' handling commands: %s",
+              serviceName.toLocal8Bit().constData(),
+              commands.join(", ").toLocal8Bit().constData());
 
     // 3. 填充路由表
     for (const QString& command : commands) 
@@ -70,11 +72,10 @@ void ServiceManager::addService(AbstractService* service)
         if (m_commandRoutingMap.contains(command)) 
         {
             // 命令已被其他服务处理，发出警告
-            qWarning() << "[ServiceManager] Command" << command
-                       << "is already handled by service"
-                       << m_commandRoutingMap[command]->serviceName()
-                       << ". New service" << serviceName
-                       << "will override it.";
+            LOG_WARN("ServiceManager Command '%s' is already handled by service '%s'. Overriding with service '%s'.",
+                     command.toLocal8Bit().constData(),
+                     m_commandRoutingMap[command]->serviceName().toLocal8Bit().constData(),
+                     serviceName.toLocal8Bit().constData());
         }
         // 建立命令到服务实例的映射
         m_commandRoutingMap[command] = service;
@@ -87,14 +88,15 @@ void ServiceManager::addService(AbstractService* service)
     // 5. 设置服务的管理器指针 (如果需要服务访问管理器本身)
     service->setServiceManager(this);
 
-    qDebug() << "[ServiceManager] Service" << serviceName << "added successfully.";
+    LOG_INFO("ServiceManager Service '%s' added successfully.",
+             serviceName.toLocal8Bit().constData());
 }
 
 bool ServiceManager::connectToServer()
 {
     if (!m_network) 
     {
-        qWarning() << "[ServiceManager] Not initialized. Cannot connect.";
+        LOG_WARN("ServiceManager Not initialized. Cannot connect to server.");
         return false;
     }
 
@@ -109,7 +111,7 @@ void ServiceManager::disconnectFromServer()
     } 
     else 
     {
-        qDebug() << "[ServiceManager] Not initialized. Nothing to disconnect.";
+        LOG_WARN("ServiceManager Not initialized. Cannot disconnect.");
     }
 }
 
@@ -127,26 +129,27 @@ void ServiceManager::onDataReceived(const QByteArray& data)
 {
     if (!m_network) 
     {
-        qWarning() << "[ServiceManager] Received data but Network is not initialized.";
+        LOG_WARN("ServiceManager Received data but Network is not initialized.");
         return;
     }
 
     // 打印接收到的原始数据
-    qDebug() << "[ServiceManager] Data received from Network, size:" << data.size() << "bytes.";
-    qDebug() << "Raw data content:" << data;
+    LOG_DEBUG("ServiceManager Data received from Network, size: %d bytes.", data.size());
+    LOG_DEBUG("receive: <<<<< %s", QString(data).toLocal8Bit().constData());
 
     // 1. 将收到的原始数据 (QByteArray) 解析为 JSON
     QJsonParseError parseError;
     QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
     if (parseError.error != QJsonParseError::NoError) 
     {
-        qWarning() << "[ServiceManager] Failed to parse incoming JSON data:" << parseError.errorString();
+        LOG_WARN("ServiceManager Failed to parse received data as JSON: %s",
+                 parseError.errorString().toLocal8Bit().constData());
         return;
     }
 
     if (!doc.isObject()) 
     {
-        qWarning() << "[ServiceManager] Received JSON data is not an object.";
+        LOG_WARN("ServiceManager Received JSON data is not an object.");
         return;
     }
 
@@ -155,7 +158,7 @@ void ServiceManager::onDataReceived(const QByteArray& data)
 
     if (command.isEmpty()) 
     {
-        qWarning() << "[ServiceManager] Received JSON object lacks a 'cmd' field.";
+        LOG_WARN("ServiceManager Received JSON without 'cmd' field.");
         return;
     }
 
@@ -163,14 +166,17 @@ void ServiceManager::onDataReceived(const QByteArray& data)
     if (m_commandRoutingMap.contains(command))
     {
         AbstractService *targetService = m_commandRoutingMap[command];
-        qDebug() << "[ServiceManager] Routing command" << command << "to service" << targetService->serviceName();
+        LOG_DEBUG("ServiceManager Routing command '%s' to service '%s'.",
+                  command.toLocal8Bit().constData(),
+                  targetService->serviceName().toLocal8Bit().constData());
 
         // 3. 将 JSON 消息转发给对应的服务
         targetService->onMessageReceived(doc);
     } 
     else 
     {
-        qWarning() << "[ServiceManager] No service registered to handle command:" << command;
+        LOG_WARN("ServiceManager No service registered to handle command '%s'.",
+                 command.toLocal8Bit().constData());
     }
 }
 
@@ -178,13 +184,13 @@ void ServiceManager::onServiceSendMessage(const QJsonDocument& doc)
 {
     if (!m_network) 
     {
-        qWarning() << "[ServiceManager] Tried to send message but Network is not initialized.";
+        LOG_WARN("ServiceManager Not initialized. Cannot send message.");
         return;
     }
 
     if (!m_network->isConnected()) 
     {
-        qWarning() << "[ServiceManager] Cannot send message, Network is not connected.";
+        LOG_WARN("ServiceManager Not connected to server. Cannot send message.");
         return;
     }
 
@@ -192,12 +198,12 @@ void ServiceManager::onServiceSendMessage(const QJsonDocument& doc)
     QByteArray jsonData = doc.toJson(QJsonDocument::Compact);
     if (jsonData.isEmpty()) 
     {
-        qWarning() << "[ServiceManager] Attempted to send empty or invalid JSON from service.";
+        LOG_WARN("ServiceManager Attempted to send empty JSON message.");
         return;
     }
 
-    qDebug() << "[ServiceManager] Sending JSON message from service, size:" << jsonData.size() << "bytes.";
-    qDebug() << "Message content:" << doc.toJson(QJsonDocument::Indented); // 调试用，打印格式化JSON
+    LOG_DEBUG("ServiceManager Sending message from service, size: %d bytes.", jsonData.size());
+    LOG_DEBUG("Send: >>>>> %s", QString(jsonData).toLocal8Bit().constData());
 
     // 通过 Network 发送数据
     m_network->sendData(jsonData);
@@ -205,7 +211,8 @@ void ServiceManager::onServiceSendMessage(const QJsonDocument& doc)
 
 void ServiceManager::onNetworkConnectionStatusChanged(bool isConnected)
 {
-    qDebug() << "[ServiceManager] Network connection status changed to:" << (isConnected ? "Connected" : "Disconnected");
+    LOG_DEBUG("ServiceManager Network connection status changed. Now connected: %s",
+              isConnected ? "true" : "false");
     // 将 Network 的连接状态变化转发出去
     emit connectionStatusChanged(isConnected);
 }

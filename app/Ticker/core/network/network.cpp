@@ -1,4 +1,6 @@
-#include "network.h"            
+#include "network.h"
+#include "utils/log/logger.h"
+
 #include <QDebug>               
 #include <QDataStream>
 #include <QTimer>
@@ -20,33 +22,35 @@ Network::Network(QObject *parent)
 
 Network::~Network()
 {
-    qDebug() << "Network object destroyed.";
+    // LOG_DEBUG("Network Destructor called, cleaning up.");
 }
 
 bool Network::connectToServer(const QString &socketPath)
 {
     if (m_isConnected)
     {
-        qWarning() << "Network: Already connected to" << m_serverPath << ". Ignoring new request to" << socketPath;
+        LOG_WARN("Network Already connected to server at: %s", m_serverPath.toLocal8Bit().constData());
         return true;
     }
 
     // 保存服务器路径
     m_serverPath = socketPath;
 
-    qDebug() << "Network: Attempting to connect to server at:" << socketPath;
+    // LOG_DEBUG("Network Connecting to server at: %s", socketPath.toLocal8Bit().constData());
 
     // 连接到本地服务器
     m_socket->connectToServer(socketPath);
-
+    // 等待连接建立，设置超时时间为 3 秒
     if (m_socket->waitForConnected(3000)) 
     {
-        qDebug() << "[Network] Connected successfully.";
+        LOG_INFO("Network Connected to server at: %s", socketPath.toLocal8Bit().constData());
         return true;
     } 
     else 
     {
-        qWarning() << "[Network] Connection failed:" << m_socket->errorString();
+        LOG_ERROR("Network Failed to connect to server at: %s. Error: %s",
+                  socketPath.toLocal8Bit().constData(),
+                  m_socket->errorString().toLocal8Bit().constData());
         return false;
     }
 
@@ -57,13 +61,13 @@ void Network::disconnectFromServer()
 {
     if (m_isConnected)
     {
-        qDebug() << "Network: Disconnecting from server at:" << m_serverPath;
+        LOG_INFO("Network Disconnecting from server at: %s", m_serverPath.toLocal8Bit().constData());
         // 断开连接
         m_socket->abort();
     }
     else
     {
-        qDebug() << "Network: disconnectFromServer called, but not currently connected.";
+       LOG_DEBUG("Network Not connected, no need to disconnect.");
     }
 }
 
@@ -76,13 +80,14 @@ void Network::sendData(const QByteArray &data)
 {
     if (!m_isConnected || !m_socket) 
     {
-        qWarning() << "[Network] Cannot send data: Not connected.";
+        LOG_WARN("Network Not connected to server. Cannot send data.");
         return; 
     }
 
     // 协议：[qint32 长度][实际数据]
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
+    // 设置小端字节序
     out.setByteOrder(QDataStream::LittleEndian);
 
     // 先写入数据长度
@@ -90,29 +95,28 @@ void Network::sendData(const QByteArray &data)
     // 再写入实际数据
     out.writeRawData(data.data(), data.size());
 
-    qDebug() << "[Network] Sending data packet of size:" << data.size() << "bytes (total"
-             << block.size() << "bytes with header).";
+    // LOG_DEBUG("Network Sending data to server, size: %d bytes.", block.size());
+    // LOG_DEBUG("Send: >>>>> %s", QString(block).toLocal8Bit().
 
     // 使用互斥锁保护写操作
     QMutexLocker locker(&m_sendMutex);
     qint64 bytesWritten = m_socket->write(block);
     if (bytesWritten == -1) 
     {
-        qCritical() << "[Network] Failed to write data to socket:" << m_socket->errorString();
+        LOG_WARN("Network Failed to write data to socket. Error: %s",
+                 m_socket->errorString().toLocal8Bit().constData());
         return; 
     }
 }
 
 void Network::onConnected()
 {
-    qDebug() << "Network: Successfully connected to server at" << m_serverPath;
     m_isConnected = true;
     emit connectionStatusChanged(true);
 }
 
 void Network::onDisconnected()
 {
-    qDebug() << "Network: Disconnected from server.";
     m_isConnected = false;
     emit connectionStatusChanged(false);
 }
@@ -120,7 +124,9 @@ void Network::onDisconnected()
 void Network::onSocketError(QLocalSocket::LocalSocketError socketError)
 {
     QString errorString = m_socket->errorString();
-    qCritical() << "Network: Socket error occurred (" << socketError << "):" << errorString;
+    LOG_ERROR("Network Socket error occurred: %s (Error code: %d)",
+              errorString.toLocal8Bit().constData(),
+              static_cast<int>(socketError));
 
     if (m_isConnected &&
         (socketError == QLocalSocket::ServerNotFoundError ||
@@ -162,8 +168,8 @@ void Network::processData()
             // 检查大小是否合理，防止恶意数据或错误
             if (size > MAX_MESSAGE_SIZE) 
             {
-                qCritical() << "[Network] Received packet size (" << size << " bytes) exceeds maximum allowed ("
-                            << MAX_MESSAGE_SIZE << " bytes). Disconnecting.";
+                LOG_ERROR("Network Received data size %u exceeds maximum allowed %d. Disconnecting.",
+                          size, MAX_MESSAGE_SIZE);
                 m_readBuffer.clear(); // 清空缓冲区
                 m_expectedDataSize = -1;
                 m_socket->disconnectFromServer(); // 断开连接
