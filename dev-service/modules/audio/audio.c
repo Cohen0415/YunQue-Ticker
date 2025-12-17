@@ -182,10 +182,20 @@ static rpc_result_t rpc_audio_volume_set(cJSON *params)
         return res;
     }
 
+    int ret = audio_volume_get(&volume);
+    if (ret != 0) 
+    {
+        LOGE("Failed to read audio volume value");
+        return res;
+    }
+
     cJSON *data = cJSON_CreateObject();
+    cJSON_AddNumberToObject(data, "volume", volume);
+
     res.status = 0;
     res.msg = "ok";
     res.data_json = cJSON_PrintUnformatted(data);
+
     cJSON_Delete(data);
     return res;
 }
