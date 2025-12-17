@@ -35,11 +35,11 @@ public slots:
     // 实现基类纯虚槽，处理收到的 JSON 消息。
     void onMessageReceived(const QJsonDocument& doc) override;
     
-    // 背光实际值范围 0 - 255 转 逻辑值范围 0 - 100
-    static int brightnessToLogical(int brightness);
-    static int logicalToBrightness(int logicalValue); 
-
 private:
+    
+    // 背光实际值范围 0 - 255 转 逻辑值范围 0 - 100
+    static int brightnessToLogical(int actualBrightness);
+    static int logicalToBrightness(int logicaBrightness);
     
 };
 

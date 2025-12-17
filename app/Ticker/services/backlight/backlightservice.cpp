@@ -152,20 +152,20 @@ void BacklightService::onMessageReceived(const QJsonDocument& doc)
     }
 }
 
-int BacklightService::brightnessToLogical(int brightness)
+int BacklightService::brightnessToLogical(int actualBrightness)
 {
-    if (brightness < MIN_BRIGHTNESS_ACTUAL)
-        brightness = MIN_BRIGHTNESS_ACTUAL;
-    if (brightness > MAX_BRIGHTNESS_ACTUAL)
-        brightness = MAX_BRIGHTNESS_ACTUAL;
-    return static_cast<int>((brightness / static_cast<double>(MAX_BRIGHTNESS_ACTUAL)) * 100);
+    if (actualBrightness < MIN_BRIGHTNESS_ACTUAL)
+        actualBrightness = MIN_BRIGHTNESS_ACTUAL;
+    if (actualBrightness > MAX_BRIGHTNESS_ACTUAL)
+        actualBrightness = MAX_BRIGHTNESS_ACTUAL;
+    return static_cast<int>((actualBrightness / static_cast<double>(MAX_BRIGHTNESS_ACTUAL)) * 100);
 }
 
-int BacklightService::logicalToBrightness(int logicalValue)
+int BacklightService::logicalToBrightness(int logicaBrightness)
 {
-    if (logicalValue < MIN_BRIGHTNESS_LOGIC) 
-        logicalValue = MIN_BRIGHTNESS_LOGIC;
-    if (logicalValue > MAX_BRIGHTNESS_LOGIC) 
-        logicalValue = MAX_BRIGHTNESS_LOGIC;
-    return static_cast<int>((logicalValue / 100.0) * MAX_BRIGHTNESS_ACTUAL);
+    if (logicaBrightness < MIN_BRIGHTNESS_LOGIC)
+        logicaBrightness = MIN_BRIGHTNESS_LOGIC;
+    if (logicaBrightness > MAX_BRIGHTNESS_LOGIC)
+        logicaBrightness = MAX_BRIGHTNESS_LOGIC;
+    return static_cast<int>((logicaBrightness / 100.0) * MAX_BRIGHTNESS_ACTUAL);
 }
