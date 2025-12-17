@@ -22,19 +22,22 @@ QString BacklightService::serviceName() const
 
 void BacklightService::setBrightness(int value)
 {
-    if (value < MIN_BRIGHTNESS || value > MAX_BRIGHTNESS) 
+    if (value < MIN_BRIGHTNESS_LOGIC || value > MAX_BRIGHTNESS_LOGIC) 
     {
         LOG_WARN("setBrightness called with invalid value %d. Must be between %d and %d.",
-                 value, MIN_BRIGHTNESS, MAX_BRIGHTNESS);
+                 value, MIN_BRIGHTNESS_LOGIC, MAX_BRIGHTNESS_LOGIC);
         return;
     }
+
+    // 转换逻辑值到实际值
+    int actualValue = logicalToBrightness(value);
 
     // 构造 'brightness.set' 请求
     QJsonObject request;
     request["cmd"] = QStringLiteral("brightness.set");
 
     QJsonObject params;
-    params["value"] = value;
+    params["value"] = actualValue;
     request["params"] = params;
 
     // LOG_DEBUG("[" + serviceName() + "] Sending 'brightness.set' request with value: %d.", value);
@@ -104,7 +107,9 @@ void BacklightService::onMessageReceived(const QJsonDocument& doc)
             LOG_WARN("'brightness.set' response 'data' is missing or not an object.");
             success = false;
         }
-
+        
+        // 实际值转逻辑值
+        resultValue = brightnessToLogical(resultValue);
         // 发射信号通知调用者结果
         emit brightnessSetResult(success, resultValue);
 
@@ -136,12 +141,31 @@ void BacklightService::onMessageReceived(const QJsonDocument& doc)
             success = false;
         }
 
+        // 实际值转逻辑值
+        resultValue = brightnessToLogical(resultValue);
         // 发射信号通知调用者结果
         emit brightnessGetResult(success, resultValue);
-
     } 
     else 
     {
         LOG_WARN("Received response for unknown command: %s", command.toLocal8Bit().constData());
     }
+}
+
+int BacklightService::brightnessToLogical(int brightness)
+{
+    if (brightness < MIN_BRIGHTNESS_ACTUAL)
+        brightness = MIN_BRIGHTNESS_ACTUAL;
+    if (brightness > MAX_BRIGHTNESS_ACTUAL)
+        brightness = MAX_BRIGHTNESS_ACTUAL;
+    return static_cast<int>((brightness / static_cast<double>(MAX_BRIGHTNESS_ACTUAL)) * 100);
+}
+
+int BacklightService::logicalToBrightness(int logicalValue)
+{
+    if (logicalValue < MIN_BRIGHTNESS_LOGIC) 
+        logicalValue = MIN_BRIGHTNESS_LOGIC;
+    if (logicalValue > MAX_BRIGHTNESS_LOGIC) 
+        logicalValue = MAX_BRIGHTNESS_LOGIC;
+    return static_cast<int>((logicalValue / 100.0) * MAX_BRIGHTNESS_ACTUAL);
 }

@@ -3,6 +3,10 @@
 
 #include "services/abstractservice.h"
 
+#define MIN_BRIGHTNESS_LOGIC        0       // 逻辑亮度最小值
+#define MAX_BRIGHTNESS_LOGIC        100     // 逻辑亮度最大值
+#define MIN_BRIGHTNESS_ACTUAL       0       // 实际亮度最小值
+#define MAX_BRIGHTNESS_ACTUAL       255     // 实际亮度最大值
 
 class BacklightService : public AbstractService
 {
@@ -12,9 +16,9 @@ public:
     
     explicit BacklightService(QObject *parent = nullptr);
 
-    // 实现基类纯虚函数，返回此服务处理的命令列表。
+    // 实现基类纯虚函数，返回此服务处理的命令列表
     QStringList registeredCommands() const override;
-    // 实现基类虚函数，返回服务名称。
+    // 实现基类虚函数，返回服务名称
     QString serviceName() const override;
     // 异步设置亮度值
     void setBrightness(int value);
@@ -30,11 +34,13 @@ public slots:
 
     // 实现基类纯虚槽，处理收到的 JSON 消息。
     void onMessageReceived(const QJsonDocument& doc) override;
+    
+    // 背光实际值范围 0 - 255 转 逻辑值范围 0 - 100
+    static int brightnessToLogical(int brightness);
+    static int logicalToBrightness(int logicalValue); 
 
 private:
     
-    static const int MIN_BRIGHTNESS = 0;
-    static const int MAX_BRIGHTNESS = 255;
 };
 
 #endif // BACKLIGHTSERVICE_H
