@@ -1,4 +1,5 @@
 include($$PWD/backlight/backlight.pri)
+include($$PWD/audio/audio.pri)
 
 HEADERS += \
     $$PWD/abstractservice.h \
