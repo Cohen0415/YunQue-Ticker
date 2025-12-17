@@ -1,0 +1,1 @@
+include($$PWD/log/log.pri)

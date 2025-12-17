@@ -34,6 +34,9 @@ include($$PWD/services/services.pri)
 # 数据模型层
 include($$PWD/models/models.pri)
 
+# 
+include($$PWD/utils/utils.pri)
+
 # presenter 和 view 层，其中 presenter 是 services 与 view 的桥梁
 # view 层获取用户事件，向 presenter 发送对应的信号 --->
 # presenter 层接收来自 view 层的信号，分析 view 层需要哪个数据模型的数据 --->
