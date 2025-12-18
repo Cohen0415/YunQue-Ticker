@@ -5,6 +5,11 @@
 #include <QString>
 #include <QDebug>
 
+// 强制开启日志上下文
+#ifndef QT_MESSAGELOGCONTEXT
+#define QT_MESSAGELOGCONTEXT
+#endif
+
 // 日志级别枚举 (从 0 开始)
 enum class LogLevel {
     DEBUG = 0,
