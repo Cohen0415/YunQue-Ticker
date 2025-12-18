@@ -3,10 +3,10 @@
 
 #include "services/abstractservice.h"
 
-#define MIN_BRIGHTNESS_LOGIC        0       // 逻辑亮度最小值
-#define MAX_BRIGHTNESS_LOGIC        100     // 逻辑亮度最大值
-#define MIN_BRIGHTNESS_ACTUAL       0       // 实际亮度最小值
-#define MAX_BRIGHTNESS_ACTUAL       255     // 实际亮度最大值
+#define MIN_BRIGHTNESS_LOGIC        (0)       // 逻辑亮度最小值
+#define MAX_BRIGHTNESS_LOGIC        (100)     // 逻辑亮度最大值
+#define MIN_BRIGHTNESS_ACTUAL       (0)       // 实际亮度最小值
+#define MAX_BRIGHTNESS_ACTUAL       (255)     // 实际亮度最大值
 
 class BacklightService : public AbstractService
 {

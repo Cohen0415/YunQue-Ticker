@@ -3,10 +3,10 @@
 
 #include "services/abstractservice.h"
 
-#define MIN_VOLUME_LOGIC        0       // 逻辑音量最小值
-#define MAX_VOLUME_LOGIC        100     // 逻辑音量最大值
-#define MIN_VOLUME_ACTUAL       0       // 实际音量最小值
-#define MAX_VOLUME_ACTUAL       255     // 实际音量最大值
+#define MIN_VOLUME_LOGIC        (0)       // 逻辑音量最小值
+#define MAX_VOLUME_LOGIC        (100)     // 逻辑音量最大值
+#define MIN_VOLUME_ACTUAL       (0)       // 实际音量最小值
+#define MAX_VOLUME_ACTUAL       (255)     // 实际音量最大值
 
 class AudioService : public AbstractService
 {
