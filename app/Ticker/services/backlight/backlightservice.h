@@ -20,10 +20,6 @@ public:
     QStringList registeredCommands() const override;
     // 实现基类虚函数，返回服务名称
     QString serviceName() const override;
-    // 异步设置亮度值
-    void setBrightness(int value);
-    // 异步获取当前亮度值，结果通过信号返回
-    void getBrightness();
 
 signals:
 
@@ -35,8 +31,18 @@ public slots:
     // 实现基类纯虚槽，处理收到的 JSON 消息。
     void onMessageReceived(const QJsonDocument& doc) override;
     
+    // 异步设置亮度值的槽函数
+    void onSetBrightness(int value);
+    // 异步获取当前亮度值的槽函数
+    void onGetBrightness();
+
 private:
     
+    // 异步设置亮度值
+    void setBrightness(int value);
+    // 异步获取当前亮度值，结果通过信号返回
+    void getBrightness();
+
     // 背光实际值范围 0 - 255 转 逻辑值范围 0 - 100
     static int brightnessToLogical(int actualBrightness);
     static int logicalToBrightness(int logicaBrightness);

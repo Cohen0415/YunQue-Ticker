@@ -152,6 +152,16 @@ void BacklightService::onMessageReceived(const QJsonDocument& doc)
     }
 }
 
+void BacklightService::onSetBrightness(int value)
+{
+    setBrightness(value);
+}
+
+void BacklightService::onGetBrightness()
+{
+    getBrightness();
+}
+
 int BacklightService::brightnessToLogical(int actualBrightness)
 {
     if (actualBrightness < MIN_BRIGHTNESS_ACTUAL)

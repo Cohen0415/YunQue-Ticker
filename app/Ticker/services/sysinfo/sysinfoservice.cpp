@@ -154,3 +154,13 @@ void SysinfoService::onMessageReceived(const QJsonDocument& doc)
         LOG_WARN("Received unknown command response: %s", command.toLocal8Bit().constData());
     }
 }
+
+void SysinfoService::onGetCpuTemperature()
+{
+    getCpuTemperature();
+}
+
+void SysinfoService::onGetBeijingTime()
+{
+    getBeijingTime();
+}

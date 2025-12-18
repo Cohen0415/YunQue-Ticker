@@ -15,10 +15,6 @@ public:
     QStringList registeredCommands() const override;
     // 实现基类虚函数，返回服务名称
     QString serviceName() const override;
-    // 异步获取CPU温度
-    void getCpuTemperature();
-    // 异步获取北京时间
-    void getBeijingTime();
 
 signals:
 
@@ -30,7 +26,17 @@ public slots:
     // 实现基类纯虚槽，处理收到的 JSON 消息
     void onMessageReceived(const QJsonDocument& doc) override;
 
+    // 异步获取CPU温度的槽函数
+    void onGetCpuTemperature();
+    // 异步获取北京时间的槽函数
+    void onGetBeijingTime();
+
 private:
+
+    // 异步获取CPU温度
+    void getCpuTemperature();
+    // 异步获取北京时间
+    void getBeijingTime();
 
 };
 

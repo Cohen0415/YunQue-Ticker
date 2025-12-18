@@ -53,7 +53,7 @@ void AudioService::setVolume(int value)
     sendMessage(QJsonDocument(request));
 }
 
-void AudioService::volume()
+void AudioService::getVolume()
 {
     /*
         {
@@ -256,6 +256,26 @@ void AudioService::onMessageReceived(const QJsonDocument& doc)
     {
         LOG_WARN("Received response for unknown command: %s", command.toLocal8Bit().constData());
     }
+}
+
+void AudioService::onSetVolume(int value)
+{
+    setVolume(value);
+}
+
+void AudioService::onGetVolume()
+{
+    getVolume();
+}
+
+void AudioService::onPlayAudioFile(const QString &filePath)
+{
+    playAudioFile(filePath);
+}
+
+void AudioService::onStopAudio()
+{
+    stopAudio();
 }
 
 int AudioService::volumeToLogical(int actualVolume)

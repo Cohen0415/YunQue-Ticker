@@ -184,3 +184,18 @@ void WifiService::onMessageReceived(const QJsonDocument& doc)
         LOG_WARN("Received response for unknown command: %s", command.toLocal8Bit().constData());
     }
 }
+
+void WifiService::onConnectToNetwork(const QString &ssid, const QString &password)
+{
+    connectToNetwork(ssid, password);
+}
+
+void WifiService::onDisconnectFromNetwork()
+{
+    disconnectFromNetwork();
+}
+
+void WifiService::onGetWifiStatus()
+{
+    getWifiStatus();
+}

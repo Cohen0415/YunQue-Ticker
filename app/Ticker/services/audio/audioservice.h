@@ -20,14 +20,6 @@ public:
     QStringList registeredCommands() const override;
     // 实现基类虚函数，返回服务名称
     QString serviceName() const override;
-    // 异步设置音量值
-    void setVolume(int value);
-    // 获取当前音量值
-    void volume();
-    // 异步播放音频文件
-    void playAudioFile(const QString& filePath);
-    // 异步停止音频播放
-    void stopAudio();
 
 signals:
 
@@ -41,7 +33,25 @@ public slots:
     // 实现基类纯虚槽，处理收到的 JSON 消息
     void onMessageReceived(const QJsonDocument& doc) override;
 
+    // 异步设置音量值的槽函数
+    void onSetVolume(int value);
+    // 异步获取当前音量值的槽函数
+    void onGetVolume();
+    // 异步播放音频文件的槽函数
+    void onPlayAudioFile(const QString& filePath);
+    // 异步停止音频播放的槽函数
+    void onStopAudio();
+
 private:
+
+    // 异步设置音量值
+    void setVolume(int value);
+    // 获取当前音量值
+    void getVolume();
+    // 异步播放音频文件
+    void playAudioFile(const QString& filePath);
+    // 异步停止音频播放
+    void stopAudio();
 
     // 音量实际值范围 0 - 255 转 逻辑值范围 0 - 100
     static int volumeToLogical(int actualVolume);
