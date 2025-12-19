@@ -1,6 +1,8 @@
 #include <QApplication>
 #include <QWidget>
 #include <QDebug>
+#include <QFontDatabase>
+#include <QFont>
 
 #include "widget.h"
 #include "utils/log/logger.h"
@@ -12,6 +14,18 @@ int main(int argc, char *argv[])
 
     installCustomLogger();
     LOG_DEBUG("Application started.");
+
+    int id = QFontDatabase::addApplicationFont(":/res/font/AlimamaShuHeiTi-Bold.ttf");
+    if (id != -1)
+    {
+        QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+        QFont font(family);
+        app.setFont(font);
+    }
+    else
+    {
+        LOG_DEBUG("Faild to load custom font.");
+    }
 
     AppContext appContext;
     if (appContext.init() != 0)
