@@ -15,7 +15,7 @@ CLIENT_TEST_DIR=${SERVICE_DIR}/test
 
 # qt客户端代码
 QT_DIR=${TOPDIR}/app
-QMAKE_PATH=/home/cohen/platform/t113/xiaozhi/tina5.0-v1.2/app/Qt-5.15.9/Qt-install-5.15.9/bin/qmake
+QMAKE_PATH=""
 QT_PRJ_DIR=${QT_DIR}/Ticker
 
 # 默认值
@@ -53,13 +53,16 @@ prepare_toolchain()
         export ARCH=arm
         export CROSS_COMPILE=arm-linux-gnueabi-
         export PATH=$PATH:${TOPDIR}/toolchain/t113/bin
+        QMAKE_PATH="/home/cohen/platform/t113/xiaozhi/tina5.0-v1.2/app/Qt-5.15.9/Qt-install-5.15.9/bin/qmake"
     elif [ "${PLATFORM}" = "t527" ]; then
         export ARCH=aarch64
         export CROSS_COMPILE=aarch64-none-linux-gnu-
         export PATH=$PATH:${TOPDIR}/toolchain/t527/bin
+        QMAKE_PATH=""
     elif [ "${PLATFORM}" = "linux" ]; then
         export ARCH=x86_64
         export CROSS_COMPILE=""
+        QMAKE_PATH="/opt/qt/qt-creator-5.14.2/5.14.2/gcc_64/bin/qmake"
     else
         log_error "Unsupported platform: ${PLATFORM}"
         exit 1
@@ -186,9 +189,9 @@ if [ ${BUILD_SERVICE} -eq 0 ] && \
     BUILD_QT=1
 fi
 
-# 目前只有 t113 支持 QT 编译
-if [ "${PLATFORM}" != "t113" ] && [ ${BUILD_QT} -eq 1 ]; then
-    log_warn "QT build is only supported for t113 platform. Skipping QT build."
+# 目前 t527 不支持 QT 编译
+if [ "${PLATFORM}" == "t527" ] && [ ${BUILD_QT} -eq 1 ]; then
+    log_warn "QT build is not supported for t527 platform. Skipping QT build."
     BUILD_QT=0
 fi
 
