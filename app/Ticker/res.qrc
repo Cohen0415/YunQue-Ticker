@@ -1,0 +1,24 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/icon/menuIcon/home.png</file>
+        <file>res/icon/menuIcon/setting.png</file>
+        <file>res/icon/menuIcon/sysinfo.png</file>
+        <file>res/icon/menuIcon/wifi.png</file>
+        <file>res/icon/staBarIcon/soundOff.png</file>
+        <file>res/icon/staBarIcon/soundOn.png</file>
+        <file>res/icon/staBarIcon/wifiConnect.png</file>
+        <file>res/icon/staBarIcon/wifiDisconnect.png</file>
+        <file>res/font/AlimamaShuHeiTi-Bold.ttf</file>
+        <file>res/icon/pageIcon/homePage/add.png</file>
+        <file>res/icon/pageIcon/settingPage/brightness.png</file>
+        <file>res/icon/pageIcon/settingPage/left.png</file>
+        <file>res/icon/pageIcon/settingPage/refreshTime.png</file>
+        <file>res/icon/pageIcon/settingPage/right.png</file>
+        <file>res/icon/pageIcon/settingPage/volume.png</file>
+        <file>res/icon/pageIcon/sysinfoPage/ip.png</file>
+        <file>res/icon/pageIcon/sysinfoPage/runtime.png</file>
+        <file>res/icon/pageIcon/sysinfoPage/storage.png</file>
+        <file>res/icon/pageIcon/sysinfoPage/version.png</file>
+        <file>res/icon/pageIcon/wifiPage/wifi.png</file>
+    </qresource>
+</RCC>
