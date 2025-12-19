@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QFontDatabase>
 #include <QFont>
+#include <QtGlobal>
 
 #include "widget.h"
 #include "utils/log/logger.h"
@@ -27,12 +28,16 @@ int main(int argc, char *argv[])
         LOG_DEBUG("Faild to load custom font.");
     }
 
+#if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86_64)
+
+#else
     AppContext appContext;
     if (appContext.init() != 0)
     {
         LOG_ERROR("Failed to initialize application context.");
         return -1;
     }
+#endif
 
     Widget w;
     w.show();
