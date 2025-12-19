@@ -14,7 +14,7 @@ Network::Network(QObject *parent)
     // 连接信号和槽
     connect(m_socket, &QLocalSocket::connected, this, &Network::onConnected);
     connect(m_socket, &QLocalSocket::disconnected, this, &Network::onDisconnected);
-    connect(m_socket, static_cast<void(QLocalSocket::*)(QLocalSocket::LocalSocketError)>(&QLocalSocket::errorOccurred),
+    connect(m_socket, static_cast<void(QLocalSocket::*)(QLocalSocket::LocalSocketError)>(&QLocalSocket::error),
                 this, &Network::onSocketError);
     
     connect(m_socket, &QLocalSocket::readyRead, this, &Network::onReadyRead);
@@ -159,7 +159,6 @@ void Network::processData()
         {
             // 从缓冲区创建一个临时的只读数据流来窥探头部
             QDataStream peekStream(m_readBuffer);
-            peekStream.setVersion(QDataStream::Qt_5_15);
             peekStream.setByteOrder(QDataStream::LittleEndian);
 
             quint32 size;
