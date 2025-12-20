@@ -3,6 +3,9 @@
 
 #include <QWidget>
 #include <QPushButton>
+#include <QPoint>
+#include <QScrollBar>
+
 #include "features/homePage/homepage.h"
 #include "features/settingPage/settingpage.h"
 #include "features/sysinfoPage/sysinfopage.h"
@@ -20,6 +23,10 @@ public:
 
     Widget(QWidget *parent = nullptr);
     ~Widget();
+
+protected:
+
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
 
@@ -55,5 +62,12 @@ private:
     SysinfoPage *m_sysinfoPageWidget;
     WifiPage *m_wifiPageWidget;
 
+    bool m_isDragging = false;
+    QPoint m_dragStartPos;              // 记录拖拽开始的位置
+    QScrollBar *m_verticalScrollBar;
+    int m_dragThreshold = 5;            // 拖拽阈值
+    bool m_isContentDragging = false;
+
+    void installScrollDragFilters();    // 初始化滚动
 };
 #endif // WIDGET_H
