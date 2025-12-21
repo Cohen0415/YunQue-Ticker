@@ -4,11 +4,16 @@
 #include <QObject>
 
 #include "utils/log/logger.h"
+
+// services
 #include "services/servicemanager.h"
 #include "services/backlight/backlightservice.h"
 #include "services/audio/audioservice.h"
 #include "services/sysinfo/sysinfoservice.h"
 #include "services/wifi/wifiservice.h"
+
+// presenters
+#include "features/settingPage/settingpresenter.h"
 
 #define UDS_PATH    "/tmp/dev.sock"
 
@@ -23,9 +28,16 @@ public:
 
     int init(void);
 
+    // 获取 AppContext 实例
+    static AppContext *getInstance();
+    // 获取 Presenters
+    SettingPresenter *settingPresenter();
+
 signals:
 
 private:
+
+    static AppContext *m_instance;
 
     ServiceManager m_serviceManager;
     BacklightService m_backlightService;
@@ -33,6 +45,7 @@ private:
     SysinfoService m_sysinfoService;
     WifiService m_wifiService;
 
+    SettingPresenter m_settingPresenter;
 };
 
 #endif // APPCONTEXT_H

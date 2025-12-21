@@ -1,6 +1,7 @@
 #include "widget.h"
 #include "ui_widget.h"
 #include "utils/log/logger.h"
+#include "appcontext.h"
 
 #include <QPushButton>
 #include <QScrollBar>
@@ -20,6 +21,9 @@ Widget::Widget(QWidget *parent)
 
     // 初始化 stackedWidget 页面
     StackedWidgetPageInit();
+
+    // 初始化信号槽
+    ConnectSignalAndSlot();
 
     // 安装滚动拖拽事件过滤器
     installScrollDragFilters();
@@ -155,8 +159,6 @@ void Widget::UiInit()
     // 初始化时间 UI
     BJTimeUIInit();
 
-    // 初始化信号槽
-    ConnectSignalAndSlot();
 }
 
 void Widget::MenuBarUIInit()
@@ -243,10 +245,19 @@ void Widget::ConnectSignalAndSlot()
         return;
     }
 
+    // 菜单栏按钮的信号槽连接
     connect(m_homePageBtn, &QPushButton::clicked, this, &Widget::onHomePageBtnClicked);
     connect(m_sysinfoPageBtn, &QPushButton::clicked, this, &Widget::onSysinfoPageBtnClicked);
     connect(m_settingPageBtn, &QPushButton::clicked, this, &Widget::onSettingPageBtnClicked);
     connect(m_wifiPageBtn, &QPushButton::clicked, this, &Widget::onWifiPageBtnClicked);
+
+    // presenters 和各个 page 的信号槽连接
+    SettingPresenter *settingPresenter = AppContext::getInstance()->settingPresenter();
+    // settingPage
+    connect(m_settingPageWidget, &SettingPage::setBacklightRequested, settingPresenter, &SettingPresenter::onBacklightChangeRequested);
+    connect(settingPresenter, &SettingPresenter::backlightChangeResult, m_settingPageWidget, &SettingPage::onBacklightSetResult);
+    connect(m_settingPageWidget, &SettingPage::setVolumeRequested, settingPresenter, &SettingPresenter::onVolumeChangeRequested);
+    connect(settingPresenter, &SettingPresenter::volumeChangeResult, m_settingPageWidget, &SettingPage::onVolumeSetResult);
 }
 
 void Widget::onHomePageBtnClicked()

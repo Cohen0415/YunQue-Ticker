@@ -154,6 +154,7 @@ void BacklightService::onMessageReceived(const QJsonDocument& doc)
 
 void BacklightService::onSetBrightness(int value)
 {
+    LOG_DEBUG("in BacklightService");
     setBrightness(value);
 }
 

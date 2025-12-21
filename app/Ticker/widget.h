@@ -11,6 +11,8 @@
 #include "features/sysinfoPage/sysinfopage.h"
 #include "features/wifiPage/wifipage.h"
 
+#include "features/settingPage/settingpresenter.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
 QT_END_NAMESPACE
@@ -41,6 +43,9 @@ private:
     // 信号槽函数初始化
     void ConnectSignalAndSlot(void);
 
+    // 初始化滚动
+    void installScrollDragFilters();
+
 private slots:
 
     void onHomePageBtnClicked(void);
@@ -62,12 +67,14 @@ private:
     SysinfoPage *m_sysinfoPageWidget;
     WifiPage *m_wifiPageWidget;
 
+    SettingPresenter *m_settingPresenter;
+
     bool m_isDragging = false;
     QPoint m_dragStartPos;              // 记录拖拽开始的位置
     QScrollBar *m_verticalScrollBar;
     int m_dragThreshold = 5;            // 拖拽阈值
     bool m_isContentDragging = false;
 
-    void installScrollDragFilters();    // 初始化滚动
+
 };
 #endif // WIDGET_H

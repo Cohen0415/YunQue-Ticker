@@ -12,10 +12,12 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    Widget w;
 
+    // 1、安装自定义日志系统
     installCustomLogger();
-    LOG_DEBUG("Application started.");
 
+    // 2、设置字体
     int id = QFontDatabase::addApplicationFont(":/res/font/AlimamaShuHeiTi-Bold.ttf");
     if (id != -1)
     {
@@ -28,18 +30,17 @@ int main(int argc, char *argv[])
         LOG_DEBUG("Faild to load custom font.");
     }
 
+    // 3、初始化 AppContext
 #if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86_64)
 
 #else
-    AppContext appContext;
-    if (appContext.init() != 0)
+    if (AppContext::getInstance()->init() != 0)
     {
         LOG_ERROR("Failed to initialize application context.");
         return -1;
     }
 #endif
 
-    Widget w;
     w.show();
     return app.exec();
 }
