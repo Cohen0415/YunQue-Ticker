@@ -8,13 +8,16 @@ SettingPage::SettingPage(QWidget *parent)
     , ui(new Ui::SettingPage)
 {
     ui->setupUi(this);
-
-    UIinit();
 }
 
 SettingPage::~SettingPage()
 {
     delete ui;
+}
+
+void SettingPage::init()
+{
+    UIinit();
 }
 
 // UI 初始化
@@ -27,37 +30,98 @@ void SettingPage::UIinit()
     // 初始化音量滑动条的范围为 0～100
     ui->soundHarSlider->setMinimum(0);
     ui->soundHarSlider->setMaximum(100);
+
+    // 通过发送信号初始化背光值和音量值
+    emit getBacklightRequested();
+    emit getVolumeRequested();
+}
+
+// 更新背光 UI 显示
+void SettingPage::updateBacklightUI(int value)
+{
+
+    ui->backlightValueLabel->setText(QString::number(value));
+    ui->backlightHarSlider->setValue(value);
+}
+
+// 更新音量 UI 显示
+void SettingPage::updateVolumeUI(int value)
+{
+    // 如果音量为 0, 相关控件变成 disabled，复选框状态变成勾选
+    if (!(ui->soundCheckBox->isChecked()))
+    {
+        ui->soundValueLabel->setText(QString::number(value));
+        ui->soundHarSlider->setValue(value);
+
+        if (value <= 0)
+        {
+            ui->soundHarSlider->setEnabled(false);
+            ui->soundPreBtn->setEnabled(false);
+            ui->soundNextBtn->setEnabled(false);
+            ui->soundCheckBox->setChecked(true);
+            emit PageMsgManager::getInstance()->volumeMuteStateChanged(true);
+        }
+        else
+        {
+            ui->soundHarSlider->setEnabled(true);
+            ui->soundPreBtn->setEnabled(true);
+            ui->soundNextBtn->setEnabled(true);
+            ui->soundCheckBox->setChecked(false);
+            emit PageMsgManager::getInstance()->volumeMuteStateChanged(false);
+        }
+    }
+    // 如果静音复选框被勾选，且旧音量不为 0，说明用户已经通过复选框一键静音
+    else if (ui->soundCheckBox->isChecked() && m_oldVolumeValue != 0 && value == 0)
+    {
+        ui->soundValueLabel->setText(QString::number(m_oldVolumeValue));
+        ui->soundHarSlider->setValue(m_oldVolumeValue);
+
+        ui->soundHarSlider->setEnabled(false);
+        ui->soundPreBtn->setEnabled(false);
+        ui->soundNextBtn->setEnabled(false);
+
+        ui->soundCheckBox->setChecked(true);
+        emit PageMsgManager::getInstance()->volumeMuteStateChanged(true);
+
+        return; // 直接返回，不更新 m_oldVolumeValue
+    }
+
+    m_oldVolumeValue = value;
 }
 
 // 接收 presenter 发送的背光设置结果
 void SettingPage::onBacklightSetResult(bool success, int value)
 {
-    updateBacklightUI(success, value);
+    if (success)
+    {
+        updateBacklightUI(value);
+    }
+}
+
+// 接收 presenter 发送的背光获取结果
+void SettingPage::onBacklightGetResult(bool success, int value)
+{
+    if (success)
+    {
+        updateBacklightUI(value);
+    }
 }
 
 // 接收 presenter 发送的音量设置结果
 void SettingPage::onVolumeSetResult(bool success, int value)
 {
-    updateVolumeUI(success, value);
-}
-
-// 更新背光 UI 显示
-void SettingPage::updateBacklightUI(bool success, int value)
-{
     if (success)
     {
-        ui->backlightValueLabel->setText(QString::number(value));
-        ui->backlightHarSlider->setValue(value);
+        updateVolumeUI(value);
     }
 }
 
-// 更新音量 UI 显示
-void SettingPage::updateVolumeUI(bool success, int value)
+// 接收 presenter 发送的音量获取结果
+void SettingPage::onVolumeGetResult(bool success, int value)
 {
     if (success)
     {
-        ui->soundValueLabel->setText(QString::number(value));
-        ui->soundHarSlider->setValue(value);
+        updateVolumeUI(value);
     }
 }
 
@@ -151,31 +215,16 @@ void SettingPage::on_soundNextBtn_clicked()
 void SettingPage::on_soundCheckBox_stateChanged(int arg1)
 {
     // 静音勾选框
-    // 选中，直接禁用音量条和加减按钮，并发送 0 音量请求
+    // 静音
     if (arg1 == Qt::Checked)
     {
-        ui->soundHarSlider->setEnabled(false);
-        ui->soundPreBtn->setEnabled(false);
-        ui->soundNextBtn->setEnabled(false);
-        // 向 presenter 发送音量设置请求信号，设置为 0
+        // 用户想静音
         emit setVolumeRequested(0);
-        // 向 pageMsgManager 发送静音状态变化信号
-        emit PageMsgManager::getInstance()->volumeMuteStateChanged(true);
     }
     else // 取消静音
     {
-        ui->soundHarSlider->setEnabled(true);
-        ui->soundPreBtn->setEnabled(true);
-        ui->soundNextBtn->setEnabled(true);
-        // 向 presenter 发送音量设置请求信号，设置为滑动条当前值
-        emit setVolumeRequested(ui->soundHarSlider->value());
-        // 向 pageMsgManager 发送静音状态变化信号
-        emit PageMsgManager::getInstance()->volumeMuteStateChanged(false);
+        // 用户想取消静音
+        // 如果旧音量值有效，恢复旧音量值
+        emit setVolumeRequested((m_oldVolumeValue > 0) ? m_oldVolumeValue : 50);
     }
 }
-
-
-
-
-
-

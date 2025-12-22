@@ -26,6 +26,8 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
+    void Init();
+
 protected:
 
     bool eventFilter(QObject *obj, QEvent *event) override;
@@ -40,6 +42,9 @@ private:
 
     // stackedWidget 页面初始化
     void StackedWidgetPageInit(void);
+
+    // pages 初始化
+    void PagesInit(void);
 
     // 信号槽函数初始化
     void ConnectSignalAndSlot(void);

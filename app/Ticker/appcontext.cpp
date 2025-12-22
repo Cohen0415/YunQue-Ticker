@@ -23,7 +23,7 @@ SettingPresenter *AppContext::settingPresenter()
     return &m_settingPresenter;
 }
 
-int AppContext::init()
+int AppContext::Init()
 {
     // 初始化 ServiceManager
     int ret = m_serviceManager.initialize(UDS_PATH);
@@ -49,12 +49,19 @@ int AppContext::init()
 
     // presenters 和各个 services 的信号槽连接
     // settingPresenter
-    // backlight
-    QObject::connect(&m_settingPresenter, &SettingPresenter::requestBacklightChange, &m_backlightService, &BacklightService::onSetBrightness);
-    QObject::connect(&m_backlightService, &BacklightService::brightnessSetResult, &m_settingPresenter, &SettingPresenter::handleBacklightChangeResult);
-    // audio
-    QObject::connect(&m_settingPresenter, &SettingPresenter::requestVolumeChange, &m_audioService, &AudioService::onSetVolume);
-    QObject::connect(&m_audioService, &AudioService::volumeSetResult, &m_settingPresenter, &SettingPresenter::handleVolumeChangeResult);
+    // backlight set
+    QObject::connect(&m_settingPresenter, &SettingPresenter::requestBacklightSetChange, &m_backlightService, &BacklightService::onSetBrightness);
+    QObject::connect(&m_backlightService, &BacklightService::brightnessSetResult, &m_settingPresenter, &SettingPresenter::handleBacklightSetChangeResult);
+    // backlight get
+    QObject::connect(&m_settingPresenter, &SettingPresenter::requestBacklightGetChange, &m_backlightService, &BacklightService::onGetBrightness);
+    QObject::connect(&m_backlightService, &BacklightService::brightnessGetResult, &m_settingPresenter, &SettingPresenter::handleBacklightGetChangeResult);
+    // audio set
+    QObject::connect(&m_settingPresenter, &SettingPresenter::requestVolumeSetChange, &m_audioService, &AudioService::onSetVolume);
+    QObject::connect(&m_audioService, &AudioService::volumeSetResult, &m_settingPresenter, &SettingPresenter::handleVolumeSetChangeResult);
+    // audio get
+    QObject::connect(&m_settingPresenter, &SettingPresenter::requestVolumeGetChange, &m_audioService, &AudioService::onGetVolume);
+    LOG_DEBUG("000000");
+    QObject::connect(&m_audioService, &AudioService::volumeGetResult, &m_settingPresenter, &SettingPresenter::handleVolumeGetChangeResult);
 
     return 0;
 }

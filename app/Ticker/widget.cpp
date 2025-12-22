@@ -17,7 +17,15 @@ Widget::Widget(QWidget *parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
+}
 
+Widget::~Widget()
+{
+    delete ui;
+}
+
+void Widget::Init()
+{
     // 初始化 UI
     UiInit();
 
@@ -27,13 +35,11 @@ Widget::Widget(QWidget *parent)
     // 初始化信号槽
     ConnectSignalAndSlot();
 
+    // 初始化 pages
+    PagesInit();
+
     // 安装滚动拖拽事件过滤器
     installScrollDragFilters();
-}
-
-Widget::~Widget()
-{
-    delete ui;
 }
 
 void Widget::installScrollDragFilters()
@@ -248,6 +254,12 @@ void Widget::StackedWidgetPageInit()
     ui->stackedWidget->setCurrentWidget(m_homePageWidget);
 }
 
+void Widget::PagesInit()
+{
+    // settingPage init
+    m_settingPageWidget->init();
+}
+
 void Widget::ConnectSignalAndSlot()
 {
     if (!m_homePageBtn || !m_sysinfoPageBtn || !m_settingPageBtn || !m_wifiPageBtn)
@@ -264,10 +276,18 @@ void Widget::ConnectSignalAndSlot()
     // presenters 和各个 page 的信号槽连接
     SettingPresenter *settingPresenter = AppContext::getInstance()->settingPresenter();
     // settingPage
-    connect(m_settingPageWidget, &SettingPage::setBacklightRequested, settingPresenter, &SettingPresenter::onBacklightChangeRequested);
-    connect(settingPresenter, &SettingPresenter::backlightChangeResult, m_settingPageWidget, &SettingPage::onBacklightSetResult);
-    connect(m_settingPageWidget, &SettingPage::setVolumeRequested, settingPresenter, &SettingPresenter::onVolumeChangeRequested);
-    connect(settingPresenter, &SettingPresenter::volumeChangeResult, m_settingPageWidget, &SettingPage::onVolumeSetResult);
+    // backlight set
+    connect(m_settingPageWidget, &SettingPage::setBacklightRequested, settingPresenter, &SettingPresenter::onBacklightSetChangeRequested);
+    connect(settingPresenter, &SettingPresenter::backlightSetChangeResult, m_settingPageWidget, &SettingPage::onBacklightSetResult);
+    // backlight get
+    connect(m_settingPageWidget, &SettingPage::getBacklightRequested, settingPresenter, &SettingPresenter::onBacklightGetChangeRequested);
+    connect(settingPresenter, &SettingPresenter::backlightGetChangeResult, m_settingPageWidget, &SettingPage::onBacklightGetResult);
+    // audio set
+    connect(m_settingPageWidget, &SettingPage::setVolumeRequested, settingPresenter, &SettingPresenter::onVolumeSetChangeRequested);
+    connect(settingPresenter, &SettingPresenter::volumeSetChangeResult, m_settingPageWidget, &SettingPage::onVolumeSetResult);
+    // audio get
+    connect(m_settingPageWidget, &SettingPage::getVolumeRequested, settingPresenter, &SettingPresenter::onVolumeGetChangeRequested);
+    connect(settingPresenter, &SettingPresenter::volumeGetChangeResult, m_settingPageWidget, &SettingPage::onVolumeGetResult);
 
     // 订阅 PageMsgManager 的信号槽连接
     // 音量静音状态变化信号

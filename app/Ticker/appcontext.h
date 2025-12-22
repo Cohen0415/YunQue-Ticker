@@ -26,7 +26,7 @@ public:
     explicit AppContext(QObject *parent = nullptr);
     ~AppContext();
 
-    int init(void);
+    int Init(void);
 
     // 获取 AppContext 实例
     static AppContext *getInstance();

@@ -25,6 +25,40 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">#backlightHarSlider::handle:horizontal,
+#soundHarSlider::handle:horizontal {
+    background: #3498db;              /* 滑块颜色，可根据需要调整 */
+    width: 32px;                        /* 滑块宽度 */
+    height: 32px;                       /* 滑块高度 */
+    border-radius: 16px;                /* 圆形滑块 */
+    margin: -12px 0;                    /* 保证滑块在槽中居中 */
+}
+
+#backlightHarSlider::groove:horizontal,
+#soundHarSlider::groove:horizontal {
+    background: #dddddd;              /* 可自定义槽体颜色 */
+    height: 8px;                        /* 槽体厚度 */
+    border-radius: 4px;
+}
+
+#backlightHarSlider::sub-page:horizontal,
+#soundHarSlider::sub-page:horizontal {
+    background: #3498db;            /* 进度填充颜色 */
+    border-radius: 4px;
+}
+
+#backlightHarSlider::add-page:horizontal,
+#soundHarSlider::add-page:horizontal {
+    background: #e0e0e0;
+    border-radius: 4px;
+}
+
+QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+}</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
     <number>0</number>
@@ -182,6 +216,18 @@
       </item>
       <item>
        <widget class="QSlider" name="backlightHarSlider">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -312,7 +358,7 @@
             </font>
            </property>
            <property name="text">
-            <string>亮度设置</string>
+            <string>音量设置</string>
            </property>
           </widget>
          </item>
@@ -377,6 +423,12 @@
          </item>
          <item>
           <widget class="QSlider" name="soundHarSlider">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -430,7 +482,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>35</width>
+          <width>33</width>
           <height>20</height>
          </size>
         </property>
@@ -442,6 +494,44 @@
          <font>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#SettingPage {
+    background-color: #000;
+}
+
+#SettingPage QLabel {
+    color: white;
+}
+
+#backlightHarSlider::handle:horizontal,
+#soundHarSlider::handle:horizontal {
+    background: #3498db;
+    border: 1px solid #5c5c5c;
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    margin: -12px 0;
+}
+
+#backlightHarSlider::groove:horizontal,
+#soundHarSlider::groove:horizontal {
+    background: #dddddd;
+    height: 8px;
+    border-radius: 4px;
+}
+
+#backlightHarSlider::sub-page:horizontal,
+#soundHarSlider::sub-page:horizontal {
+    background: #3498db;
+    border-radius: 4px;
+}
+
+#backlightHarSlider::add-page:horizontal,
+#soundHarSlider::add-page:horizontal {
+    background: #e0e0e0;
+    border-radius: 4px;
+}</string>
         </property>
         <property name="text">
          <string>静音</string>
