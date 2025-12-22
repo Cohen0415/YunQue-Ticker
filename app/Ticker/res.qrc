@@ -20,5 +20,6 @@
         <file>res/icon/pageIcon/sysinfoPage/storage.png</file>
         <file>res/icon/pageIcon/sysinfoPage/version.png</file>
         <file>res/icon/pageIcon/wifiPage/wifi.png</file>
+        <file>res/qss/pageQss/settingPage.qss</file>
     </qresource>
 </RCC>

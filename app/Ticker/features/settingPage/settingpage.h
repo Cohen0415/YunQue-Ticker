@@ -62,6 +62,9 @@ private:
     void updateBacklightUI(int value);
     void updateVolumeUI(int value);
 
+    // 加载样式表
+    QString LoadQssStyle(const QString &path);
+
 private:
 
     Ui::SettingPage *ui;

@@ -2,6 +2,7 @@
 #include "ui_settingpage.h"
 #include "utils/log/logger.h"
 #include "features/pagemsgmanager.h"
+#include <QFile>
 
 SettingPage::SettingPage(QWidget *parent)
     : QWidget(parent)
@@ -30,6 +31,11 @@ void SettingPage::UIinit()
     // 初始化音量滑动条的范围为 0～100
     ui->soundHarSlider->setMinimum(0);
     ui->soundHarSlider->setMaximum(100);
+
+    // 加载样式表
+    QString qss = LoadQssStyle(":/res/qss/pageQss/settingPage.qss");
+    if (!qss.isEmpty())
+        this->setStyleSheet(qss);
 
     // 通过发送信号初始化背光值和音量值
     emit getBacklightRequested();
@@ -87,6 +93,20 @@ void SettingPage::updateVolumeUI(int value)
     }
 
     m_oldVolumeValue = value;
+}
+
+QString SettingPage::LoadQssStyle(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+        return QString(); // 打开失败返回空字符串
+
+    QTextStream in(&file);
+    in.setCodec("UTF-8"); // 保证中文正常显示
+
+    QString style = in.readAll();
+    file.close();
+    return style;
 }
 
 // 接收 presenter 发送的背光设置结果

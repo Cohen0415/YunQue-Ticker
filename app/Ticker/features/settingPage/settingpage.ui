@@ -25,40 +25,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">#backlightHarSlider::handle:horizontal,
-#soundHarSlider::handle:horizontal {
-    background: #3498db;              /* 滑块颜色，可根据需要调整 */
-    width: 32px;                        /* 滑块宽度 */
-    height: 32px;                       /* 滑块高度 */
-    border-radius: 16px;                /* 圆形滑块 */
-    margin: -12px 0;                    /* 保证滑块在槽中居中 */
-}
-
-#backlightHarSlider::groove:horizontal,
-#soundHarSlider::groove:horizontal {
-    background: #dddddd;              /* 可自定义槽体颜色 */
-    height: 8px;                        /* 槽体厚度 */
-    border-radius: 4px;
-}
-
-#backlightHarSlider::sub-page:horizontal,
-#soundHarSlider::sub-page:horizontal {
-    background: #3498db;            /* 进度填充颜色 */
-    border-radius: 4px;
-}
-
-#backlightHarSlider::add-page:horizontal,
-#soundHarSlider::add-page:horizontal {
-    background: #e0e0e0;
-    border-radius: 4px;
-}
-
-QCheckBox::indicator {
-    width: 20px;
-    height: 20px;
-}</string>
-  </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
     <number>0</number>
@@ -147,7 +113,7 @@ QCheckBox::indicator {
        <widget class="QLabel" name="backlightSloganLabel">
         <property name="font">
          <font>
-          <pointsize>14</pointsize>
+          <pointsize>18</pointsize>
          </font>
         </property>
         <property name="text">
@@ -165,7 +131,7 @@ QCheckBox::indicator {
         </property>
         <property name="font">
          <font>
-          <pointsize>14</pointsize>
+          <pointsize>18</pointsize>
          </font>
         </property>
         <property name="text">
@@ -205,8 +171,8 @@ QCheckBox::indicator {
         </property>
         <property name="iconSize">
          <size>
-          <width>32</width>
-          <height>32</height>
+          <width>48</width>
+          <height>48</height>
          </size>
         </property>
         <property name="flat">
@@ -262,8 +228,8 @@ QCheckBox::indicator {
         </property>
         <property name="iconSize">
          <size>
-          <width>32</width>
-          <height>32</height>
+          <width>48</width>
+          <height>48</height>
          </size>
         </property>
         <property name="flat">
@@ -354,7 +320,7 @@ QCheckBox::indicator {
           <widget class="QLabel" name="soundSloganLabel">
            <property name="font">
             <font>
-             <pointsize>14</pointsize>
+             <pointsize>18</pointsize>
             </font>
            </property>
            <property name="text">
@@ -372,7 +338,7 @@ QCheckBox::indicator {
            </property>
            <property name="font">
             <font>
-             <pointsize>14</pointsize>
+             <pointsize>18</pointsize>
             </font>
            </property>
            <property name="text">
@@ -412,8 +378,8 @@ QCheckBox::indicator {
            </property>
            <property name="iconSize">
             <size>
-             <width>32</width>
-             <height>32</height>
+             <width>48</width>
+             <height>48</height>
             </size>
            </property>
            <property name="flat">
@@ -463,8 +429,8 @@ QCheckBox::indicator {
            </property>
            <property name="iconSize">
             <size>
-             <width>32</width>
-             <height>32</height>
+             <width>48</width>
+             <height>48</height>
             </size>
            </property>
            <property name="flat">
@@ -482,7 +448,7 @@ QCheckBox::indicator {
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>33</width>
+          <width>25</width>
           <height>20</height>
          </size>
         </property>
@@ -492,7 +458,7 @@ QCheckBox::indicator {
        <widget class="QCheckBox" name="soundCheckBox">
         <property name="font">
          <font>
-          <pointsize>14</pointsize>
+          <pointsize>18</pointsize>
          </font>
         </property>
         <property name="styleSheet">
