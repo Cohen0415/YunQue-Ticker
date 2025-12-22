@@ -18,6 +18,10 @@ SettingPage::~SettingPage()
 
 void SettingPage::UIinit()
 {
+    qDebug() << QIcon(":/res/icon/pageIcon/settingPage/left.png").isNull();
+
+
+
     // 初始化背光滑动条的范围为 0～100
     ui->backlightHarSlider->setMinimum(0);
     ui->backlightHarSlider->setMaximum(100);
@@ -70,3 +74,97 @@ void SettingPage::on_soundHarSlider_sliderReleased()
     // 向 presenter 发送音量设置请求信号
     emit setVolumeRequested(ui->soundHarSlider->value());
 }
+
+void SettingPage::on_backlightHarSlider_valueChanged(int value)
+{
+    ui->backlightValueLabel->setText(QString::number(value));
+}
+
+void SettingPage::on_soundHarSlider_valueChanged(int value)
+{
+    ui->soundValueLabel->setText(QString::number(value));
+}
+
+void SettingPage::on_backlightPreBtn_clicked()
+{
+    // 背光滑动条减 1
+    int currentValue = ui->backlightHarSlider->value();
+    if (currentValue > ui->backlightHarSlider->minimum())
+    {
+        currentValue--;
+        ui->backlightHarSlider->setValue(currentValue);
+        ui->backlightValueLabel->setText(QString::number(currentValue));
+        // 向 presenter 发送背光设置请求信号
+        emit setBacklightRequested(currentValue);
+    }
+}
+
+void SettingPage::on_backlightNextBtn_clicked()
+{
+    // 背光滑动条加 1
+    int currentValue = ui->backlightHarSlider->value();
+    if (currentValue < ui->backlightHarSlider->maximum())
+    {
+        currentValue++;
+        ui->backlightHarSlider->setValue(currentValue);
+        ui->backlightValueLabel->setText(QString::number(currentValue));
+        // 向 presenter 发送背光设置请求信号
+        emit setBacklightRequested(currentValue);
+    }
+}
+
+void SettingPage::on_soundPreBtn_clicked()
+{
+    // 音量滑动条减 1
+    int currentValue = ui->soundHarSlider->value();
+    if (currentValue > ui->soundHarSlider->minimum())
+    {
+        currentValue--;
+        ui->soundHarSlider->setValue(currentValue);
+        ui->soundValueLabel->setText(QString::number(currentValue));
+        // 向 presenter 发送音量设置请求信号
+        emit setVolumeRequested(currentValue);
+    }
+}
+
+void SettingPage::on_soundNextBtn_clicked()
+{
+    // 音量滑动条加 1
+    int currentValue = ui->soundHarSlider->value();
+    if (currentValue < ui->soundHarSlider->maximum())
+    {
+        currentValue++;
+        ui->soundHarSlider->setValue(currentValue);
+        ui->soundValueLabel->setText(QString::number(currentValue));
+        // 向 presenter 发送音量设置请求信号
+        emit setVolumeRequested(currentValue);
+    }
+}
+
+void SettingPage::on_soundCheckBox_stateChanged(int arg1)
+{
+    // 静音勾选框
+    // 选中，直接禁用音量条和加减按钮，并发送 0 音量请求
+    if (arg1 == Qt::Checked)
+    {
+        ui->soundHarSlider->setEnabled(false);
+        ui->soundPreBtn->setEnabled(false);
+        ui->soundNextBtn->setEnabled(false);
+        // 向 presenter 发送音量设置请求信号，设置为 0
+        emit setVolumeRequested(0);
+    }
+    else // 取消静音
+    {
+        ui->soundHarSlider->setEnabled(true);
+        ui->soundPreBtn->setEnabled(true);
+        ui->soundNextBtn->setEnabled(true);
+        // 向 presenter 发送音量设置请求信号，设置为滑动条当前值
+        emit setVolumeRequested(ui->soundHarSlider->value());
+    }
+}
+
+
+
+
+
+

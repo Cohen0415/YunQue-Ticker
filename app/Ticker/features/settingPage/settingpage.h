@@ -27,6 +27,16 @@ private slots:
     void on_backlightHarSlider_sliderReleased();
     void on_soundHarSlider_sliderReleased();
 
+    void on_backlightPreBtn_clicked();
+    void on_backlightNextBtn_clicked();
+    void on_soundPreBtn_clicked();
+    void on_soundNextBtn_clicked();
+
+    void on_soundCheckBox_stateChanged(int arg1);
+
+    void on_soundHarSlider_valueChanged(int value);
+    void on_backlightHarSlider_valueChanged(int value);
+
 public slots:
 
     // 接收 presenter 发送的结果
