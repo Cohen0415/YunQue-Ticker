@@ -1,6 +1,7 @@
 #include "settingpage.h"
 #include "ui_settingpage.h"
 #include "utils/log/logger.h"
+#include "features/pagemsgmanager.h"
 
 SettingPage::SettingPage(QWidget *parent)
     : QWidget(parent)
@@ -16,12 +17,9 @@ SettingPage::~SettingPage()
     delete ui;
 }
 
+// UI 初始化
 void SettingPage::UIinit()
 {
-    qDebug() << QIcon(":/res/icon/pageIcon/settingPage/left.png").isNull();
-
-
-
     // 初始化背光滑动条的范围为 0～100
     ui->backlightHarSlider->setMinimum(0);
     ui->backlightHarSlider->setMaximum(100);
@@ -63,28 +61,33 @@ void SettingPage::updateVolumeUI(bool success, int value)
     }
 }
 
+// 背光滑动条释放槽函数
 void SettingPage::on_backlightHarSlider_sliderReleased()
 {
     // 向 presenter 发送背光设置请求信号
     emit setBacklightRequested(ui->backlightHarSlider->value());
 }
 
+// 音量滑动条释放槽函数
 void SettingPage::on_soundHarSlider_sliderReleased()
 {
     // 向 presenter 发送音量设置请求信号
     emit setVolumeRequested(ui->soundHarSlider->value());
 }
 
+// 背光滑动条值变化槽函数
 void SettingPage::on_backlightHarSlider_valueChanged(int value)
 {
     ui->backlightValueLabel->setText(QString::number(value));
 }
 
+// 音量滑动条值变化槽函数
 void SettingPage::on_soundHarSlider_valueChanged(int value)
 {
     ui->soundValueLabel->setText(QString::number(value));
 }
 
+// 背光减按钮槽函数
 void SettingPage::on_backlightPreBtn_clicked()
 {
     // 背光滑动条减 1
@@ -99,6 +102,7 @@ void SettingPage::on_backlightPreBtn_clicked()
     }
 }
 
+// 背光加按钮槽函数
 void SettingPage::on_backlightNextBtn_clicked()
 {
     // 背光滑动条加 1
@@ -113,6 +117,7 @@ void SettingPage::on_backlightNextBtn_clicked()
     }
 }
 
+// 音量减按钮槽函数
 void SettingPage::on_soundPreBtn_clicked()
 {
     // 音量滑动条减 1
@@ -127,6 +132,7 @@ void SettingPage::on_soundPreBtn_clicked()
     }
 }
 
+// 音量加按钮槽函数
 void SettingPage::on_soundNextBtn_clicked()
 {
     // 音量滑动条加 1
@@ -141,6 +147,7 @@ void SettingPage::on_soundNextBtn_clicked()
     }
 }
 
+// 音量静音勾选框状态变化槽函数
 void SettingPage::on_soundCheckBox_stateChanged(int arg1)
 {
     // 静音勾选框
@@ -152,6 +159,8 @@ void SettingPage::on_soundCheckBox_stateChanged(int arg1)
         ui->soundNextBtn->setEnabled(false);
         // 向 presenter 发送音量设置请求信号，设置为 0
         emit setVolumeRequested(0);
+        // 向 pageMsgManager 发送静音状态变化信号
+        emit PageMsgManager::getInstance()->volumeMuteStateChanged(true);
     }
     else // 取消静音
     {
@@ -160,6 +169,8 @@ void SettingPage::on_soundCheckBox_stateChanged(int arg1)
         ui->soundNextBtn->setEnabled(true);
         // 向 presenter 发送音量设置请求信号，设置为滑动条当前值
         emit setVolumeRequested(ui->soundHarSlider->value());
+        // 向 pageMsgManager 发送静音状态变化信号
+        emit PageMsgManager::getInstance()->volumeMuteStateChanged(false);
     }
 }
 

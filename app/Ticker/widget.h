@@ -36,6 +36,7 @@ private:
     void UiInit(void);
     void MenuBarUIInit(void);
     void BJTimeUIInit(void);
+    void StaBarUIInit(void);
 
     // stackedWidget 页面初始化
     void StackedWidgetPageInit(void);
@@ -52,6 +53,8 @@ private slots:
     void onSysinfoPageBtnClicked(void);
     void onSettingPageBtnClicked(void);
     void onWifiPageBtnClicked(void);
+
+    void onVolumeMuteStateChanged(bool isMuted);
 
 private:
 
@@ -74,7 +77,6 @@ private:
     QScrollBar *m_verticalScrollBar;
     int m_dragThreshold = 5;            // 拖拽阈值
     bool m_isContentDragging = false;
-
 
 };
 #endif // WIDGET_H

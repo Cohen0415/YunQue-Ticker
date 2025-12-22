@@ -2,6 +2,7 @@
 #include "ui_widget.h"
 #include "utils/log/logger.h"
 #include "appcontext.h"
+#include "features/pagemsgmanager.h"
 
 #include <QPushButton>
 #include <QScrollBar>
@@ -9,6 +10,7 @@
 #include <QApplication>
 #include <QWidget>
 #include <QList>
+#include <QLabel>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -159,6 +161,8 @@ void Widget::UiInit()
     // 初始化时间 UI
     BJTimeUIInit();
 
+    // 初始化状态栏 UI
+    StaBarUIInit();
 }
 
 void Widget::MenuBarUIInit()
@@ -216,6 +220,12 @@ void Widget::BJTimeUIInit()
     ui->bjTimeLabel->setText("1219 - 13:53");
 }
 
+void Widget::StaBarUIInit()
+{
+    ui->soundLabelIcon->setPixmap(QPixmap(":/res/icon/staBarIcon/soundOff.png"));
+    ui->wifiLabelIcon->setPixmap(QPixmap(":/res/icon/staBarIcon/wifiDisconnect.png"));
+}
+
 void Widget::StackedWidgetPageInit()
 {
     // 主页 页面
@@ -258,6 +268,11 @@ void Widget::ConnectSignalAndSlot()
     connect(settingPresenter, &SettingPresenter::backlightChangeResult, m_settingPageWidget, &SettingPage::onBacklightSetResult);
     connect(m_settingPageWidget, &SettingPage::setVolumeRequested, settingPresenter, &SettingPresenter::onVolumeChangeRequested);
     connect(settingPresenter, &SettingPresenter::volumeChangeResult, m_settingPageWidget, &SettingPage::onVolumeSetResult);
+
+    // 订阅 PageMsgManager 的信号槽连接
+    // 音量静音状态变化信号
+    PageMsgManager *pageMsgManager = PageMsgManager::getInstance();
+    connect(pageMsgManager, &PageMsgManager::volumeMuteStateChanged, this, &Widget::onVolumeMuteStateChanged);
 }
 
 void Widget::onHomePageBtnClicked()
@@ -282,4 +297,16 @@ void Widget::onWifiPageBtnClicked()
 {
     if (m_wifiPageWidget)
         ui->stackedWidget->setCurrentWidget(m_wifiPageWidget);
+}
+
+void Widget::onVolumeMuteStateChanged(bool isMuted)
+{
+    if (isMuted) // 静音
+    {
+        ui->soundLabelIcon->setPixmap(QPixmap(":/res/icon/staBarIcon/soundOff.png"));
+    }
+    else // 取消静音
+    {
+        ui->soundLabelIcon->setPixmap(QPixmap(":/res/icon/staBarIcon/soundOn.png"));
+    }
 }
