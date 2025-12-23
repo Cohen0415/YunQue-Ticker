@@ -5,8 +5,6 @@
 
 #define MIN_BRIGHTNESS_LOGIC        (0)       // 逻辑亮度最小值
 #define MAX_BRIGHTNESS_LOGIC        (100)     // 逻辑亮度最大值
-#define MIN_BRIGHTNESS_ACTUAL       (0)       // 实际亮度最小值
-#define MAX_BRIGHTNESS_ACTUAL       (255)     // 实际亮度最大值
 
 class BacklightService : public AbstractService
 {
@@ -42,10 +40,6 @@ private:
     void setBrightness(int value);
     // 异步获取当前亮度值，结果通过信号返回
     void getBrightness();
-
-    // 背光实际值范围 0 - 255 转 逻辑值范围 0 - 100
-    static int brightnessToLogical(int actualBrightness);
-    static int logicalToBrightness(int logicaBrightness);
     
 };
 

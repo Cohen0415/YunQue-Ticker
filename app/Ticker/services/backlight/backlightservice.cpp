@@ -29,15 +29,12 @@ void BacklightService::setBrightness(int value)
         return;
     }
 
-    // 转换逻辑值到实际值
-    int actualValue = logicalToBrightness(value);
-
     // 构造 'brightness.set' 请求
     QJsonObject request;
     request["cmd"] = QStringLiteral("brightness.set");
 
     QJsonObject params;
-    params["value"] = actualValue;
+    params["value"] = value;
     request["params"] = params;
 
     // LOG_DEBUG("[" + serviceName() + "] Sending 'brightness.set' request with value: %d.", value);
@@ -108,8 +105,6 @@ void BacklightService::onMessageReceived(const QJsonDocument& doc)
             success = false;
         }
         
-        // 实际值转逻辑值
-        resultValue = brightnessToLogical(resultValue);
         // 发射信号通知调用者结果
         emit brightnessSetResult(success, resultValue);
 
@@ -141,8 +136,6 @@ void BacklightService::onMessageReceived(const QJsonDocument& doc)
             success = false;
         }
 
-        // 实际值转逻辑值
-        resultValue = brightnessToLogical(resultValue);
         // 发射信号通知调用者结果
         emit brightnessGetResult(success, resultValue);
     } 
@@ -160,22 +153,4 @@ void BacklightService::onSetBrightness(int value)
 void BacklightService::onGetBrightness()
 {
     getBrightness();
-}
-
-int BacklightService::brightnessToLogical(int actualBrightness)
-{
-    if (actualBrightness < MIN_BRIGHTNESS_ACTUAL)
-        actualBrightness = MIN_BRIGHTNESS_ACTUAL;
-    if (actualBrightness > MAX_BRIGHTNESS_ACTUAL)
-        actualBrightness = MAX_BRIGHTNESS_ACTUAL;
-    return static_cast<int>((actualBrightness / static_cast<double>(MAX_BRIGHTNESS_ACTUAL)) * 100);
-}
-
-int BacklightService::logicalToBrightness(int logicaBrightness)
-{
-    if (logicaBrightness < MIN_BRIGHTNESS_LOGIC)
-        logicaBrightness = MIN_BRIGHTNESS_LOGIC;
-    if (logicaBrightness > MAX_BRIGHTNESS_LOGIC)
-        logicaBrightness = MAX_BRIGHTNESS_LOGIC;
-    return static_cast<int>((logicaBrightness / 100.0) * MAX_BRIGHTNESS_ACTUAL);
 }
