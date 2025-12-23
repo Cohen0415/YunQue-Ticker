@@ -8,6 +8,28 @@
 #include <stdio.h>     
 #include <stdlib.h>     
 #include <string.h>
+#include <math.h>
+
+// 将0~100的逻辑值转换为0~255的实际值
+static int logic_to_actual(int logical)
+{
+    if (logical < MIN_BRIGHTNESS_LOGIC) 
+        logical = MIN_BRIGHTNESS_LOGIC;
+    if (logical > MAX_BRIGHTNESS_LOGIC) 
+        logical = MAX_BRIGHTNESS_LOGIC;
+
+    return (int) round((logical / 100.0) * 255);
+}
+
+// 将0~255的实际值转换为0~100的逻辑值
+static int actual_to_logic(int actual)
+{
+    if (actual < MIN_BRIGHTNESS_ACTUAL) 
+        actual = MIN_BRIGHTNESS_ACTUAL;
+    if (actual > MAX_BRIGHTNESS_ACTUAL) 
+        actual = MAX_BRIGHTNESS_ACTUAL;
+    return (int) round((actual / 255.0) * 100);
+}
 
 static int backlight_set(const char *path, int value)
 {
@@ -45,7 +67,7 @@ static rpc_result_t rpc_backlight_set(cJSON *params)
     /* 
     cmd：string；brightness.set；命令名称
     params
-    | - value：int；0~255；要设置的亮度值
+    | - value：int；0~100；要设置的亮度值
     */
 
     // 响应
@@ -53,7 +75,7 @@ static rpc_result_t rpc_backlight_set(cJSON *params)
     status：int；0 表示成功，其它表示失败
     msg：string；提示信息
     data
-    | - value：int；0~255；当前亮度值
+    | - value：int；0~100；当前亮度值
     */
 
     rpc_result_t res = { 
@@ -62,44 +84,47 @@ static rpc_result_t rpc_backlight_set(cJSON *params)
         .data_json = NULL 
     };
 
-    cJSON *value_item = cJSON_GetObjectItem(params, "value");
-    if (!cJSON_IsNumber(value_item)) 
+     cJSON *value_item = cJSON_GetObjectItem(params, "value");
+    if (!cJSON_IsNumber(value_item))
     {
         LOGE("Invalid or missing 'value' parameter");
         res.msg = "value parameter missing or invalid";
         return res;
     }
 
-    int value = value_item->valueint;
-    if (value < 0 || value > 255) 
+    int logical_value = value_item->valueint;
+    if (logical_value < 0 || logical_value > 100)
     {
-        LOGE("'value' parameter out of range: %d", value);
-        res.msg = "value parameter out of range (0-255)";
+        LOGE("'value' parameter out of range: %d", logical_value);
+        res.msg = "value parameter out of range (0-100)";
         return res;
     }
-    LOGI("Setting brightness to %d", value);
+    int actual_value = logic_to_actual(logical_value);
+    LOGD("Setting brightness, logical=%d, actual=%d", logical_value, actual_value);
 
-    int ret = backlight_set(BRIGHTNESS_PATH, value);
-    if (ret != 0) 
+    int ret = backlight_set(BRIGHTNESS_PATH, actual_value);
+    if (ret != 0)
     {
         LOGE("Failed to set brightness value");
         return res;
     }
 
-    ret = backlight_get(BRIGHTNESS_PATH);
-    if (ret < 0) 
+    // 读取实际值再转回逻辑值反馈
+    int current_actual = backlight_get(BRIGHTNESS_PATH);
+    if (current_actual < 0)
     {
         LOGE("Failed to read brightness value");
-        return res; 
+        return res;
     }
+    int current_logic = actual_to_logic(current_actual);
 
     cJSON *data = cJSON_CreateObject();
-    cJSON_AddNumberToObject(data, "value", ret);
+    cJSON_AddNumberToObject(data, "value", current_logic);
 
     res.status = 0;
     res.msg = "ok";
     res.data_json = cJSON_PrintUnformatted(data);
-    
+
     cJSON_Delete(data);
     return res;
 }
@@ -118,7 +143,7 @@ static rpc_result_t rpc_backlight_get(cJSON *params)
     status：int；0 表示成功，其它表示失败
     msg：string；提示信息
     data
-    | - value：int；0~255；当前亮度值
+    | - value：int；0~100；当前亮度值
     */
 
     rpc_result_t res = { 
@@ -127,15 +152,16 @@ static rpc_result_t rpc_backlight_get(cJSON *params)
         .data_json = NULL 
     };
 
-    int ret = backlight_get(BRIGHTNESS_PATH);
-    if (ret < 0) 
+    int actual = backlight_get(BRIGHTNESS_PATH);
+    if (actual < 0)
     {
         LOGE("Failed to read brightness value");
-        return res; 
+        return res;
     }
+    int logic = actual_to_logic(actual);
 
     cJSON *data = cJSON_CreateObject();
-    cJSON_AddNumberToObject(data, "value", ret);
+    cJSON_AddNumberToObject(data, "value", logic);
 
     res.status = 0;
     res.msg = "ok";
