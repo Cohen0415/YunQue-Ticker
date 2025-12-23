@@ -520,44 +520,6 @@ QCheckBox::indicator {
           <pointsize>18</pointsize>
          </font>
         </property>
-        <property name="styleSheet">
-         <string notr="true">#SettingPage {
-    background-color: #000;
-}
-
-#SettingPage QLabel {
-    color: white;
-}
-
-#backlightHarSlider::handle:horizontal,
-#soundHarSlider::handle:horizontal {
-    background: #3498db;
-    border: 1px solid #5c5c5c;
-    width: 32px;
-    height: 32px;
-    border-radius: 16px;
-    margin: -12px 0;
-}
-
-#backlightHarSlider::groove:horizontal,
-#soundHarSlider::groove:horizontal {
-    background: #dddddd;
-    height: 8px;
-    border-radius: 4px;
-}
-
-#backlightHarSlider::sub-page:horizontal,
-#soundHarSlider::sub-page:horizontal {
-    background: #3498db;
-    border-radius: 4px;
-}
-
-#backlightHarSlider::add-page:horizontal,
-#soundHarSlider::add-page:horizontal {
-    background: #e0e0e0;
-    border-radius: 4px;
-}</string>
-        </property>
         <property name="text">
          <string>静音</string>
         </property>

@@ -1,3 +1,12 @@
+/*  */
+#SettingPage {
+	background: #000000;
+}
+
+QLabel {
+	color: white;
+}
+
 /* 滑块的基本样式 */
 #backlightHarSlider::handle:horizontal,
 #soundHarSlider::handle:horizontal {
@@ -49,8 +58,27 @@
     border-radius: 4px;
 }
 
+#soundCheckBox {
+    color: white;
+}
+
 /* 复选框的样式 */
-QCheckBox::indicator {
-    width: 35px;
-    height: 35px;
+/* 未选中效果 */
+#soundCheckBox::indicator {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #bbb;    /* 原色描边 */
+    border-radius: 6px;
+    background: #222;           /* 外部原色或透明 */
+}
+
+/* 选中效果 */
+#soundCheckBox::indicator:checked {
+    border: 2px solid #bbb;     /* 外部还是原色 */
+    border-radius: 6px;
+    background: 
+        qradialgradient(cx:0.5, cy:0.5, radius:0.8, fx:0.5, fy:0.5,
+            stop:0 #08f,    /* 内部较深蓝 */
+            stop:0.7 #08f,
+            stop:1 transparent); /* 虚化边，或直接用白色圆心，要动感可加渐变 */
 }
