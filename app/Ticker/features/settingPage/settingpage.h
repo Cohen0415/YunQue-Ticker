@@ -56,7 +56,7 @@ public slots:
 private:
 
     // UI init
-    void UIinit();
+    void UIInit();
 
     // 更新 UI 显示
     void updateBacklightUI(int value);

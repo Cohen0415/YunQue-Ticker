@@ -18,11 +18,11 @@ SettingPage::~SettingPage()
 
 void SettingPage::Init()
 {
-    UIinit();
+    UIInit();
 }
 
 // UI 初始化
-void SettingPage::UIinit()
+void SettingPage::UIInit()
 {
     // 初始化背光滑动条的范围为 0～100
     ui->backlightHarSlider->setMinimum(0);
