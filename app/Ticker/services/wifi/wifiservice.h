@@ -4,8 +4,8 @@
 #include "services/abstractservice.h"
 
 typedef struct {
+    bool connected;
     QString ssid;
-    QString password;
     QString ip;
     QString rssi;
 } WifiNetworkInfo;
@@ -27,7 +27,7 @@ signals:
 
     void connectResult(bool success);
     void disconnectResult(bool success);
-    void wifiStatusResult(bool success, const WifiNetworkInfo& info);
+    void wifiStatusResult(bool success, bool connected, QString &ssid, QString &ip, QString &rssi);
 
 public slots:
 

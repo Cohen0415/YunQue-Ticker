@@ -35,7 +35,7 @@ void Widget::Init()
     // 初始化信号槽
     ConnectSignalAndSlot();
 
-    // 初始化 pages
+    // 在初始化信号后，再初始化 pages，因为 pages 初始化时可能会发送信号
     PagesInit();
 
     // 安装滚动拖拽事件过滤器
@@ -296,8 +296,8 @@ void Widget::ConnectSignalAndSlot()
     connect(m_wifiPageBtn, &QPushButton::clicked, this, &Widget::onWifiPageBtnClicked);
 
     // presenters 和各个 page 的信号槽连接
+    // settingPresenter <--> settingPage
     SettingPresenter *settingPresenter = AppContext::getInstance()->settingPresenter();
-    // settingPage
     // backlight set
     connect(m_settingPageWidget, &SettingPage::setBacklightRequested, settingPresenter, &SettingPresenter::onBacklightSetChangeRequested);
     connect(settingPresenter, &SettingPresenter::backlightSetChangeResult, m_settingPageWidget, &SettingPage::onBacklightSetResult);
@@ -310,6 +310,18 @@ void Widget::ConnectSignalAndSlot()
     // audio get
     connect(m_settingPageWidget, &SettingPage::getVolumeRequested, settingPresenter, &SettingPresenter::onVolumeGetChangeRequested);
     connect(settingPresenter, &SettingPresenter::volumeGetChangeResult, m_settingPageWidget, &SettingPage::onVolumeGetResult);
+
+    // wifiPresenter <--> wifiPage
+    WifiPresenter *wifiPresenter = AppContext::getInstance()->wifiPresenter();
+    // wifi connect
+    connect(m_wifiPageWidget, &WifiPage::connectWifiRequested, wifiPresenter, &WifiPresenter::onConnectWifiRequested);
+    connect(wifiPresenter, &WifiPresenter::connectWifiResult, m_wifiPageWidget, &WifiPage::onConnectWifiResult);
+    // wifi disconnect
+    connect(m_wifiPageWidget, &WifiPage::disconnectWifiRequested, wifiPresenter, &WifiPresenter::onDisconnectWifiRequested);
+    connect(wifiPresenter, &WifiPresenter::disconnectWifiResult, m_wifiPageWidget, &WifiPage::onDisconnectWifiResult);
+    // wifi get status
+    connect(m_wifiPageWidget, &WifiPage::getWifiStatusRequested, wifiPresenter, &WifiPresenter::onGetWifiStatusRequested);
+    connect(wifiPresenter, &WifiPresenter::getWifiStatusResult, m_wifiPageWidget, &WifiPage::onGetWifiStatusResult);
 
     // 订阅 PageMsgManager 的信号槽连接
     // 音量静音状态变化信号

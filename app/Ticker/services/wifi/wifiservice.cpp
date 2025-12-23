@@ -163,6 +163,7 @@ void WifiService::onMessageReceived(const QJsonDocument& doc)
         if (success && dataValue.isObject()) 
         {
             QJsonObject dataObj = dataValue.toObject();
+            info.connected = dataObj["connected"].toBool(false);
             info.ssid = dataObj["ssid"].toString();
             info.ip = dataObj["ip"].toString();
             info.rssi = dataObj["rssi"].toString();
@@ -177,7 +178,7 @@ void WifiService::onMessageReceived(const QJsonDocument& doc)
             success = false;
         }
 
-        emit wifiStatusResult(success, info);
+        emit wifiStatusResult(success, info.connected, info.ssid, info.ip, info.rssi);
     }
     else 
     {

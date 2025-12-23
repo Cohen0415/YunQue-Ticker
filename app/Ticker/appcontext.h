@@ -14,6 +14,7 @@
 
 // presenters
 #include "features/settingPage/settingpresenter.h"
+#include "features/wifiPage/wifipresenter.h"
 
 #define UDS_PATH    "/tmp/dev.sock"
 
@@ -32,6 +33,7 @@ public:
     static AppContext *getInstance();
     // 获取 Presenters
     SettingPresenter *settingPresenter();
+    WifiPresenter *wifiPresenter();
 
 signals:
 
@@ -46,6 +48,7 @@ private:
     WifiService m_wifiService;
 
     SettingPresenter m_settingPresenter;
+    WifiPresenter m_wifiPresenter;
 };
 
 #endif // APPCONTEXT_H

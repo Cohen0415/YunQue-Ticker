@@ -9,7 +9,8 @@ AppContext::AppContext(QObject *parent)
     m_audioService(this),
     m_sysinfoService(this),
     m_wifiService(this),
-    m_settingPresenter(this)
+    m_settingPresenter(this),
+    m_wifiPresenter(this)
 {
 }
 
@@ -21,6 +22,11 @@ AppContext::~AppContext()
 SettingPresenter *AppContext::settingPresenter()
 {
     return &m_settingPresenter;
+}
+
+WifiPresenter *AppContext::wifiPresenter()
+{
+    return &m_wifiPresenter;
 }
 
 int AppContext::Init()
@@ -60,8 +66,18 @@ int AppContext::Init()
     QObject::connect(&m_audioService, &AudioService::volumeSetResult, &m_settingPresenter, &SettingPresenter::handleVolumeSetChangeResult);
     // audio get
     QObject::connect(&m_settingPresenter, &SettingPresenter::requestVolumeGetChange, &m_audioService, &AudioService::onGetVolume);
-    LOG_DEBUG("000000");
     QObject::connect(&m_audioService, &AudioService::volumeGetResult, &m_settingPresenter, &SettingPresenter::handleVolumeGetChangeResult);
+
+    // wifiPresenter
+    // wifi connect
+    QObject::connect(&m_wifiPresenter, &WifiPresenter::requestConnectWifi, &m_wifiService, &WifiService::onConnectToNetwork);
+    QObject::connect(&m_wifiService, &WifiService::connectResult, &m_wifiPresenter, &WifiPresenter::handleConnectWifiResult);
+    // wifi distconnect
+    QObject::connect(&m_wifiPresenter, &WifiPresenter::requestDisconnectWifi, &m_wifiService, &WifiService::onDisconnectFromNetwork);
+    QObject::connect(&m_wifiService, &WifiService::disconnectResult, &m_wifiPresenter, &WifiPresenter::handleDisconnectWifiResult);
+    // wifi get status
+    QObject::connect(&m_wifiPresenter, &WifiPresenter::requestGetWifiStatus, &m_wifiService, &WifiService::onGetWifiStatus);
+    QObject::connect(&m_wifiService, &WifiService::wifiStatusResult, &m_wifiPresenter, &WifiPresenter::handleGetWifiStatusResult);
 
     return 0;
 }
