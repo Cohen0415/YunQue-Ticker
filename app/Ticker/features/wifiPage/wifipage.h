@@ -27,6 +27,9 @@ signals:
     void disconnectWifiRequested(void);
     void getWifiStatusRequested(void);
 
+    // 向子页面发送的结果信号
+    void getWifiStatusResultToSubPage(bool success, bool connected, QString &ssid, QString &ip, QString &rssi);
+
 public slots:
 
     // 接收 presenter 发送的结果
@@ -34,8 +37,17 @@ public slots:
     void onDisconnectWifiResult(bool success);
     void onGetWifiStatusResult(bool success, bool connected, QString &ssid, QString &ip, QString &rssi);
 
+    // 接收子页面发送的请求
+    void onGetStatusRequestFromSubPage(void);
+    void onDisconnectRequestFromSubPage(void);
+    void onConnectRequestFromSubPage(const QString &ssid, const QString &password);
+
+    // 接收 connPage 的切换到 staPage 的请求
+    void onSwitchToStaPageRequestFromConnSubPage(void);
+
 private:
 
+    // 子页面初始化
     void SubPageInit(void);
 
 private:

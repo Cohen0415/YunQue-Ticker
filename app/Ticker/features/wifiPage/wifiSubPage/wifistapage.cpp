@@ -12,3 +12,8 @@ WifiStaPage::~WifiStaPage()
 {
     delete ui;
 }
+
+void WifiStaPage::onGetWifiStatusResult(bool success, bool connected, QString &ssid, QString &ip, QString &rssi)
+{
+
+}

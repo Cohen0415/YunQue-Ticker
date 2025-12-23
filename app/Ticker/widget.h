@@ -63,6 +63,7 @@ private slots:
     void onWifiPageBtnClicked(void);
 
     void onVolumeMuteStateChanged(bool isMuted);
+    void onWifiStatusChanged(bool connected);
 
 private:
 

@@ -324,9 +324,11 @@ void Widget::ConnectSignalAndSlot()
     connect(wifiPresenter, &WifiPresenter::getWifiStatusResult, m_wifiPageWidget, &WifiPage::onGetWifiStatusResult);
 
     // 订阅 PageMsgManager 的信号槽连接
-    // 音量静音状态变化信号
     PageMsgManager *pageMsgManager = PageMsgManager::getInstance();
+    // 音量静音状态变化信号
     connect(pageMsgManager, &PageMsgManager::volumeMuteStateChanged, this, &Widget::onVolumeMuteStateChanged);
+    // wifi 状态变化信号
+    connect(pageMsgManager, &PageMsgManager::wifiStatusChanged, this, &Widget::onWifiStatusChanged);
 }
 
 void Widget::onHomePageBtnClicked()
@@ -353,6 +355,7 @@ void Widget::onWifiPageBtnClicked()
         ui->stackedWidget->setCurrentWidget(m_wifiPageWidget);
 }
 
+// 收到 音量 状态变化信号
 void Widget::onVolumeMuteStateChanged(bool isMuted)
 {
     if (isMuted) // 静音
@@ -362,5 +365,18 @@ void Widget::onVolumeMuteStateChanged(bool isMuted)
     else // 取消静音
     {
         ui->soundLabelIcon->setPixmap(QPixmap(":/res/icon/staBarIcon/soundOn.png"));
+    }
+}
+
+// 收到 wifi 状态变化信号
+void Widget::onWifiStatusChanged(bool connected)
+{
+    if (connected) // 已连接
+    {
+        ui->wifiLabelIcon->setPixmap(QPixmap(":/res/icon/staBarIcon/wifiConnect.png"));
+    }
+    else // 未连接
+    {
+        ui->wifiLabelIcon->setPixmap(QPixmap(":/res/icon/staBarIcon/wifiDisconnect.png"));
     }
 }

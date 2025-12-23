@@ -1,4 +1,5 @@
 #include "wifipresenter.h"
+#include "utils/log/logger.h"
 
 WifiPresenter::WifiPresenter(QObject *parent)
     : QObject{parent}

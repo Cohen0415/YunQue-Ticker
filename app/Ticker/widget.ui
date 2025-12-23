@@ -235,7 +235,7 @@
         <number>0</number>
        </property>
        <property name="topMargin">
-        <number>15</number>
+        <number>10</number>
        </property>
        <property name="rightMargin">
         <number>0</number>
@@ -254,7 +254,7 @@
          <property name="minimumSize">
           <size>
            <width>3</width>
-           <height>250</height>
+           <height>263</height>
           </size>
          </property>
          <property name="maximumSize">
@@ -273,7 +273,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>0</width>
-           <height>12</height>
+           <height>4</height>
           </size>
          </property>
         </spacer>
