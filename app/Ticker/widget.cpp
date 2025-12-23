@@ -65,6 +65,20 @@ void Widget::installScrollDragFilters()
     }
 }
 
+QString Widget::LoadQssStyle(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+        return QString(); // 打开失败返回空字符串
+
+    QTextStream in(&file);
+    in.setCodec("UTF-8"); // 保证中文正常显示
+
+    QString style = in.readAll();
+    file.close();
+    return style;
+}
+
 bool Widget::eventFilter(QObject *obj, QEvent *event)
 {
     // 确定事件相关的对象是否是我们关心的（scrollArea的内容部件或其子控件）
@@ -169,6 +183,11 @@ void Widget::UiInit()
 
     // 初始化状态栏 UI
     StaBarUIInit();
+
+    // 加载样式表
+    QString qss = LoadQssStyle(":/res/qss/mainFrameQss/mainFrame.qss");
+    if (!qss.isEmpty())
+        this->setStyleSheet(qss);
 }
 
 void Widget::MenuBarUIInit()
@@ -258,6 +277,9 @@ void Widget::PagesInit()
 {
     // settingPage init
     m_settingPageWidget->Init();
+
+    // wifiPage init
+    m_wifiPageWidget->Init();
 }
 
 void Widget::ConnectSignalAndSlot()

@@ -96,7 +96,7 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
-        <number>5</number>
+        <number>3</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -133,7 +133,7 @@
             <x>0</x>
             <y>0</y>
             <width>107</width>
-            <height>247</height>
+            <height>252</height>
            </rect>
           </property>
          </widget>
@@ -184,6 +184,11 @@
           </item>
           <item>
            <widget class="QLabel" name="bjTimeLabel">
+            <property name="font">
+             <font>
+              <pointsize>13</pointsize>
+             </font>
+            </property>
             <property name="text">
              <string>1219 - 10:48</string>
             </property>
@@ -204,6 +209,74 @@
           </item>
          </layout>
         </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="splitTopWidget" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>3</width>
+        <height>280</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>3</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>15</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QWidget" name="splitWidget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>3</width>
+           <height>250</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>3</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>12</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -243,13 +316,13 @@
         <number>5</number>
        </property>
        <property name="leftMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="topMargin">
         <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="bottomMargin">
         <number>5</number>
@@ -352,7 +425,7 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>1275</width>
+        <width>1272</width>
         <height>0</height>
        </size>
       </property>

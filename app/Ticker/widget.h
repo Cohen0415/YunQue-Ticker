@@ -52,6 +52,9 @@ private:
     // 初始化滚动
     void installScrollDragFilters();
 
+    // 加载样式表
+    QString LoadQssStyle(const QString &path);
+
 private slots:
 
     void onHomePageBtnClicked(void);

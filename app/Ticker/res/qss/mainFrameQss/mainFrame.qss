@@ -1,0 +1,20 @@
+/* 全局 Widget */
+#Widget {
+	background-color: #000000;  /* 背景色 */
+}
+
+/* scroll Area*/
+#scrollAreaWidgetContents {
+	background-color: #000000;  /* 背景色 */
+}
+
+/* 分割条 */
+#splitWidget {
+	background-color: #cccccc;  /* 背景色 */
+	border-radius: 1px;
+}
+
+/* 所有 QLabel */
+QLabel {
+	color: white		/* 字体设置白色 */
+}
