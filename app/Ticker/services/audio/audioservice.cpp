@@ -41,13 +41,11 @@ void AudioService::setVolume(int value)
         return;
     }
 
-    int actualValue = logicalToVolume(value);
-
     QJsonObject request;
     request["cmd"] = QStringLiteral("audio.volume.set");
 
     QJsonObject params;
-    params["volume"] = actualValue;
+    params["volume"] = value;
     request["params"] = params;
 
     sendMessage(QJsonDocument(request));
@@ -171,8 +169,6 @@ void AudioService::onMessageReceived(const QJsonDocument& doc)
             success = false;
         }
 
-        // 实际值转逻辑值
-        resultValue = volumeToLogical(resultValue);
         // 发射信号通知调用者结果
         emit volumeSetResult(success, resultValue);
     } 
@@ -213,8 +209,6 @@ void AudioService::onMessageReceived(const QJsonDocument& doc)
             success = false;
         }
 
-        // 实际值转逻辑值
-        resultValue = volumeToLogical(resultValue);
         // 发射信号通知调用者结果
         emit volumeGetResult(success, resultValue);
     }
@@ -276,24 +270,4 @@ void AudioService::onPlayAudioFile(const QString &filePath)
 void AudioService::onStopAudio()
 {
     stopAudio();
-}
-
-int AudioService::volumeToLogical(int actualVolume)
-{
-    // 将实际音量值 0-255 转换为逻辑音量值 0-100
-    if (actualVolume < MIN_VOLUME_ACTUAL)
-        actualVolume = MIN_VOLUME_ACTUAL;
-    if (actualVolume > MAX_VOLUME_ACTUAL)
-        actualVolume = MAX_VOLUME_ACTUAL;
-    return static_cast<int>((actualVolume / static_cast<double>(MAX_VOLUME_ACTUAL)) * 100);
-}
-
-int AudioService::logicalToVolume(int logicVolume)
-{
-    // 将逻辑音量值 0-100 转换为实际音量值 0-255
-    if (logicVolume < MIN_VOLUME_LOGIC)
-        logicVolume = MIN_VOLUME_LOGIC;
-    if (logicVolume > MAX_VOLUME_LOGIC)
-        logicVolume = MAX_VOLUME_LOGIC;
-    return static_cast<int>((logicVolume / 100.0) * MAX_VOLUME_ACTUAL);
 }

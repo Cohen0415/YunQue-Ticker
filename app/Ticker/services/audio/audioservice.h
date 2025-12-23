@@ -5,8 +5,6 @@
 
 #define MIN_VOLUME_LOGIC        (0)       // 逻辑音量最小值
 #define MAX_VOLUME_LOGIC        (100)     // 逻辑音量最大值
-#define MIN_VOLUME_ACTUAL       (0)       // 实际音量最小值
-#define MAX_VOLUME_ACTUAL       (255)     // 实际音量最大值
 
 class AudioService : public AbstractService
 {
@@ -52,10 +50,6 @@ private:
     void playAudioFile(const QString& filePath);
     // 异步停止音频播放
     void stopAudio();
-
-    // 音量实际值范围 0 - 255 转 逻辑值范围 0 - 100
-    static int volumeToLogical(int actualVolume);
-    static int logicalToVolume(int logicalVolume);
 
 };
 
