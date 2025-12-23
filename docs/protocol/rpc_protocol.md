@@ -91,12 +91,12 @@
 /* 
   cmd：string；brightness.set；命令名称
   params
-  | - value：int；0~255；要设置的亮度值
+  | - value：int；0~100；要设置的亮度值
 */
 {
   "cmd": "brightness.set",
   "params": {
-    "value": 200
+    "value": 80
   }
 }
 
@@ -106,14 +106,14 @@
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
-  | - value：int；0~255；当前的亮度值
+  | - value：int；0~100；当前的亮度值
 */
 {
   "cmd": "brightness.set",
   "status": 0,
   "msg": "ok",
   "data": {
-    "value": 200
+    "value": 80
   }
 }
 ```
@@ -138,14 +138,14 @@
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
-  | - value：int；0~255；当前亮度值
+  | - value：int；0~100；当前亮度值
 */
 {
   "cmd": "brightness.get",
   "status": 0,
   "msg": "ok",
   "data": {
-    "value": 200
+    "value": 80
   }
 }
 ```
@@ -287,12 +287,12 @@
 /* 
   cmd：string；audio.volume.set；命令名称
   params
-  | - volume：int；0~255；音量值（0静音，255最大）
+  | - volume：int；0~100；音量值（0静音，100最大）
 */
 {
   "cmd": "audio.volume.set",
   "params": {
-    "volume": 200
+    "volume": 100
   }
 }
 
@@ -302,14 +302,14 @@
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
-  | - volume：int；0~255；当前音量大小
+  | - volume：int；0~100；当前音量大小
 */
 {
   "cmd": "audio.volume.set",
   "status": 0,
   "msg": "ok",
   "data": {
-    "volume": 200
+    "volume": 80
   }
 }
 ```
@@ -334,14 +334,14 @@
   status：int；0 表示成功，其它表示失败
   msg：string；提示信息
   data
-  | - volume：int；0~255；当前音量大小
+  | - volume：int；0~100；当前音量大小
 */
 {
   "cmd": "audio.volume.get",
   "status": 0,
   "msg": "ok",
   "data": {
-    "volume": 200
+    "volume": 80
   }
 }
 ```
