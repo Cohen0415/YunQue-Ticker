@@ -111,7 +111,7 @@ build_service()
     make clean
     make -j12
 
-    log_ingo " =========================== Service built successfully for ${PLATFORM} ==========================="
+    log_info " =========================== Service built successfully for ${PLATFORM} ==========================="
 }
 
 build_client()
