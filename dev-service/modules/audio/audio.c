@@ -12,6 +12,27 @@
 #define NUMID_L 17        // DACL Volume
 #define NUMID_R 18        // DACR Volume
 
+// 将0~100的逻辑值转换为0~255的实际值
+static int logic_to_actual(int logical)
+{
+    if (logical < MIN_VOLUME_LOGIC) 
+        logical = MIN_VOLUME_LOGIC;
+    if (logical > MAX_VOLUME_LOGIC) 
+        logical = MAX_VOLUME_LOGIC;
+
+    return (int) round((logical / 100.0) * 255);
+}
+
+// 将0~255的实际值转换为0~100的逻辑值
+static int actual_to_logic(int actual)
+{
+    if (actual < MIN_VOLUME_ACTUAL) 
+        actual = MIN_VOLUME_ACTUAL;
+    if (actual > MAX_VOLUME_ACTUAL) 
+        actual = MAX_VOLUME_ACTUAL;
+    return (int) round((actual / 255.0) * 100);
+}
+
 // 设置音量 0~255
 int audio_volume_set(int volume)
 {
@@ -149,14 +170,14 @@ static rpc_result_t rpc_audio_volume_set(cJSON *params)
     /* 
         cmd：string；audio.volume.set；命令名称
         params
-        | - volume：int；0~255；音量值（0静音，255最大）
+        | - volume：int；0~100；音量值（0静音，100最大）
     */
     // 响应
     /* 
         status：int；0 表示成功，其它表示失败
         msg：string；提示信息
         data
-        | - NULL
+        | - volume：int；0~100；当前音量大小
     */
 
     rpc_result_t res = { 
@@ -165,32 +186,44 @@ static rpc_result_t rpc_audio_volume_set(cJSON *params)
         .data_json = NULL 
     };
 
-    if (!params) 
+    if (!params)
         return res;
 
     cJSON *vol_item = cJSON_GetObjectItem(params, "volume");
-    if (!cJSON_IsNumber(vol_item)) 
+    if (!cJSON_IsNumber(vol_item))
     {
+        LOGE("Invalid or missing 'volume' parameter");
         res.msg = "Missing or invalid 'volume' parameter";
         return res;
     }
 
-    int volume = vol_item->valueint;
-    if (audio_volume_set(volume) != 0) 
+    int logic_volume = vol_item->valueint;
+    if (logic_volume < 0 || logic_volume > 100)
+    {
+        LOGE("'volume' parameter out of range: %d", logic_volume);
+        res.msg = "volume parameter out of range (0-100)";
+        return res;
+    }
+
+    int actual_volume = logic_to_actual(logic_volume);
+    LOGD("Setting volume, logical=%d, actual=%d", logic_volume, actual_volume);
+    
+    if (audio_volume_set(actual_volume) != 0)
     {
         res.msg = "audio_volume_set failed";
         return res;
     }
 
-    int ret = audio_volume_get(&volume);
-    if (ret != 0) 
+    int ret_volume;
+    if (audio_volume_get(&ret_volume) != 0)
     {
         LOGE("Failed to read audio volume value");
         return res;
     }
+    int logic_ret = actual_to_logic(ret_volume);
 
     cJSON *data = cJSON_CreateObject();
-    cJSON_AddNumberToObject(data, "volume", volume);
+    cJSON_AddNumberToObject(data, "volume", logic_ret);
 
     res.status = 0;
     res.msg = "ok";
@@ -214,7 +247,7 @@ static rpc_result_t rpc_audio_volume_get(cJSON *params)
         status：int；0 表示成功，其它表示失败
         msg：string；提示信息
         data
-        | - volume：int；0~255；当前音量
+        | - volume：int；0~100；当前音量
     */
 
     (void)params;
@@ -225,14 +258,16 @@ static rpc_result_t rpc_audio_volume_get(cJSON *params)
         .data_json = NULL 
     };
 
-    int volume = 0;
-    if (audio_volume_get(&volume) != 0) 
+    int actual_volume = 0;
+    if (audio_volume_get(&actual_volume) != 0)
     {
         return res;
     }
 
+    int logic_volume = actual_to_logic(actual_volume);
+
     cJSON *data = cJSON_CreateObject();
-    cJSON_AddNumberToObject(data, "volume", volume);
+    cJSON_AddNumberToObject(data, "volume", logic_volume);
 
     res.status = 0;
     res.msg = "ok";
