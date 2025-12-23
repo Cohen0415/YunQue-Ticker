@@ -16,7 +16,7 @@ SettingPage::~SettingPage()
     delete ui;
 }
 
-void SettingPage::init()
+void SettingPage::Init()
 {
     UIinit();
 }

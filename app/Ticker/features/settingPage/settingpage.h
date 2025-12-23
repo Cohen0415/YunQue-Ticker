@@ -16,7 +16,7 @@ public:
     explicit SettingPage(QWidget *parent = nullptr);
     ~SettingPage();
 
-    void init();
+    void Init();
 
 signals:
 

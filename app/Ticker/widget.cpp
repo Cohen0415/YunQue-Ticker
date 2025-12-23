@@ -257,7 +257,7 @@ void Widget::StackedWidgetPageInit()
 void Widget::PagesInit()
 {
     // settingPage init
-    m_settingPageWidget->init();
+    m_settingPageWidget->Init();
 }
 
 void Widget::ConnectSignalAndSlot()
