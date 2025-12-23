@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1275</width>
+    <width>1272</width>
     <height>280</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>1275</width>
+    <width>1272</width>
     <height>0</height>
    </size>
   </property>
@@ -115,6 +115,65 @@
          <font>
           <pointsize>18</pointsize>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">/* 滑块的基本样式 */
+#backlightHarSlider::handle:horizontal,
+#soundHarSlider::handle:horizontal {
+    background: #3498db;              /* 滑块颜色，可根据需要调整 */
+    width: 32px;                       /* 滑块宽度 */
+    height: 32px;                      /* 滑块高度 */
+    border-radius: 16px;               /* 圆形滑块 */
+    margin: -12px 0;                   /* 保证滑块在槽中居中 */
+}
+
+/* 槽的基本样式 */
+#backlightHarSlider::groove:horizontal,
+#soundHarSlider::groove:horizontal {
+    background: #dddddd;               /* 可自定义槽体颜色 */
+    height: 8px;                       /* 槽体厚度 */
+    border-radius: 4px;
+}
+
+/* 进度填充颜色 */
+#backlightHarSlider::sub-page:horizontal,
+#soundHarSlider::sub-page:horizontal {
+    background: #3498db;
+    border-radius: 4px;
+}
+
+/* 其它部分填充颜色 */
+#backlightHarSlider::add-page:horizontal,
+#soundHarSlider::add-page:horizontal {
+    background: #e0e0e0;
+    border-radius: 4px;
+}
+
+/* 禁用状态下滑块的样式 */
+#backlightHarSlider::handle:disabled,
+#soundHarSlider::handle:disabled {
+    background: #cccccc;               /* 修改为灰色 */
+}
+
+/* 禁用状态下槽的样式 */
+#backlightHarSlider::groove:disabled,
+#soundHarSlider::groove:disabled {
+    background: #eeeeee;               /* 修改为灰色 */
+}
+
+/* 禁用状态下的进度填充样式 */
+#backlightHarSlider::sub-page:disabled:horizontal,
+#soundHarSlider::sub-page:disabled:horizontal {
+    background: #bbbbbb;               /* 设为较浅的灰色 */
+    border-radius: 4px;
+}
+
+/* 复选框的样式 */
+QCheckBox::indicator {
+    width: 35px;
+    height: 35px;
+}
+</string>
         </property>
         <property name="text">
          <string>亮度设置</string>
