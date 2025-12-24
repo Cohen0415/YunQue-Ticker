@@ -3,12 +3,16 @@
 
 #include <QWidget>
 #include <QTimer>
+#include "features/pagelifecycleaware.h"
+
+#define CHECK_WIFI_CONN_INTERVAL_MS    1000    // 检测连接状态间隔
+#define WIFI_CONN_TIMEOUT_MS           15000   // 连接超时
 
 namespace Ui {
-class WifiConnPage;
+class WifiConnPageWidget;
 }
 
-class WifiConnPage : public QWidget
+class WifiConnPage : public QWidget, public PageLifecycleAware
 {
     Q_OBJECT
 
@@ -18,6 +22,10 @@ public:
     ~WifiConnPage();
 
     void Init();
+
+    // PageLifecycleAware 接口实现
+    void onPageEnter() override;
+    void onPageLeave() override;
 
 signals:
 
@@ -43,22 +51,27 @@ private slots:
     // 定时器槽函数
     void onStatusTimerTimeout();
 
+    void on_ssidClearButton_clicked();
+
+    void on_pwdClearButton_clicked();
+
 private:
 
     // UI 初始化
     void UIInit(void);
     // 用户输入框内容检测
-    void inputLineInspect(void);
+    bool inputLineInspect(void);
+    // 加载样式表
+    QString LoadQssStyle(const QString &path);
 
 private:
 
-    Ui::WifiConnPage *ui;
+    Ui::WifiConnPageWidget *ui;
 
     QTimer *m_statusTimer = nullptr;    // 轮询定时器
     int m_elapsed = 0;                  // 已用时ms
-    int m_checkInterval = 700;          // 检测间隔ms
-    int m_timeoutMs = 8000;             // 超时ms，可调
-
+    int m_checkInterval;                // 检测间隔ms
+    int m_timeoutMs;                    // 超时ms，可调
 };
 
 #endif // WIFICONNPAGE_H

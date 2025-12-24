@@ -17,6 +17,8 @@ WifiPage::~WifiPage()
 void WifiPage::Init()
 {
     SubPageInit();
+
+    qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
 }
 
 // 接收 presenter 发送的 Wi-Fi 连接结果
@@ -35,7 +37,11 @@ void WifiPage::onDisconnectWifiResult(bool success)
 void WifiPage::onGetWifiStatusResult(bool success, bool connected, QString &ssid, QString &ip, QString &rssi)
 {
     // 将结果发送给子页面
-    emit getWifiStatusResultToSubPage(success, connected, ssid, ip, rssi);
+    // 如果当前是 connPage
+    if (ui->stackedWidget->currentWidget() == m_wifiConnPage)
+        emit getWifiStatusResultToConnSubPage(success, connected, ssid, ip, rssi);
+    else if (ui->stackedWidget->currentWidget() == m_wifiStaPage)
+        emit getWifiStatusResultToStaSubPage(success, connected, ssid, ip, rssi);
 }
 
 // 接收子页面发送的获取状态请求
@@ -62,7 +68,13 @@ void WifiPage::onConnectRequestFromSubPage(const QString &ssid, const QString &p
 // 接收 connPage 的切换到 staPage 的请求
 void WifiPage::onSwitchToStaPageRequestFromConnSubPage()
 {
-    ui->stackedWidget->setCurrentWidget(m_wifiStaPage);
+    switchToPage(m_wifiStaPage);
+}
+
+// 接收 staPage 的切换到 connPage 的请求
+void WifiPage::onSwitchToConnPageRequestFromStaSubPage()
+{
+    switchToPage(m_wifiConnPage);
 }
 
 // 子页面初始化
@@ -75,7 +87,7 @@ void WifiPage::SubPageInit()
     connect(m_wifiConnPage, &WifiConnPage::connectWifiRequested, this, &WifiPage::onConnectRequestFromSubPage);
     connect(m_wifiConnPage, &WifiConnPage::disconnectWifiRequested, this, &WifiPage::onDisconnectRequestFromSubPage);
     connect(m_wifiConnPage, &WifiConnPage::getWifiStatusRequested, this, &WifiPage::onGetStatusRequestFromSubPage);
-    connect(this, &WifiPage::getWifiStatusResultToSubPage, m_wifiConnPage, &WifiConnPage::onGetWifiStatusResult);
+    connect(this, &WifiPage::getWifiStatusResultToConnSubPage, m_wifiConnPage, &WifiConnPage::onGetWifiStatusResult);
     // 切换到 staPage 请求
     connect(m_wifiConnPage, &WifiConnPage::switchToStaPageRequested, this, &WifiPage::onSwitchToStaPageRequestFromConnSubPage);
     // 显示初始化
@@ -87,25 +99,70 @@ void WifiPage::SubPageInit()
     // 连接信号槽
     connect(m_wifiStaPage, &WifiStaPage::disconnectWifiRequested, this, &WifiPage::onDisconnectRequestFromSubPage);
     connect(m_wifiStaPage, &WifiStaPage::getWifiStatusRequested, this, &WifiPage::onGetStatusRequestFromSubPage);
-    connect(this, &WifiPage::getWifiStatusResultToSubPage, m_wifiStaPage, &WifiStaPage::onGetWifiStatusResult);
+    connect(this, &WifiPage::getWifiStatusResultToStaSubPage, m_wifiStaPage, &WifiStaPage::onGetWifiStatusResult);
+    // 切换到 connPage 请求
+    connect(m_wifiStaPage, &WifiStaPage::switchToConnPageRequested, this, &WifiPage::onSwitchToConnPageRequestFromStaSubPage);
+    // 显示初始化
+    m_wifiStaPage->Init();
 
     // 默认显示 wifi 连接子页面
     ui->stackedWidget->setCurrentWidget(m_wifiConnPage);
+}
+
+void WifiPage::switchToPage(QWidget *target)
+{
+    // 如果目标页等于当前页，直接返回
+    if (ui->stackedWidget->currentWidget() == target)
+        return;
+
+    // 先通知上一个页面
+    if (m_lastPageWidget)
+    {
+        auto lastAble = dynamic_cast<PageLifecycleAware *>(m_lastPageWidget);
+        if (lastAble)
+            lastAble->onPageLeave();
+    }
+
+    // 切换页面
+    ui->stackedWidget->setCurrentWidget(target);
+
+    // 再通知新页面
+    auto newAble = dynamic_cast<PageLifecycleAware *>(target);
+    if (newAble)
+        newAble->onPageEnter();
+
+    // 更新last
+    m_lastPageWidget = target;
 }
 
 // 页面进入回调
 void WifiPage::onPageEnter()
 {
     LOG_DEBUG("WifiPage entered.");
+
+    // 显示调用子页的进入函数
+    if (ui->stackedWidget->currentWidget() == m_wifiStaPage)
+    {
+        m_wifiStaPage->onPageEnter();
+    }
+    else if (ui->stackedWidget->currentWidget() == m_wifiConnPage)
+    {
+        m_wifiConnPage->onPageEnter();
+    }
 }
 
 // 页面离开回调
 void WifiPage::onPageLeave()
 {
     LOG_DEBUG("WifiPage left.");
+
+    // 显示调用子页的离开函数
+    if (ui->stackedWidget->currentWidget() == m_wifiStaPage)
+    {
+        m_wifiStaPage->onPageLeave();
+    }
+    else if (ui->stackedWidget->currentWidget() == m_wifiConnPage)
+    {
+        m_wifiConnPage->onPageLeave();
+    }
 }
-
-
-
-
-

@@ -400,6 +400,9 @@
         <property name="text">
          <string>连     接</string>
         </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
       <item>

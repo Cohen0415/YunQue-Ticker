@@ -33,7 +33,8 @@ signals:
     void getWifiStatusRequested(void);
 
     // 向子页面发送的结果信号
-    void getWifiStatusResultToSubPage(bool success, bool connected, QString &ssid, QString &ip, QString &rssi);
+    void getWifiStatusResultToConnSubPage(bool success, bool connected, QString &ssid, QString &ip, QString &rssi);
+    void getWifiStatusResultToStaSubPage(bool success, bool connected, QString &ssid, QString &ip, QString &rssi);
 
 public slots:
 
@@ -49,11 +50,16 @@ public slots:
 
     // 接收 connPage 的切换到 staPage 的请求
     void onSwitchToStaPageRequestFromConnSubPage(void);
+    // 接收 staPage 的切换到 connPage 的请求
+    void onSwitchToConnPageRequestFromStaSubPage(void);
 
 private:
 
     // 子页面初始化
     void SubPageInit(void);
+
+    // 切换到指定页面
+    void switchToPage(QWidget *target);
 
 private:
 
@@ -63,6 +69,8 @@ private:
     WifiConnPage *m_wifiConnPage;
     // wifi 状态子页面
     WifiStaPage *m_wifiStaPage;
+
+    QWidget *m_lastPageWidget = nullptr;
 };
 
 #endif // WIFIPAGE_H

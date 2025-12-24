@@ -2,13 +2,17 @@
 #include "ui_wificonnpage.h"
 #include "utils/log/logger.h"
 #include "features/pagemsgmanager.h"
+#include <QFile>
 
 WifiConnPage::WifiConnPage(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::WifiConnPage)
+    , ui(new Ui::WifiConnPageWidget)
     , m_statusTimer(new QTimer(this))
 {
     ui->setupUi(this);
+
+    m_checkInterval = CHECK_WIFI_CONN_INTERVAL_MS;
+    m_timeoutMs = WIFI_CONN_TIMEOUT_MS;
 }
 
 WifiConnPage::~WifiConnPage()
@@ -29,19 +33,45 @@ void WifiConnPage::Init()
     emit getWifiStatusRequested();
 }
 
+// 页面进入回调
+void WifiConnPage::onPageEnter()
+{
+    LOG_DEBUG("WifiConnPage entered.");
+
+    // 复位提示语
+    ui->inputHintLabel->setText("");
+}
+
+// 页面离开回调
+void WifiConnPage::onPageLeave()
+{
+    LOG_DEBUG("WifiConnPage left.");
+}
+
 void WifiConnPage::onGetWifiStatusResult(bool success, bool connected, QString &ssid, QString &ip, QString &rssi)
 {
-    //if (!m_statusTimer->isActive())
-    //    return;
-
     if (success && connected)
     {
+        // 连接成功，停止定时器
         if (m_statusTimer->isActive())
             m_statusTimer->stop();
+
         // 向 PageMsgManager 发送已连接信号
         emit PageMsgManager::getInstance()->wifiStatusChanged(true);
+
         // 切换到sta页面
         emit switchToStaPageRequested();
+
+        // 复位提示语
+        ui->inputHintLabel->setText("");
+
+        // 复位用户输入框
+        ui->ssidLineEdit->setEnabled(true);
+        ui->pwdLineEdit->setEnabled(true);
+
+        // 复位按钮
+        ui->connButton->setText("连 接");
+        ui->connButton->setEnabled(true);
     }
     else if (success && !connected)
     {
@@ -58,6 +88,10 @@ void WifiConnPage::onGetWifiStatusResult(bool success, bool connected, QString &
 // 连接按钮槽函数
 void WifiConnPage::on_connButton_clicked()
 {
+    bool ret = inputLineInspect();
+    if (!ret)
+        return;
+
     // 获取用户输入的 ssid 和 pwd
     QString ssid = ui->ssidLineEdit->text();
     QString password = ui->pwdLineEdit->text();
@@ -82,8 +116,20 @@ void WifiConnPage::on_connButton_clicked()
         m_statusTimer->start(m_checkInterval);
 }
 
+// UI 初始化
 void WifiConnPage::UIInit()
 {
+    // 加载样式表
+    QString style = LoadQssStyle(":/res/qss/pageQss/wifiConnPage.qss");
+    if (!style.isEmpty())
+    {
+        this->setStyleSheet(style);
+    }
+
+    // 复位清除按钮的文本
+    ui->ssidClearButton->setText("");
+    ui->pwdClearButton->setText("");
+
     // 错误提示语默认为空
     ui->inputHintLabel->setText("");
 
@@ -94,22 +140,22 @@ void WifiConnPage::UIInit()
     // 提示语默认为空
     ui->inputHintLabel->setText("");
 
-    // 连接按钮默认不可使用
-    ui->connButton->setEnabled(false);
+    // 复位按钮提示语
     ui->connButton->setText("连 接");
+    ui->connButton->setFocusPolicy(Qt::NoFocus);
 }
 
 // wifi 信息输入检测
-void WifiConnPage::inputLineInspect()
+bool WifiConnPage::inputLineInspect()
 {
-    ui->connButton->setEnabled(false);
+    bool ret = false;
 
     // 检测 ssid 为空，则提示
     QString ssid = ui->ssidLineEdit->text();
     if (ssid.isEmpty())
     {
         ui->inputHintLabel->setText("Wi-Fi 名称不能为空！");
-        return;
+        return ret;
     }
     else
     {
@@ -121,7 +167,7 @@ void WifiConnPage::inputLineInspect()
     if (pwd.isEmpty())
     {
         ui->inputHintLabel->setText("Wi-Fi 密码不能为空！");
-        return;
+        return ret;
     }
     else
     {
@@ -132,14 +178,28 @@ void WifiConnPage::inputLineInspect()
     if (pwd.length() < 8)
     {
         ui->inputHintLabel->setText("Wi-Fi 密码不能少于 8 位！");
-        return;
+        return ret;
     }
     else
     {
         ui->inputHintLabel->setText("");
     }
 
-    ui->connButton->setEnabled(true);
+    return true;
+}
+
+QString WifiConnPage::LoadQssStyle(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+        return QString(); // 打开失败返回空字符串
+
+    QTextStream in(&file);
+    in.setCodec("UTF-8"); // 保证中文正常显示
+
+    QString style = in.readAll();
+    file.close();
+    return style;
 }
 
 // PWD 输入框文本变化槽函数
@@ -161,17 +221,17 @@ void WifiConnPage::onStatusTimerTimeout()
 
     emit getWifiStatusRequested();  // 轮询请求主页面
 
-    if (m_elapsed >= m_timeoutMs)
+    if (m_elapsed >= m_timeoutMs)   // 连接超时
     {
         // 发送断开连接请求
         emit disconnectWifiRequested();
 
         m_statusTimer->stop();
-        ui->inputHintLabel->setText("Wi-Fi 连接超时，请检查ssid和密码！");
+        ui->inputHintLabel->setText("Wi-Fi 连接超时，请检查ssid或密码！");
 
         // 复位用户输入框
-        ui->ssidLineEdit->setEnabled(false);
-        ui->pwdLineEdit->setEnabled(false);
+        ui->ssidLineEdit->setEnabled(true);
+        ui->pwdLineEdit->setEnabled(true);
 
         // 复位连接按钮
         ui->connButton->setEnabled(true);
@@ -179,4 +239,15 @@ void WifiConnPage::onStatusTimerTimeout()
     }
 }
 
+// SSID 清除按钮槽函数
+void WifiConnPage::on_ssidClearButton_clicked()
+{
+    ui->ssidLineEdit->clear();
+}
+
+// PWD 清除按钮槽函数
+void WifiConnPage::on_pwdClearButton_clicked()
+{
+    ui->pwdLineEdit->clear();
+}
 
