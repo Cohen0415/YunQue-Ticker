@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WifiConnPage</class>
- <widget class="QWidget" name="WifiConnPage">
+ <class>WifiConnPageWidget</class>
+ <widget class="QWidget" name="WifiConnPageWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -122,13 +122,13 @@
              <number>10</number>
             </property>
             <property name="leftMargin">
-             <number>5</number>
+             <number>0</number>
             </property>
             <property name="topMargin">
              <number>0</number>
             </property>
             <property name="rightMargin">
-             <number>5</number>
+             <number>0</number>
             </property>
             <property name="bottomMargin">
              <number>0</number>
@@ -137,7 +137,7 @@
              <widget class="QLabel" name="ssidSloganLabel">
               <property name="font">
                <font>
-                <pointsize>18</pointsize>
+                <pointsize>22</pointsize>
                </font>
               </property>
               <property name="text">
@@ -146,7 +146,20 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="ssidLineEdit"/>
+             <widget class="QLineEdit" name="ssidLineEdit">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>180</width>
+                <height>35</height>
+               </size>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -170,13 +183,13 @@
              <number>10</number>
             </property>
             <property name="leftMargin">
-             <number>5</number>
+             <number>0</number>
             </property>
             <property name="topMargin">
              <number>0</number>
             </property>
             <property name="rightMargin">
-             <number>5</number>
+             <number>0</number>
             </property>
             <property name="bottomMargin">
              <number>0</number>
@@ -185,7 +198,7 @@
              <widget class="QLabel" name="pwdSloganLabel">
               <property name="font">
                <font>
-                <pointsize>18</pointsize>
+                <pointsize>22</pointsize>
                </font>
               </property>
               <property name="text">
@@ -194,7 +207,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="pwdLineEdit"/>
+             <widget class="QLineEdit" name="pwdLineEdit">
+              <property name="minimumSize">
+               <size>
+                <width>180</width>
+                <height>35</height>
+               </size>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -279,7 +299,8 @@
         </property>
         <property name="font">
          <font>
-          <pointsize>18</pointsize>
+          <pointsize>12</pointsize>
+          <bold>true</bold>
          </font>
         </property>
         <property name="text">

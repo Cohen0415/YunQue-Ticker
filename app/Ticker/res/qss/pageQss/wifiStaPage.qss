@@ -1,0 +1,37 @@
+/* 页面背景色 */
+#WifiStaPageWidget {
+	background: #000000;
+}
+
+QLabel {
+    color: white;
+}
+
+QPushButton#disconnButton {
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 #ff6e72, stop:1 #e64242);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 24px;
+    font-size: 17px;
+    font-weight: bold;
+}
+QPushButton#disconnButton:hover {
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 #ff9093, stop:1 #ff6f61);
+    color: #fff;
+}
+QPushButton#disconnButton:pressed {
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 #cc3a3d, stop:1 #b52e34);
+    color: #ffecec;
+    padding-left: 28px; padding-right: 20px;
+}
+QPushButton#disconnButton:disabled {
+    background: #f7bfc0;
+    color: #ffecec;
+}

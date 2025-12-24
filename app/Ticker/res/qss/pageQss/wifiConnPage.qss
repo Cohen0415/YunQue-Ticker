@@ -1,0 +1,54 @@
+/* 页面背景色 */
+#WifiConnPageWidget {
+	background: #000000;
+}
+
+/* 输入文本框 */
+QLineEdit {
+    border: 2px solid #bfc9d9;
+    border-radius: 6px;
+    padding: 4px 8px;
+    background: #f7faff;
+    color: #233047;
+    font-size: 16px;
+    selection-background-color: #99c8fa;
+}
+QLineEdit:focus {
+    border: 2.5px solid #3399ff;
+    background: #fff;
+}
+
+/*  */
+#pwdSloganLabel,
+#ssidSloganLabel {
+	color: white
+}
+
+/* 连接按钮 id为connButton */
+QPushButton#connButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #54c5fd, stop:1 #198cf8);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 24px;
+    font-size: 17px;
+    font-weight: bold;
+}
+QPushButton#connButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #7fd3fe, stop:1 #45a6fc);
+    color: #fff;
+}
+QPushButton#connButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #198cf8, stop:1 #1167bb);
+    color: #e2eafd;
+    padding-left: 28px; padding-right: 20px;
+}
+QPushButton#connButton:disabled {
+    background: #cfe7fa;
+    color: #f0f0f0;
+}
+
+/* 提示语 */
+#inputHintLabel {
+	color: #e95454
+}
