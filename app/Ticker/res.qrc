@@ -30,5 +30,7 @@
         <file>res/qss/pageQss/wifiStaPage.qss</file>
         <file>res/icon/pageIcon/wifiPage/clear-normal.png</file>
         <file>res/icon/pageIcon/wifiPage/clear-pressed.png</file>
+        <file>res/icon/pageIcon/wifiPage/pwd.png</file>
+        <file>res/icon/pageIcon/wifiPage/ssid.png</file>
     </qresource>
 </RCC>

@@ -143,6 +143,10 @@ void WifiConnPage::UIInit()
     // 复位按钮提示语
     ui->connButton->setText("连 接");
     ui->connButton->setFocusPolicy(Qt::NoFocus);
+
+    //
+    ui->ssidClearButton->setFocusPolicy(Qt::NoFocus);
+    ui->pwdClearButton->setFocusPolicy(Qt::NoFocus);
 }
 
 // wifi 信息输入检测

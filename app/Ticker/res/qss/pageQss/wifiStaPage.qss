@@ -15,7 +15,7 @@ QPushButton#disconnButton {
     border: none;
     border-radius: 8px;
     padding: 6px 24px;
-    font-size: 17px;
+    font-size: 30px;
     font-weight: bold;
 }
 QPushButton#disconnButton:hover {
