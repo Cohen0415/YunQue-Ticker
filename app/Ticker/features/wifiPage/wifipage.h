@@ -2,6 +2,7 @@
 #define WIFIPAGE_H
 
 #include <QWidget>
+#include "features/pagelifecycleaware.h"
 #include "features/wifiPage/wifiSubPage/wifistapage.h"
 #include "features/wifiPage/wifiSubPage/wificonnpage.h"
 
@@ -9,7 +10,7 @@ namespace Ui {
 class WifiPage;
 }
 
-class WifiPage : public QWidget
+class WifiPage : public QWidget , public PageLifecycleAware
 {
     Q_OBJECT
 
@@ -19,6 +20,10 @@ public:
     ~WifiPage();
 
     void Init(void);
+
+    // PageLifecycleAware 接口实现
+    void onPageEnter() override;
+    void onPageLeave() override;
 
 signals:
 

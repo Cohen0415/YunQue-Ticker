@@ -248,3 +248,15 @@ void SettingPage::on_soundCheckBox_stateChanged(int arg1)
         emit setVolumeRequested((m_oldVolumeValue > 0) ? m_oldVolumeValue : 50);
     }
 }
+
+// 页面进入回调
+void SettingPage::onPageEnter()
+{
+    LOG_DEBUG("SettingPage entered.");
+}
+
+// 页面离开回调
+void SettingPage::onPageLeave()
+{
+    LOG_DEBUG("SettingPage left.");
+}

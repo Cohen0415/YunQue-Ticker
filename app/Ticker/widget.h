@@ -55,6 +55,9 @@ private:
     // 加载样式表
     QString LoadQssStyle(const QString &path);
 
+    // 切换到指定页面
+    void switchToPage(QWidget *target);
+
 private slots:
 
     void onHomePageBtnClicked(void);
@@ -87,5 +90,6 @@ private:
     int m_dragThreshold = 5;            // 拖拽阈值
     bool m_isContentDragging = false;
 
+    QWidget *m_lastPageWidget = nullptr;
 };
 #endif // WIDGET_H

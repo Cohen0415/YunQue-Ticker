@@ -4,6 +4,7 @@ include($$PWD/sysinfoPage/sysinfoPage.pri)
 include($$PWD/wifiPage/wifiPage.pri)
 
 HEADERS += \
+    $$PWD/pagelifecycleaware.h \
     $$PWD/pagemsgmanager.h
 
 SOURCES += \

@@ -1,5 +1,6 @@
 #include "wifipage.h"
 #include "ui_wifipage.h"
+#include "utils/log/logger.h"
 
 WifiPage::WifiPage(QWidget *parent)
     : QWidget(parent)
@@ -64,6 +65,7 @@ void WifiPage::onSwitchToStaPageRequestFromConnSubPage()
     ui->stackedWidget->setCurrentWidget(m_wifiStaPage);
 }
 
+// 子页面初始化
 void WifiPage::SubPageInit()
 {
     // 创建 wifi 连接子页面，并添加到 stackedWidget
@@ -90,3 +92,20 @@ void WifiPage::SubPageInit()
     // 默认显示 wifi 连接子页面
     ui->stackedWidget->setCurrentWidget(m_wifiConnPage);
 }
+
+// 页面进入回调
+void WifiPage::onPageEnter()
+{
+    LOG_DEBUG("WifiPage entered.");
+}
+
+// 页面离开回调
+void WifiPage::onPageLeave()
+{
+    LOG_DEBUG("WifiPage left.");
+}
+
+
+
+
+

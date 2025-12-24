@@ -2,12 +2,13 @@
 #define SETTINGPAGE_H
 
 #include <QWidget>
+#include "features/pagelifecycleaware.h"
 
 namespace Ui {
 class SettingPage;
 }
 
-class SettingPage : public QWidget
+class SettingPage : public QWidget, public PageLifecycleAware
 {
     Q_OBJECT
 
@@ -17,6 +18,10 @@ public:
     ~SettingPage();
 
     void Init();
+
+    // PageLifecycleAware 接口实现
+    void onPageEnter() override;
+    void onPageLeave() override;
 
 signals:
 

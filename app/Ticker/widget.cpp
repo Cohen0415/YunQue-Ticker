@@ -3,6 +3,7 @@
 #include "utils/log/logger.h"
 #include "appcontext.h"
 #include "features/pagemsgmanager.h"
+#include "features/pagelifecycleaware.h"
 
 #include <QPushButton>
 #include <QScrollBar>
@@ -77,6 +78,32 @@ QString Widget::LoadQssStyle(const QString &path)
     QString style = in.readAll();
     file.close();
     return style;
+}
+
+void Widget::switchToPage(QWidget *target)
+{
+    // 如果目标页等于当前页，直接返回
+    if (ui->stackedWidget->currentWidget() == target)
+        return;
+
+    // 先通知上一个页面
+    if (m_lastPageWidget)
+    {
+        auto lastAble = dynamic_cast<PageLifecycleAware *>(m_lastPageWidget);
+        if (lastAble)
+            lastAble->onPageLeave();
+    }
+
+    // 切换页面
+    ui->stackedWidget->setCurrentWidget(target);
+
+    // 再通知新页面
+    auto newAble = dynamic_cast<PageLifecycleAware *>(target);
+    if (newAble)
+        newAble->onPageEnter();
+
+    // 更新last
+    m_lastPageWidget = target;
 }
 
 bool Widget::eventFilter(QObject *obj, QEvent *event)
@@ -270,7 +297,7 @@ void Widget::StackedWidgetPageInit()
     ui->stackedWidget->addWidget(m_wifiPageWidget);
 
     // 默认显示 主页 页面
-    ui->stackedWidget->setCurrentWidget(m_homePageWidget);
+    switchToPage(m_homePageWidget);
 }
 
 void Widget::PagesInit()
@@ -334,25 +361,25 @@ void Widget::ConnectSignalAndSlot()
 void Widget::onHomePageBtnClicked()
 {
     if (m_homePageWidget)
-        ui->stackedWidget->setCurrentWidget(m_homePageWidget);
+        switchToPage(m_homePageWidget);
 }
 
 void Widget::onSysinfoPageBtnClicked()
 {
     if (m_sysinfoPageWidget)
-        ui->stackedWidget->setCurrentWidget(m_sysinfoPageWidget);
+        switchToPage(m_sysinfoPageWidget);
 }
 
 void Widget::onSettingPageBtnClicked()
 {
     if (m_settingPageWidget)
-        ui->stackedWidget->setCurrentWidget(m_settingPageWidget);
+        switchToPage(m_settingPageWidget);
 }
 
 void Widget::onWifiPageBtnClicked()
 {
     if (m_wifiPageWidget)
-        ui->stackedWidget->setCurrentWidget(m_wifiPageWidget);
+        switchToPage(m_wifiPageWidget);
 }
 
 // 收到 音量 状态变化信号
