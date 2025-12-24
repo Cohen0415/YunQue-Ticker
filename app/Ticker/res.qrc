@@ -19,8 +19,12 @@
         <file>res/icon/pageIcon/sysinfoPage/runtime.png</file>
         <file>res/icon/pageIcon/sysinfoPage/storage.png</file>
         <file>res/icon/pageIcon/sysinfoPage/version.png</file>
-        <file>res/icon/pageIcon/wifiPage/wifi.png</file>
         <file>res/qss/pageQss/settingPage.qss</file>
         <file>res/qss/mainFrameQss/mainFrame.qss</file>
+        <file>res/icon/pageIcon/wifiPage/wifi-0.png</file>
+        <file>res/icon/pageIcon/wifiPage/wifi-1.png</file>
+        <file>res/icon/pageIcon/wifiPage/wifi-2.png</file>
+        <file>res/icon/pageIcon/wifiPage/wifi-3.png</file>
+        <file>res/icon/pageIcon/wifiPage/wifi-4.png</file>
     </qresource>
 </RCC>
