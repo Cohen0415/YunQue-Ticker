@@ -28,5 +28,7 @@
         <file>res/icon/pageIcon/wifiPage/wifi-4.png</file>
         <file>res/qss/pageQss/wifiConnPage.qss</file>
         <file>res/qss/pageQss/wifiStaPage.qss</file>
+        <file>res/icon/pageIcon/wifiPage/clear-normal.png</file>
+        <file>res/icon/pageIcon/wifiPage/clear-pressed.png</file>
     </qresource>
 </RCC>

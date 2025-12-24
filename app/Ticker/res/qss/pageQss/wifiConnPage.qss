@@ -24,6 +24,17 @@ QLineEdit:focus {
 	color: white
 }
 
+/* 清除按钮 */
+QPushButton#ssidClearButton,
+QPushButton#pwdClearButton {
+    border-image: url(:/res/icon/pageIcon/wifiPage/clear-normal.png);
+}
+
+QPushButton#ssidClearButton:pressed,
+QPushButton#pwdClearButton:pressed {
+    border-image: url(:/res/icon/pageIcon/wifiPage/clear-pressed.png);
+}
+
 /* 连接按钮 id为connButton */
 QPushButton#connButton {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #54c5fd, stop:1 #198cf8);
