@@ -62,5 +62,3 @@ void SettingPresenter::handleVolumeGetChangeResult(bool success, int value)
     // 将结果通过信号发回给 View
     emit volumeGetChangeResult(success, value);
 }
-
-

@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 #endif
 
     // 4、初始化 Widget
-    w.Init();
+    w.init();
 
     w.show();
     return app.exec();

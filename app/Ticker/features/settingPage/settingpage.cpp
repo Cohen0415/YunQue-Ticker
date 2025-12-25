@@ -16,13 +16,15 @@ SettingPage::~SettingPage()
     delete ui;
 }
 
-void SettingPage::Init()
+// 页面初始化，给 widget.cpp 调用
+void SettingPage::init()
 {
-    UIInit();
+    // 初始化 UI
+    uiInit();
 }
 
 // UI 初始化
-void SettingPage::UIInit()
+void SettingPage::uiInit()
 {
     // 初始化背光滑动条的范围为 0～100
     ui->backlightHarSlider->setMinimum(0);
@@ -33,7 +35,7 @@ void SettingPage::UIInit()
     ui->soundHarSlider->setMaximum(100);
 
     // 加载样式表
-    QString qss = LoadQssStyle(":/res/qss/pageQss/settingPage.qss");
+    QString qss = loadQssStyle(":/res/qss/pageQss/settingPage.qss");
     if (!qss.isEmpty())
         this->setStyleSheet(qss);
 
@@ -42,7 +44,7 @@ void SettingPage::UIInit()
     emit getVolumeRequested();
 }
 
-// 更新背光 UI 显示
+// 更新背光相关控件的 UI 显示
 void SettingPage::updateBacklightUI(int value)
 {
 
@@ -50,7 +52,7 @@ void SettingPage::updateBacklightUI(int value)
     ui->backlightHarSlider->setValue(value);
 }
 
-// 更新音量 UI 显示
+// 更新音量相关控件的 UI 显示
 void SettingPage::updateVolumeUI(int value)
 {
     // 如果音量为 0, 相关控件变成 disabled，复选框状态变成勾选
@@ -95,7 +97,8 @@ void SettingPage::updateVolumeUI(int value)
     m_oldVolumeValue = value;
 }
 
-QString SettingPage::LoadQssStyle(const QString &path)
+// 加载样式表
+QString SettingPage::loadQssStyle(const QString &path)
 {
     QFile file(path);
     if (!file.open(QFile::ReadOnly | QFile::Text))
@@ -114,6 +117,7 @@ void SettingPage::onBacklightSetResult(bool success, int value)
 {
     if (success)
     {
+        // 更新背光相关控件的 UI 显示
         updateBacklightUI(value);
     }
 }
@@ -123,6 +127,7 @@ void SettingPage::onBacklightGetResult(bool success, int value)
 {
     if (success)
     {
+        // 更新背光相关控件的 UI 显示
         updateBacklightUI(value);
     }
 }
@@ -132,6 +137,7 @@ void SettingPage::onVolumeSetResult(bool success, int value)
 {
     if (success)
     {
+        // 更新音量相关控件的 UI 显示
         updateVolumeUI(value);
     }
 }
@@ -141,6 +147,7 @@ void SettingPage::onVolumeGetResult(bool success, int value)
 {
     if (success)
     {
+        // 更新音量相关控件的 UI 显示
         updateVolumeUI(value);
     }
 }
@@ -162,12 +169,14 @@ void SettingPage::on_soundHarSlider_sliderReleased()
 // 背光滑动条值变化槽函数
 void SettingPage::on_backlightHarSlider_valueChanged(int value)
 {
+    // 实时更新背光值显示
     ui->backlightValueLabel->setText(QString::number(value));
 }
 
 // 音量滑动条值变化槽函数
 void SettingPage::on_soundHarSlider_valueChanged(int value)
 {
+    // 实时更新音量值显示
     ui->soundValueLabel->setText(QString::number(value));
 }
 
@@ -181,6 +190,7 @@ void SettingPage::on_backlightPreBtn_clicked()
         currentValue--;
         ui->backlightHarSlider->setValue(currentValue);
         ui->backlightValueLabel->setText(QString::number(currentValue));
+
         // 向 presenter 发送背光设置请求信号
         emit setBacklightRequested(currentValue);
     }
@@ -196,6 +206,7 @@ void SettingPage::on_backlightNextBtn_clicked()
         currentValue++;
         ui->backlightHarSlider->setValue(currentValue);
         ui->backlightValueLabel->setText(QString::number(currentValue));
+
         // 向 presenter 发送背光设置请求信号
         emit setBacklightRequested(currentValue);
     }
@@ -211,6 +222,7 @@ void SettingPage::on_soundPreBtn_clicked()
         currentValue--;
         ui->soundHarSlider->setValue(currentValue);
         ui->soundValueLabel->setText(QString::number(currentValue));
+
         // 向 presenter 发送音量设置请求信号
         emit setVolumeRequested(currentValue);
     }
@@ -226,6 +238,7 @@ void SettingPage::on_soundNextBtn_clicked()
         currentValue++;
         ui->soundHarSlider->setValue(currentValue);
         ui->soundValueLabel->setText(QString::number(currentValue));
+
         // 向 presenter 发送音量设置请求信号
         emit setVolumeRequested(currentValue);
     }
@@ -238,7 +251,7 @@ void SettingPage::on_soundCheckBox_stateChanged(int arg1)
     // 静音
     if (arg1 == Qt::Checked)
     {
-        // 用户想静音
+        // 用户想静音，向 presenter 发送音量设置请求信号，设置音量为 0
         emit setVolumeRequested(0);
     }
     else // 取消静音

@@ -14,11 +14,11 @@ WifiPage::~WifiPage()
     delete ui;
 }
 
-void WifiPage::Init()
+// 页面初始化，给 widget.cpp 调用
+void WifiPage::init()
 {
-    SubPageInit();
-
-    qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
+    // 子页面初始化
+    subPageInit();
 }
 
 // 接收 presenter 发送的 Wi-Fi 连接结果
@@ -37,8 +37,7 @@ void WifiPage::onDisconnectWifiResult(bool success)
 void WifiPage::onGetWifiStatusResult(bool success, bool connected, QString &ssid, QString &ip, QString &rssi)
 {
     // 将结果发送给子页面
-    // 如果当前是 connPage
-    if (ui->stackedWidget->currentWidget() == m_wifiConnPage)
+    if (ui->stackedWidget->currentWidget() == m_wifiConnPage)       // 如果当前是 connPage
         emit getWifiStatusResultToConnSubPage(success, connected, ssid, ip, rssi);
     else if (ui->stackedWidget->currentWidget() == m_wifiStaPage)
         emit getWifiStatusResultToStaSubPage(success, connected, ssid, ip, rssi);
@@ -68,17 +67,19 @@ void WifiPage::onConnectRequestFromSubPage(const QString &ssid, const QString &p
 // 接收 connPage 的切换到 staPage 的请求
 void WifiPage::onSwitchToStaPageRequestFromConnSubPage()
 {
+    // 切换到 staPage
     switchToPage(m_wifiStaPage);
 }
 
 // 接收 staPage 的切换到 connPage 的请求
 void WifiPage::onSwitchToConnPageRequestFromStaSubPage()
 {
+    // 切换到 connPage
     switchToPage(m_wifiConnPage);
 }
 
 // 子页面初始化
-void WifiPage::SubPageInit()
+void WifiPage::subPageInit()
 {
     // 创建 wifi 连接子页面，并添加到 stackedWidget
     m_wifiConnPage = new WifiConnPage(this);
@@ -91,7 +92,7 @@ void WifiPage::SubPageInit()
     // 切换到 staPage 请求
     connect(m_wifiConnPage, &WifiConnPage::switchToStaPageRequested, this, &WifiPage::onSwitchToStaPageRequestFromConnSubPage);
     // 显示初始化
-    m_wifiConnPage->Init();
+    m_wifiConnPage->init();
 
     // 创建 wifi 连接状态子页面，并添加到 stackedWidget
     m_wifiStaPage = new WifiStaPage(this);
@@ -103,12 +104,13 @@ void WifiPage::SubPageInit()
     // 切换到 connPage 请求
     connect(m_wifiStaPage, &WifiStaPage::switchToConnPageRequested, this, &WifiPage::onSwitchToConnPageRequestFromStaSubPage);
     // 显示初始化
-    m_wifiStaPage->Init();
+    m_wifiStaPage->init();
 
     // 默认显示 wifi 连接子页面
     ui->stackedWidget->setCurrentWidget(m_wifiConnPage);
 }
 
+// 切换到指定页面
 void WifiPage::switchToPage(QWidget *target)
 {
     // 如果目标页等于当前页，直接返回

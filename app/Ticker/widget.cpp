@@ -25,24 +25,26 @@ Widget::~Widget()
     delete ui;
 }
 
-void Widget::Init()
+// 初始化函数
+void Widget::init()
 {
     // 初始化 UI
-    UiInit();
+    uiInit();
 
     // 初始化 stackedWidget 页面
-    StackedWidgetPageInit();
+    stackedWidgetPageInit();
 
     // 初始化信号槽
-    ConnectSignalAndSlot();
+    connectSignalAndSlot();
 
     // 在初始化信号后，再初始化 pages，因为 pages 初始化时可能会发送信号
-    PagesInit();
+    pagesInit();
 
     // 安装滚动拖拽事件过滤器
     installScrollDragFilters();
 }
 
+// 安装滚动拖拽事件过滤器
 void Widget::installScrollDragFilters()
 {
     m_verticalScrollBar = ui->scrollArea->verticalScrollBar();
@@ -66,7 +68,8 @@ void Widget::installScrollDragFilters()
     }
 }
 
-QString Widget::LoadQssStyle(const QString &path)
+// 加载样式表
+QString Widget::loadQssStyle(const QString &path)
 {
     QFile file(path);
     if (!file.open(QFile::ReadOnly | QFile::Text))
@@ -80,6 +83,7 @@ QString Widget::LoadQssStyle(const QString &path)
     return style;
 }
 
+// 切换到指定页面
 void Widget::switchToPage(QWidget *target)
 {
     // 如果目标页等于当前页，直接返回
@@ -106,6 +110,7 @@ void Widget::switchToPage(QWidget *target)
     m_lastPageWidget = target;
 }
 
+// 事件过滤器重载，用于实现滚动拖拽
 bool Widget::eventFilter(QObject *obj, QEvent *event)
 {
     // 确定事件相关的对象是否是我们关心的（scrollArea的内容部件或其子控件）
@@ -195,7 +200,8 @@ bool Widget::eventFilter(QObject *obj, QEvent *event)
     return QWidget::eventFilter(obj, event);
 }
 
-void Widget::UiInit()
+// UI 初始化
+void Widget::uiInit()
 {
     // 禁用标题栏
     // this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint);
@@ -203,21 +209,22 @@ void Widget::UiInit()
     // QWidget::setCursor(QCursor(Qt::BlankCursor));
 
     // 初始化菜单栏 UI
-    MenuBarUIInit();
+    menuBarUIInit();
 
     // 初始化时间 UI
-    BJTimeUIInit();
+    bjTimeUIInit();
 
     // 初始化状态栏 UI
-    StaBarUIInit();
+    staBarUIInit();
 
     // 加载样式表
-    QString qss = LoadQssStyle(":/res/qss/mainFrameQss/mainFrame.qss");
+    QString qss = loadQssStyle(":/res/qss/mainFrameQss/mainFrame.qss");
     if (!qss.isEmpty())
         this->setStyleSheet(qss);
 }
 
-void Widget::MenuBarUIInit()
+// 菜单栏 UI 初始化
+void Widget::menuBarUIInit()
 {
     // 获取 scrollArea 内部的内容 widget
     QWidget *contentWidget = ui->scrollArea->widget();
@@ -267,18 +274,21 @@ void Widget::MenuBarUIInit()
     ui->scrollArea->setFrameShadow(QFrame::Plain);
 }
 
-void Widget::BJTimeUIInit()
+// 北京时间 UI 初始化
+void Widget::bjTimeUIInit()
 {
     ui->bjTimeLabel->setText("1219 - 13:53");
 }
 
-void Widget::StaBarUIInit()
+// 状态栏 UI 初始化
+void Widget::staBarUIInit()
 {
     ui->soundLabelIcon->setPixmap(QPixmap(":/res/icon/staBarIcon/soundOff.png"));
     ui->wifiLabelIcon->setPixmap(QPixmap(":/res/icon/staBarIcon/wifiDisconnect.png"));
 }
 
-void Widget::StackedWidgetPageInit()
+// stackedWidget 页面初始化
+void Widget::stackedWidgetPageInit()
 {
     // 主页 页面
     m_homePageWidget = new HomePage(this);
@@ -300,16 +310,18 @@ void Widget::StackedWidgetPageInit()
     switchToPage(m_homePageWidget);
 }
 
-void Widget::PagesInit()
+// pages 初始化
+void Widget::pagesInit()
 {
     // settingPage init
-    m_settingPageWidget->Init();
+    m_settingPageWidget->init();
 
     // wifiPage init
-    m_wifiPageWidget->Init();
+    m_wifiPageWidget->init();
 }
 
-void Widget::ConnectSignalAndSlot()
+// 信号槽函数初始化
+void Widget::connectSignalAndSlot()
 {
     if (!m_homePageBtn || !m_sysinfoPageBtn || !m_settingPageBtn || !m_wifiPageBtn)
     {
@@ -317,10 +329,10 @@ void Widget::ConnectSignalAndSlot()
     }
 
     // 菜单栏按钮的信号槽连接
-    connect(m_homePageBtn, &QPushButton::clicked, this, &Widget::onHomePageBtnClicked);
-    connect(m_sysinfoPageBtn, &QPushButton::clicked, this, &Widget::onSysinfoPageBtnClicked);
-    connect(m_settingPageBtn, &QPushButton::clicked, this, &Widget::onSettingPageBtnClicked);
-    connect(m_wifiPageBtn, &QPushButton::clicked, this, &Widget::onWifiPageBtnClicked);
+    connect(m_homePageBtn, &QPushButton::clicked, this, &Widget::on_homePageButton_clicked);
+    connect(m_sysinfoPageBtn, &QPushButton::clicked, this, &Widget::on_sysinfoPageButton_clicked);
+    connect(m_settingPageBtn, &QPushButton::clicked, this, &Widget::on_settingPageButton_clicked);
+    connect(m_wifiPageBtn, &QPushButton::clicked, this, &Widget::on_wifiPageButton_clicked);
 
     // presenters 和各个 page 的信号槽连接
     // settingPresenter <--> settingPage
@@ -358,25 +370,25 @@ void Widget::ConnectSignalAndSlot()
     connect(pageMsgManager, &PageMsgManager::wifiStatusChanged, this, &Widget::onWifiStatusChanged);
 }
 
-void Widget::onHomePageBtnClicked()
+void Widget::on_homePageButton_clicked()
 {
     if (m_homePageWidget)
         switchToPage(m_homePageWidget);
 }
 
-void Widget::onSysinfoPageBtnClicked()
+void Widget::on_sysinfoPageButton_clicked()
 {
     if (m_sysinfoPageWidget)
         switchToPage(m_sysinfoPageWidget);
 }
 
-void Widget::onSettingPageBtnClicked()
+void Widget::on_settingPageButton_clicked()
 {
     if (m_settingPageWidget)
         switchToPage(m_settingPageWidget);
 }
 
-void Widget::onWifiPageBtnClicked()
+void Widget::on_wifiPageButton_clicked()
 {
     if (m_wifiPageWidget)
         switchToPage(m_wifiPageWidget);

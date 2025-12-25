@@ -26,63 +26,55 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
-    void Init();
+    void init();
 
 protected:
 
+    // 事件过滤器重载，用于实现滚动拖拽
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
 
     // UI 相关
-    void UiInit(void);
-    void MenuBarUIInit(void);
-    void BJTimeUIInit(void);
-    void StaBarUIInit(void);
+    void uiInit();          // UI 初始化
+    void menuBarUIInit();   // 菜单栏 UI 初始化
+    void bjTimeUIInit();    // 北京时间 UI 初始化
+    void staBarUIInit();    // 状态栏 UI 初始化
+    
+    void stackedWidgetPageInit();   // stackedWidget 页面初始化
+    void pagesInit();               // pages 初始化
+    void connectSignalAndSlot();    // 信号槽函数初始化
 
-    // stackedWidget 页面初始化
-    void StackedWidgetPageInit(void);
+    void installScrollDragFilters();    // 初始化滚动
 
-    // pages 初始化
-    void PagesInit(void);
-
-    // 信号槽函数初始化
-    void ConnectSignalAndSlot(void);
-
-    // 初始化滚动
-    void installScrollDragFilters();
-
-    // 加载样式表
-    QString LoadQssStyle(const QString &path);
-
-    // 切换到指定页面
-    void switchToPage(QWidget *target);
+    QString loadQssStyle(const QString &path);  // 加载样式表
+    void switchToPage(QWidget *target); // 切换到指定页面
 
 private slots:
 
-    void onHomePageBtnClicked(void);
-    void onSysinfoPageBtnClicked(void);
-    void onSettingPageBtnClicked(void);
-    void onWifiPageBtnClicked(void);
+    void on_homePageButton_clicked();
+    void on_sysinfoPageButton_clicked();
+    void on_settingPageButton_clicked();
+    void on_wifiPageButton_clicked();
 
-    void onVolumeMuteStateChanged(bool isMuted);
-    void onWifiStatusChanged(bool connected);
+    void onVolumeMuteStateChanged(bool isMuted);    // 音量静音状态改变
+    void onWifiStatusChanged(bool connected);       // wifi 状态改变
 
 private:
 
     Ui::Widget *ui;
 
-    QPushButton *m_homePageBtn;
-    QPushButton *m_sysinfoPageBtn;
-    QPushButton *m_settingPageBtn;
-    QPushButton *m_wifiPageBtn;
+    QPushButton *m_homePageBtn;         // 主页 按钮
+    QPushButton *m_sysinfoPageBtn;      // 系统信息页 按钮
+    QPushButton *m_settingPageBtn;      // 设置页 按钮
+    QPushButton *m_wifiPageBtn;         // wifi设置页 按钮
 
-    HomePage *m_homePageWidget;
-    SettingPage *m_settingPageWidget;
-    SysinfoPage *m_sysinfoPageWidget;
-    WifiPage *m_wifiPageWidget;
+    HomePage *m_homePageWidget;         // 主页 页面
+    SettingPage *m_settingPageWidget;   // 设置页 页面
+    SysinfoPage *m_sysinfoPageWidget;   // 系统信息页 页面
+    WifiPage *m_wifiPageWidget;         // wifi设置页 页面
 
-    SettingPresenter *m_settingPresenter;
+    SettingPresenter *m_settingPresenter;   // 设置页 Presenter
 
     bool m_isDragging = false;
     QPoint m_dragStartPos;              // 记录拖拽开始的位置
@@ -90,6 +82,7 @@ private:
     int m_dragThreshold = 5;            // 拖拽阈值
     bool m_isContentDragging = false;
 
-    QWidget *m_lastPageWidget = nullptr;
+    QWidget *m_lastPageWidget = nullptr;// 记录上一个页面指针
+
 };
 #endif // WIDGET_H

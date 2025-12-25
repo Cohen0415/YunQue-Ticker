@@ -20,10 +20,11 @@ WifiStaPage::~WifiStaPage()
     delete ui;
 }
 
-void WifiStaPage::Init()
+// 页面初始化，给父页面调用
+void WifiStaPage::init()
 {
     // UI 初始化
-    UIInit();
+    uiInit();
 }
 
 // 页面进入回调
@@ -46,6 +47,7 @@ void WifiStaPage::onPageLeave()
         m_statusTimer->stop();
 }
 
+// 接收父页面发送的获取 wifi 状态结果
 void WifiStaPage::onGetWifiStatusResult(bool success, bool connected, QString &ssid, QString &ip, QString &rssi)
 {
     if (success && connected)
@@ -98,15 +100,17 @@ void WifiStaPage::onGetWifiStatusResult(bool success, bool connected, QString &s
     }
 }
 
+// 轮询定时器槽函数
 void WifiStaPage::onStatusTimerTimeout()
 {
     emit getWifiStatusRequested();
 }
 
-void WifiStaPage::UIInit()
+// UI 初始化
+void WifiStaPage::uiInit()
 {
     // 加载样式表
-    QString style = LoadQssStyle(":/res/qss/pageQss/wifiStaPage.qss");
+    QString style = loadQssStyle(":/res/qss/pageQss/wifiStaPage.qss");
     if (!style.isEmpty())
     {
         this->setStyleSheet(style);
@@ -148,7 +152,8 @@ WifiRssiLevel WifiStaPage::getRssiLevel(const int &rssi)
     }
 }
 
-QString WifiStaPage::LoadQssStyle(const QString &path)
+// 加载样式表
+QString WifiStaPage::loadQssStyle(const QString &path)
 {
     QFile file(path);
     if (!file.open(QFile::ReadOnly | QFile::Text))
@@ -172,4 +177,3 @@ void WifiStaPage::on_disconnButton_clicked()
     ui->disconnButton->setText("断 开 连 接 中...");
     ui->disconnButton->setEnabled(false);
 }
-

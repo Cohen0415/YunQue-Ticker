@@ -21,6 +21,12 @@ public:
     void onPageEnter() override;
     void onPageLeave() override;
 
+signals:
+
+public slots:
+
+private slots:
+
 private:
 
     Ui::HomePage *ui;

@@ -16,10 +16,8 @@ public:
 signals:
 
     // 定义页面间通信的信号
-    // 音量静音状态改变
-    void volumeMuteStateChanged(bool isMuted);
-    // wifi 状态改变
-    void wifiStatusChanged(bool connected);
+    void volumeMuteStateChanged(bool isMuted);  // 音量静音状态改变
+    void wifiStatusChanged(bool connected);     // wifi 状态改变
 
 private:
 

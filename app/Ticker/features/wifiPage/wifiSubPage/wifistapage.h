@@ -28,52 +28,43 @@ public:
     explicit WifiStaPage(QWidget *parent = nullptr);
     ~WifiStaPage();
 
-    void Init();
+    void init();        // 页面初始化，给父页面调用
 
     // PageLifecycleAware 接口实现
-    void onPageEnter() override;
-    void onPageLeave() override;
+    void onPageEnter() override;    // 页面进入回调
+    void onPageLeave() override;    // 页面离开回调
 
 signals:
 
     // 向父页面发送的信号
-    void disconnectWifiRequested(void);
-    void getWifiStatusRequested(void);
+    void disconnectWifiRequested();     // 向父页面发送断开 wifi 请求
+    void getWifiStatusRequested();      // 向父页面发送获取 wifi 状态请求
 
     // 向父页面发送切换到状态页面请求信号
-    void switchToConnPageRequested(void);
+    void switchToConnPageRequested();   // 向父页面发送切换到连接页面请求
 
 public slots:
 
     // 接收父页面发送的结果
-    void onGetWifiStatusResult(bool success, bool connected, QString &ssid, QString &ip, QString &rssi);
+    void onGetWifiStatusResult(bool success, bool connected, QString &ssid, QString &ip, QString &rssi);    // 接收父页面发送的获取 wifi 状态结果
 
     // 轮询定时器槽函数
-    void onStatusTimerTimeout();
+    void onStatusTimerTimeout();            // 定时器槽函数
 
 private slots:
 
-    void on_disconnButton_clicked();
+    void on_disconnButton_clicked();        // 断开连接按钮槽函数
 
 private:
 
-    // UI 初始化
-    void UIInit(void);
-
-    // 获取当前信号等级
-    WifiRssiLevel getRssiLevel(const int &rssi);
-
-    // 加载样式表
-    QString LoadQssStyle(const QString &path);
-
-private:
+    void uiInit(void);          // UI 初始化
+    WifiRssiLevel getRssiLevel(const int &rssi);    // 获取当前信号等级
+    QString loadQssStyle(const QString &path);      // 加载样式表
 
     Ui::WifiStaPageWidget *ui;
 
     WifiRssiLevel m_currentRssiLevel = WIFI_RSSI_LEVEL_0;   // 当前信号等级
-
     QTimer* m_statusTimer;      // 轮询定时器
-
     int m_startFlag = 1;        // 首次启动标志
 };
 

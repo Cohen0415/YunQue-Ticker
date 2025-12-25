@@ -22,14 +22,16 @@ WifiConnPage::~WifiConnPage()
     delete ui;
 }
 
-void WifiConnPage::Init()
+// 页面初始化, 给父页面调用
+void WifiConnPage::init()
 {
+    // 连接定时器槽函数
     connect(m_statusTimer, &QTimer::timeout, this, &WifiConnPage::onStatusTimerTimeout);
 
     // UI 初始化
-    UIInit();
+    uiInit();
 
-    // 初始化时，请求一次当前的 wifi 连接状态
+    // 初始化时，请求获取一次当前的 wifi 连接状态
     emit getWifiStatusRequested();
 }
 
@@ -48,6 +50,7 @@ void WifiConnPage::onPageLeave()
     LOG_DEBUG("WifiConnPage left.");
 }
 
+// 接收父页面发送的获取 wifi 状态结果
 void WifiConnPage::onGetWifiStatusResult(bool success, bool connected, QString &ssid, QString &ip, QString &rssi)
 {
     if (success && connected)
@@ -88,6 +91,7 @@ void WifiConnPage::onGetWifiStatusResult(bool success, bool connected, QString &
 // 连接按钮槽函数
 void WifiConnPage::on_connButton_clicked()
 {
+    // 用户输入检测
     bool ret = inputLineInspect();
     if (!ret)
         return;
@@ -117,10 +121,10 @@ void WifiConnPage::on_connButton_clicked()
 }
 
 // UI 初始化
-void WifiConnPage::UIInit()
+void WifiConnPage::uiInit()
 {
     // 加载样式表
-    QString style = LoadQssStyle(":/res/qss/pageQss/wifiConnPage.qss");
+    QString style = loadQssStyle(":/res/qss/pageQss/wifiConnPage.qss");
     if (!style.isEmpty())
     {
         this->setStyleSheet(style);
@@ -192,7 +196,7 @@ bool WifiConnPage::inputLineInspect()
     return true;
 }
 
-QString WifiConnPage::LoadQssStyle(const QString &path)
+QString WifiConnPage::loadQssStyle(const QString &path)
 {
     QFile file(path);
     if (!file.open(QFile::ReadOnly | QFile::Text))
@@ -254,4 +258,3 @@ void WifiConnPage::on_pwdClearButton_clicked()
 {
     ui->pwdLineEdit->clear();
 }
-

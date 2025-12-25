@@ -46,6 +46,3 @@ void WifiPresenter::handleGetWifiStatusResult(bool success, bool connected, QStr
     // 将结果通过信号发回给 View
     emit getWifiStatusResult(success, connected, ssid, ip, rssi);
 }
-
-
-
