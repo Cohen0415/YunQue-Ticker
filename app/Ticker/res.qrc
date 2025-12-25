@@ -17,8 +17,6 @@
         <file>res/icon/pageIcon/settingPage/volume.png</file>
         <file>res/icon/pageIcon/sysinfoPage/ip.png</file>
         <file>res/icon/pageIcon/sysinfoPage/runtime.png</file>
-        <file>res/icon/pageIcon/sysinfoPage/storage.png</file>
-        <file>res/icon/pageIcon/sysinfoPage/version.png</file>
         <file>res/qss/pageQss/settingPage.qss</file>
         <file>res/qss/mainFrameQss/mainFrame.qss</file>
         <file>res/icon/pageIcon/wifiPage/wifi-0.png</file>
@@ -32,5 +30,8 @@
         <file>res/icon/pageIcon/wifiPage/clear-pressed.png</file>
         <file>res/icon/pageIcon/wifiPage/pwd.png</file>
         <file>res/icon/pageIcon/wifiPage/ssid.png</file>
+        <file>res/icon/pageIcon/sysinfoPage/cputemp.png</file>
+        <file>res/icon/pageIcon/sysinfoPage/version-app.png</file>
+        <file>res/icon/pageIcon/sysinfoPage/version-sys.png</file>
     </qresource>
 </RCC>
