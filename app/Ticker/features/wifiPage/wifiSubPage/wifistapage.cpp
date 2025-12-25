@@ -64,8 +64,6 @@ void WifiStaPage::onGetWifiStatusResult(bool success, bool connected, QString &s
 
         // 获取当前信号等级
         WifiRssiLevel level = getRssiLevel(rssi.toInt());
-        LOG_DEBUG("m_currentRssiLevel = %d", m_currentRssiLevel);
-        LOG_DEBUG("level = %d", level);
         if (level != m_currentRssiLevel)
         {
             // 更新信号图标
