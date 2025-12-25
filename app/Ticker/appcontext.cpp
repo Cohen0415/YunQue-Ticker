@@ -10,7 +10,8 @@ AppContext::AppContext(QObject *parent)
     m_sysinfoService(this),
     m_wifiService(this),
     m_settingPresenter(this),
-    m_wifiPresenter(this)
+    m_wifiPresenter(this),
+    m_sysinfoPresenter(this)
 {
 }
 
@@ -29,7 +30,12 @@ WifiPresenter *AppContext::wifiPresenter()
     return &m_wifiPresenter;
 }
 
-int AppContext::Init()
+SysinfoPresenter *AppContext::sysinfoPresenter()
+{
+    return &m_sysinfoPresenter;
+}
+
+int AppContext::init()
 {
     // 初始化 ServiceManager
     int ret = m_serviceManager.initialize(UDS_PATH);
@@ -78,6 +84,14 @@ int AppContext::Init()
     // wifi get status
     QObject::connect(&m_wifiPresenter, &WifiPresenter::requestGetWifiStatus, &m_wifiService, &WifiService::onGetWifiStatus);
     QObject::connect(&m_wifiService, &WifiService::wifiStatusResult, &m_wifiPresenter, &WifiPresenter::handleGetWifiStatusResult);
+
+    // sysinfoPresenter
+    // cpu temp get
+    QObject::connect(&m_sysinfoPresenter, &SysinfoPresenter::getCpuTempRequested, &m_sysinfoService, &SysinfoService::onGetCpuTemperature);
+    QObject::connect(&m_sysinfoService, &SysinfoService::cpuTemperatureResult, &m_sysinfoPresenter, &SysinfoPresenter::handleCpuTempGetResult);
+    // bj time get
+    QObject::connect(&m_sysinfoPresenter, &SysinfoPresenter::getBjTimeRequested, &m_sysinfoService, &SysinfoService::onGetBeijingTime);
+    QObject::connect(&m_sysinfoService, &SysinfoService::beijingTimeResult, &m_sysinfoPresenter, &SysinfoPresenter::handleBjTimeGetResult);
 
     return 0;
 }

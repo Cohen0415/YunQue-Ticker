@@ -18,6 +18,7 @@ signals:
     // 定义页面间通信的信号
     void volumeMuteStateChanged(bool isMuted);  // 音量静音状态改变
     void wifiStatusChanged(bool connected);     // wifi 状态改变
+    void bjTimeUpdated(const QString &bjTime);  // 北京时间更新
 
 private:
 

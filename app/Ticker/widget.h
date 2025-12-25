@@ -12,6 +12,8 @@
 #include "features/wifiPage/wifipage.h"
 
 #include "features/settingPage/settingpresenter.h"
+#include "features/wifiPage/wifipresenter.h"
+#include "features/sysinfoPage/sysinfopresenter.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -52,13 +54,14 @@ private:
 
 private slots:
 
-    void on_homePageButton_clicked();
-    void on_sysinfoPageButton_clicked();
-    void on_settingPageButton_clicked();
-    void on_wifiPageButton_clicked();
+    void onHomePageButtonClicked();
+    void onSysinfoPageButtonClicked();
+    void onSettingPageButtonClicked();
+    void onWifiPageButtonClicked();
 
     void onVolumeMuteStateChanged(bool isMuted);    // 音量静音状态改变
     void onWifiStatusChanged(bool connected);       // wifi 状态改变
+    void onBjTimeUpdated(const QString &bjTime);    // 北京时间更新
 
 private:
 
@@ -73,8 +76,6 @@ private:
     SettingPage *m_settingPageWidget;   // 设置页 页面
     SysinfoPage *m_sysinfoPageWidget;   // 系统信息页 页面
     WifiPage *m_wifiPageWidget;         // wifi设置页 页面
-
-    SettingPresenter *m_settingPresenter;   // 设置页 Presenter
 
     bool m_isDragging = false;
     QPoint m_dragStartPos;              // 记录拖拽开始的位置

@@ -15,6 +15,7 @@
 // presenters
 #include "features/settingPage/settingpresenter.h"
 #include "features/wifiPage/wifipresenter.h"
+#include "features/sysinfoPage/sysinfopresenter.h"
 
 #define UDS_PATH    "/tmp/dev.sock"
 
@@ -27,15 +28,18 @@ public:
     explicit AppContext(QObject *parent = nullptr);
     ~AppContext();
 
-    int Init(void);
+    int init(void);
 
-    // 获取 AppContext 实例
-    static AppContext *getInstance();
+    static AppContext *getInstance();       // 获取 AppContext 实例
+
     // 获取 Presenters
-    SettingPresenter *settingPresenter();
-    WifiPresenter *wifiPresenter();
+    SettingPresenter *settingPresenter();   // 获取 SettingPresenter 对象
+    WifiPresenter *wifiPresenter();         // 获取 WifiPresenter 对象
+    SysinfoPresenter *sysinfoPresenter();   // 获取 SysinfoPresenter 对象
 
 signals:
+
+public slots:
 
 private:
 
@@ -49,6 +53,7 @@ private:
 
     SettingPresenter m_settingPresenter;
     WifiPresenter m_wifiPresenter;
+    SysinfoPresenter m_sysinfoPresenter;
 };
 
 #endif // APPCONTEXT_H

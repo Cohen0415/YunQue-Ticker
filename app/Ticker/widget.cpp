@@ -12,6 +12,8 @@
 #include <QWidget>
 #include <QList>
 #include <QLabel>
+#include <QDateTime>
+#include <QTimeZone>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -318,6 +320,9 @@ void Widget::pagesInit()
 
     // wifiPage init
     m_wifiPageWidget->init();
+
+    // sysinfoPage init
+    m_sysinfoPageWidget->init();
 }
 
 // 信号槽函数初始化
@@ -329,10 +334,10 @@ void Widget::connectSignalAndSlot()
     }
 
     // 菜单栏按钮的信号槽连接
-    connect(m_homePageBtn, &QPushButton::clicked, this, &Widget::on_homePageButton_clicked);
-    connect(m_sysinfoPageBtn, &QPushButton::clicked, this, &Widget::on_sysinfoPageButton_clicked);
-    connect(m_settingPageBtn, &QPushButton::clicked, this, &Widget::on_settingPageButton_clicked);
-    connect(m_wifiPageBtn, &QPushButton::clicked, this, &Widget::on_wifiPageButton_clicked);
+    connect(m_homePageBtn, &QPushButton::clicked, this, &Widget::onHomePageButtonClicked);
+    connect(m_sysinfoPageBtn, &QPushButton::clicked, this, &Widget::onSysinfoPageButtonClicked);
+    connect(m_settingPageBtn, &QPushButton::clicked, this, &Widget::onSettingPageButtonClicked);
+    connect(m_wifiPageBtn, &QPushButton::clicked, this, &Widget::onWifiPageButtonClicked);
 
     // presenters 和各个 page 的信号槽连接
     // settingPresenter <--> settingPage
@@ -362,33 +367,44 @@ void Widget::connectSignalAndSlot()
     connect(m_wifiPageWidget, &WifiPage::getWifiStatusRequested, wifiPresenter, &WifiPresenter::onGetWifiStatusRequested);
     connect(wifiPresenter, &WifiPresenter::getWifiStatusResult, m_wifiPageWidget, &WifiPage::onGetWifiStatusResult);
 
+    // sysinfoPresenter <--> sysinfoPage
+    SysinfoPresenter *sysinfoPresenter = AppContext::getInstance()->sysinfoPresenter();
+    // cpu temp get
+    connect(m_sysinfoPageWidget, &SysinfoPage::getCpuTempRequested, sysinfoPresenter, &SysinfoPresenter::onGetCpuTempRequested);
+    connect(sysinfoPresenter, &SysinfoPresenter::cpuTempGetResult, m_sysinfoPageWidget, &SysinfoPage::onCpuTempGetResult);
+    // bj time get
+    connect(m_sysinfoPageWidget, &SysinfoPage::getBjTimeRequested, sysinfoPresenter, &SysinfoPresenter::onGetBjTimeRequested);
+    connect(sysinfoPresenter, &SysinfoPresenter::bjTimeGetResult, m_sysinfoPageWidget, &SysinfoPage::onBjTimeGetResult);
+
     // 订阅 PageMsgManager 的信号槽连接
     PageMsgManager *pageMsgManager = PageMsgManager::getInstance();
     // 音量静音状态变化信号
     connect(pageMsgManager, &PageMsgManager::volumeMuteStateChanged, this, &Widget::onVolumeMuteStateChanged);
     // wifi 状态变化信号
     connect(pageMsgManager, &PageMsgManager::wifiStatusChanged, this, &Widget::onWifiStatusChanged);
+    // 北京时间更新信号
+    connect(pageMsgManager, &PageMsgManager::bjTimeUpdated, this, &Widget::onBjTimeUpdated);
 }
 
-void Widget::on_homePageButton_clicked()
+void Widget::onHomePageButtonClicked()
 {
     if (m_homePageWidget)
         switchToPage(m_homePageWidget);
 }
 
-void Widget::on_sysinfoPageButton_clicked()
+void Widget::onSysinfoPageButtonClicked()
 {
     if (m_sysinfoPageWidget)
         switchToPage(m_sysinfoPageWidget);
 }
 
-void Widget::on_settingPageButton_clicked()
+void Widget::onSettingPageButtonClicked()
 {
     if (m_settingPageWidget)
         switchToPage(m_settingPageWidget);
 }
 
-void Widget::on_wifiPageButton_clicked()
+void Widget::onWifiPageButtonClicked()
 {
     if (m_wifiPageWidget)
         switchToPage(m_wifiPageWidget);
@@ -417,5 +433,20 @@ void Widget::onWifiStatusChanged(bool connected)
     else // 未连接
     {
         ui->wifiLabelIcon->setPixmap(QPixmap(":/res/icon/staBarIcon/wifiDisconnect.png"));
+    }
+}
+
+// 收到北京时间更新
+void Widget::onBjTimeUpdated(const QString &bjTime)
+{
+    QDateTime dateTime = QDateTime::fromString(bjTime, Qt::ISODate);
+    if (dateTime.isValid())
+    {
+        // 指定北京时间时区
+        QTimeZone tz("Asia/Shanghai");
+        QDateTime localT = dateTime.toTimeZone(tz);
+        QString formattedTime = localT.toString("MMdd - HH:mm");
+
+        ui->bjTimeLabel->setText(formattedTime);
     }
 }

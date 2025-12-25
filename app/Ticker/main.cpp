@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 #if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86_64)
 
 #else
-    if (AppContext::getInstance()->Init() != 0)
+    if (AppContext::getInstance()->init() != 0)
     {
         LOG_ERROR("Failed to initialize application context.");
         return -1;
