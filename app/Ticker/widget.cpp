@@ -267,9 +267,9 @@ void Widget::menuBarUIInit()
 
     // scrollWidget 添加按钮
     menuScrollWidgetLayout->addWidget(m_homePageBtn);
-    menuScrollWidgetLayout->addWidget(m_sysinfoPageBtn);
     menuScrollWidgetLayout->addWidget(m_settingPageBtn);
     menuScrollWidgetLayout->addWidget(m_wifiPageBtn);
+    menuScrollWidgetLayout->addWidget(m_sysinfoPageBtn);
 
     // 去除边框和阴影
     ui->scrollArea->setFrameShape(QFrame::NoFrame);
