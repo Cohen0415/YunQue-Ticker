@@ -1,0 +1,27 @@
+#SysinfoPage {
+	background: #000000;
+}
+
+#splitWidget {
+    background: white;
+}
+
+#appVerLabel,
+#sysVerLabel,
+#cpuTempLabel,
+#sysRunTimeLabel {
+    color: white;
+}
+
+#titleLabel {
+    color: #2A82E4;
+}
+
+#title2Label {
+    color: white;
+}
+
+#titleBodyLabel {
+    color: #737373;
+}
+

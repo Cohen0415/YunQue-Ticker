@@ -401,13 +401,13 @@
        <number>0</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>8</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>15</number>
+       <number>23</number>
       </property>
       <item>
        <widget class="QWidget" name="titleWidget" native="true">
@@ -543,7 +543,7 @@
             <enum>Qt::LeftToRight</enum>
            </property>
            <property name="text">
-            <string>云雀股股桌面看台</string>
+            <string>云雀桌面股票看台</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -636,7 +636,7 @@
             </font>
            </property>
            <property name="text">
-            <string>        云雀桌面股票看台 V1.0 是一款基于全志 T113 SoC 的桌面智能设备，集实时行情展示与家居装饰于一体，让用户在日常办公与家居场景中，随时便捷掌握股市动态。</string>
+            <string>        云雀桌面股票看台  是一款基于全志 T113 SoC 的桌面智能设备，集实时行情展示与家居装饰于一体，让用户在日常办公与家居场景中，随时便捷掌握股市动态。</string>
            </property>
            <property name="wordWrap">
             <bool>true</bool>

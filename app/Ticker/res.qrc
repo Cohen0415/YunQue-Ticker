@@ -33,5 +33,6 @@
         <file>res/icon/pageIcon/sysinfoPage/cputemp.png</file>
         <file>res/icon/pageIcon/sysinfoPage/version-app.png</file>
         <file>res/icon/pageIcon/sysinfoPage/version-sys.png</file>
+        <file>res/qss/pageQss/sysinfoPage.qss</file>
     </qresource>
 </RCC>

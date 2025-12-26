@@ -3,7 +3,7 @@
 #include "utils/log/logger.h"
 #include "features/pagemsgmanager.h"
 #include "utils/log/logger.h"
-
+#include "utils/qssload/qssloader.h"
 #include <QFile>
 
 SysinfoPage::SysinfoPage(QWidget *parent)
@@ -104,6 +104,13 @@ void SysinfoPage::uiInit()
     ui->appVerLabel->setText(m_infoAppVerPrefixStr);
     ui->cpuTempLabel->setText(m_infoCpuTempPrefixStr);
     ui->sysRunTimeLabel->setText(m_infoSysRunTimePrefixStr);
+
+    // 加载样式表
+    QString style = QssLoader::load(":/res/qss/pageQss/sysinfoPage.qss");
+    if (!style.isEmpty())
+    {
+        this->setStyleSheet(style);
+    }
 }
 
 // 更新系统运行时间
