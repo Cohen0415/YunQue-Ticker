@@ -59,7 +59,6 @@ private:
 
     void uiInit(void);          // UI 初始化
     WifiRssiLevel getRssiLevel(const int &rssi);    // 获取当前信号等级
-    QString loadQssStyle(const QString &path);      // 加载样式表
 
     Ui::WifiStaPageWidget *ui;
 

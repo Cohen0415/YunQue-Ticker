@@ -55,7 +55,6 @@ private:
 
     void uiInit();                              // UI 初始化
     bool inputLineInspect();                    // 用户输入框内容检测
-    QString loadQssStyle(const QString &path);  // 加载样式表
 
     Ui::WifiConnPageWidget *ui;
 

@@ -1,6 +1,7 @@
 #include "settingpage.h"
 #include "ui_settingpage.h"
 #include "utils/log/logger.h"
+#include "utils/qssload/qssloader.h"
 #include "features/pagemsgmanager.h"
 #include <QFile>
 
@@ -35,7 +36,7 @@ void SettingPage::uiInit()
     ui->soundHarSlider->setMaximum(100);
 
     // 加载样式表
-    QString qss = loadQssStyle(":/res/qss/pageQss/settingPage.qss");
+    QString qss = QssLoader::load(":/res/qss/pageQss/settingPage.qss");
     if (!qss.isEmpty())
         this->setStyleSheet(qss);
 
@@ -95,21 +96,6 @@ void SettingPage::updateVolumeUI(int value)
     }
 
     m_oldVolumeValue = value;
-}
-
-// 加载样式表
-QString SettingPage::loadQssStyle(const QString &path)
-{
-    QFile file(path);
-    if (!file.open(QFile::ReadOnly | QFile::Text))
-        return QString(); // 打开失败返回空字符串
-
-    QTextStream in(&file);
-    in.setCodec("UTF-8"); // 保证中文正常显示
-
-    QString style = in.readAll();
-    file.close();
-    return style;
 }
 
 // 接收 presenter 发送的背光设置结果

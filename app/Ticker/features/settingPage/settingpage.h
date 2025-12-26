@@ -63,8 +63,6 @@ private:
     void updateBacklightUI(int value);          // 更新背光相关控件的 UI 显示
     void updateVolumeUI(int value);             // 更新音量相关控件的 UI 显示
 
-    QString loadQssStyle(const QString &path);  // 加载样式表
-
     Ui::SettingPage *ui;
 
     int m_oldVolumeValue = -1;                  // 用于记录静音前的音量值

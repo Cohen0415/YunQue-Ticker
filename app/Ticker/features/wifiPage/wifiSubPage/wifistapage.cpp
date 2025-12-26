@@ -2,6 +2,7 @@
 #include "ui_wifistapage.h"
 #include "features/pagemsgmanager.h"
 #include "utils/log/logger.h"
+#include "utils/qssload/qssloader.h"
 #include <QFile>
 
 WifiStaPage::WifiStaPage(QWidget *parent)
@@ -108,7 +109,7 @@ void WifiStaPage::onStatusTimerTimeout()
 void WifiStaPage::uiInit()
 {
     // 加载样式表
-    QString style = loadQssStyle(":/res/qss/pageQss/wifiStaPage.qss");
+    QString style = QssLoader::load(":/res/qss/pageQss/wifiStaPage.qss");
     if (!style.isEmpty())
     {
         this->setStyleSheet(style);
@@ -148,21 +149,6 @@ WifiRssiLevel WifiStaPage::getRssiLevel(const int &rssi)
     {
         return WIFI_RSSI_LEVEL_0;
     }
-}
-
-// 加载样式表
-QString WifiStaPage::loadQssStyle(const QString &path)
-{
-    QFile file(path);
-    if (!file.open(QFile::ReadOnly | QFile::Text))
-        return QString(); // 打开失败返回空字符串
-
-    QTextStream in(&file);
-    in.setCodec("UTF-8"); // 保证中文正常显示
-
-    QString style = in.readAll();
-    file.close();
-    return style;
 }
 
 // 断开连接按钮槽函数

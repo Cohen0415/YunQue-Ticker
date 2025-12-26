@@ -1,6 +1,7 @@
 #include "wificonnpage.h"
 #include "ui_wificonnpage.h"
 #include "utils/log/logger.h"
+#include "utils/qssload/qssloader.h"
 #include "features/pagemsgmanager.h"
 #include <QFile>
 
@@ -124,7 +125,7 @@ void WifiConnPage::on_connButton_clicked()
 void WifiConnPage::uiInit()
 {
     // 加载样式表
-    QString style = loadQssStyle(":/res/qss/pageQss/wifiConnPage.qss");
+    QString style = QssLoader::load(":/res/qss/pageQss/wifiConnPage.qss");
     if (!style.isEmpty())
     {
         this->setStyleSheet(style);
@@ -194,20 +195,6 @@ bool WifiConnPage::inputLineInspect()
     }
 
     return true;
-}
-
-QString WifiConnPage::loadQssStyle(const QString &path)
-{
-    QFile file(path);
-    if (!file.open(QFile::ReadOnly | QFile::Text))
-        return QString(); // 打开失败返回空字符串
-
-    QTextStream in(&file);
-    in.setCodec("UTF-8"); // 保证中文正常显示
-
-    QString style = in.readAll();
-    file.close();
-    return style;
 }
 
 // PWD 输入框文本变化槽函数
