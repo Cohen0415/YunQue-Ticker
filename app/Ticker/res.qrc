@@ -34,5 +34,7 @@
         <file>res/icon/pageIcon/sysinfoPage/version-app.png</file>
         <file>res/icon/pageIcon/sysinfoPage/version-sys.png</file>
         <file>res/qss/pageQss/sysinfoPage.qss</file>
+        <file>res/icon/pageIcon/sysinfoPage/update-normal.png</file>
+        <file>res/icon/pageIcon/sysinfoPage/update-pressed.png</file>
     </qresource>
 </RCC>

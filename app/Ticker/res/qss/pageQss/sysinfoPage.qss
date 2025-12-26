@@ -6,6 +6,18 @@
     background: white;
 }
 
+QPushButton#sysUpdateBtn,
+QPushButton#appUpdateBtn
+{
+    border-image: url(:/res/icon/pageIcon/sysinfoPage/update-normal.png);
+}
+
+QPushButton#sysUpdateBtn:pressed,
+QPushButton#appUpdateBtn:pressed
+{
+    border-image: url(:/res/icon/pageIcon/sysinfoPage/update-pressed.png);
+}
+
 #appVerLabel,
 #sysVerLabel,
 #cpuTempLabel,

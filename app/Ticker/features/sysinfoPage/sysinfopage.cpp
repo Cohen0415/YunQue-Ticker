@@ -111,6 +111,10 @@ void SysinfoPage::uiInit()
     {
         this->setStyleSheet(style);
     }
+
+    // 默认不显示更新按钮
+    ui->appUpdateBtn->setVisible(false);
+    ui->sysUpdateBtn->setVisible(false);
 }
 
 // 更新系统运行时间
@@ -136,11 +140,11 @@ void SysinfoPage::updateSysRunTime()
                 int minutes = (totalSeconds % 3600) / 60;
                 QString runTimeStr;
                 if (days > 0)
-                    runTimeStr = QString("%1 d %2 h %3 m").arg(days).arg(hours).arg(minutes);
+                    runTimeStr = QString("%1 天 %2 时 %3 min").arg(days).arg(hours).arg(minutes);
                 else if (hours > 0)
-                    runTimeStr = QString("%1 h %2 m").arg(hours).arg(minutes);
+                    runTimeStr = QString("%1 时 %2 min").arg(hours).arg(minutes);
                 else
-                    runTimeStr = QString("%1 m").arg(minutes);
+                    runTimeStr = QString("%1 min").arg(minutes);
                 ui->sysRunTimeLabel->setText(m_infoSysRunTimePrefixStr + runTimeStr);
             }
         }
