@@ -1,0 +1,8 @@
+#stockBlockWidget {
+	background-color:#593131; 
+	border-radius:20px;
+}
+
+QLabel {
+	color: white;
+}

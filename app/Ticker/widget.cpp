@@ -315,6 +315,9 @@ void Widget::stackedWidgetPageInit()
 // pages 初始化
 void Widget::pagesInit()
 {
+    // homePage init
+    m_homePageWidget->init();
+
     // settingPage init
     m_settingPageWidget->init();
 

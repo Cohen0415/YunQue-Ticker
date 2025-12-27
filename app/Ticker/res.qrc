@@ -36,5 +36,9 @@
         <file>res/qss/pageQss/sysinfoPage.qss</file>
         <file>res/icon/pageIcon/sysinfoPage/update-normal.png</file>
         <file>res/icon/pageIcon/sysinfoPage/update-pressed.png</file>
+        <file>res/icon/pageIcon/homePage/greenCir.png</file>
+        <file>res/icon/pageIcon/homePage/redCir.png</file>
+        <file>res/qss/pageQss/homePage.qss</file>
+        <file>res/qss/pageQss/stockBlock.qss</file>
     </qresource>
 </RCC>
