@@ -178,6 +178,11 @@ void HomePage::uiInit()
     // 清除组合下拉框
     ui->portfolioComboBox->clear();
 
+    // 按钮不显示聚焦框
+    ui->addNewPortfolioBtn->setFocusPolicy(Qt::NoFocus);
+    ui->addNewStockBtn->setFocusPolicy(Qt::NoFocus);
+    ui->delPortfolioBtn->setFocusPolicy(Qt::NoFocus);
+
     // 设置水平布局
     QWidget *contentWidget = ui->scrollArea->widget();
     stockBlocksLayout = new QHBoxLayout(contentWidget);
@@ -205,7 +210,7 @@ int HomePage::isStockCode(const QString& rawInput, QString& outNormalizedCode)
     // 必须是6位纯数字
     if (code.length() != 6 || !QRegularExpression(R"(^\d+$)").match(code).hasMatch())
     {
-        return -1;
+        return STOCKCODE_ERR_LEN_INVALID;
     }
 
     // 判断市场类型并生成后缀
@@ -223,13 +228,13 @@ int HomePage::isStockCode(const QString& rawInput, QString& outNormalizedCode)
     }
     else
     {
-        return -2;
+        return STOCKCODE_ERR_ILLEGAL;
     }
 
     return 0;
 }
 
-// 获取组合索引，找不到返回 -1
+// 获取组合索引
 int HomePage::getIndexOfPortfolio(const QString& name)
 {
     for (int i = 0; i < m_portfolioList.size(); ++i)
@@ -268,13 +273,13 @@ void HomePage::on_addNewStockBtn_clicked()
 
     // 检查股票代码合法性
     int ret = isStockCode(ui->inputLineEdit->text(), newCode);
-    if (ret == -1)
+    if (ret == STOCKCODE_ERR_LEN_INVALID)
     {
         ui->inputErrHintLabel->setText("请输入6位数字代码！");
         ui->inputErrHintLabel->setVisible(true);
         return;
     }
-    else if (ret == -2)
+    else if (ret == STOCKCODE_ERR_ILLEGAL)
     {
         ui->inputErrHintLabel->setText("请输入合法代码！");
         ui->inputErrHintLabel->setVisible(true);
@@ -315,7 +320,7 @@ void HomePage::on_addNewPortfolioBtn_clicked()
         ui->inputErrHintLabel->setVisible(true);
         return;
     }
-    if (portfolioName.length() > 7)
+    if (portfolioName.length() > PORTFOLIO_NAME_MAX_LEN)
     {
         ui->inputErrHintLabel->setText("组合名不能超过7个字符！");
         ui->inputErrHintLabel->setVisible(true);
@@ -403,10 +408,9 @@ void HomePage::on_delPortfolioBtn_clicked()
     saveAllPortfoliosToLocal();
 }
 
-// 打印当前组合列表，调试用
+// 打印所有组合名称及其下的股票代码
 void HomePage::printAllPortfolioList()
 {
-    // 打印组合列表的每个组合，及该组合下的股票代码
     LOG_DEBUG("Current Portfolios:");
     for (int i = 0; i < m_portfolioList.size(); ++i)
     {
@@ -421,7 +425,7 @@ void HomePage::printAllPortfolioList()
     }
 }
 
-// 打印当前组合的股票列表，调试用
+// 打印当前组合名称及其下的股票列表
 void HomePage::printCurrentPortfolioStocks()
 {
     if (m_currentPortfolio == nullptr)
@@ -528,7 +532,7 @@ void HomePage::loadAllPortfoliosFromLocal()
     printAllPortfolioList();
 }
 
-// 刷新股票信息显示
+// 刷新当前组合下已有股票的信息显示
 void HomePage::refreshStockInfoDisplay()
 {
     if (!m_currentPortfolio)
@@ -545,10 +549,13 @@ void HomePage::refreshStockInfoDisplay()
     }
 }
 
-// 更新股票块显示
+// 更新当前组合下的股票块
 void HomePage::updateStockBlocks()
 {
-    // 清除原有所有股票Block
+    if (!m_currentPortfolio)
+        return;
+
+    // 清除原有所有股票块
     QLayoutItem *item;
     while ((item = stockBlocksLayout->takeAt(0)) != nullptr)
     {
@@ -559,10 +566,7 @@ void HomePage::updateStockBlocks()
     }
     stockBlocksLayout->update();
 
-    if (!m_currentPortfolio)
-        return;
-
-    // 遍历当前组合，生成新的StockBlock
+    // 遍历当前组合，生成新的股票块
     QList<StockInfo> stocks = m_currentPortfolio->stocks();
     for (int i = 0; i < stocks.size(); ++i)
     {
@@ -617,6 +621,7 @@ void HomePage::on_quoteProvider_updateQuotes(const QList<StockInfo> &infos)
     refreshStockInfoDisplay();
 }
 
+// 行情错误槽函数
 void HomePage::on_quoteProvider_error(const QString &stockCode, const QString &errReason)
 {
     LOG_DEBUG("Quote error for %s: %s", stockCode.toStdString().c_str(), errReason.toStdString().c_str());

@@ -10,6 +10,13 @@
 #include "features/homePage/stockportfolio.h"
 #include "utils/stock/sinaquoteprovider.h"
 
+/* 股票代码错误 */
+#define STOCKCODE_ERR_LEN_INVALID       (-1)    // 股票代码长度无效
+#define STOCKCODE_ERR_ILLEGAL           (-2)    // 股票代码不合法
+
+/* 组合名词长度上限 */
+#define PORTFOLIO_NAME_MAX_LEN          (7)     // 组合名称最大长度
+
 namespace Ui {
 class HomePage;
 }
@@ -27,12 +34,11 @@ public:
     void onPageEnter() override;
     void onPageLeave() override;
 
-    void init();     // 页面初始化，给 widget.cpp 调用
+    void init();                            // 页面初始化，给 widget.cpp 调用
 
 protected:
 
-    // 事件过滤器重载，用于实现滚动拖拽
-    bool eventFilter(QObject *obj, QEvent *event) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;             // 事件过滤器重载，用于实现滚动拖拽
 
 signals:
 
@@ -41,12 +47,9 @@ public slots:
 private slots:
 
     void on_addNewStockBtn_clicked();       // 添加股票按钮槽函数
-
-    void on_addNewPortfolioBtn_clicked();
-
-    void on_portfolioComboBox_currentIndexChanged(int index);
-
-    void on_delPortfolioBtn_clicked();
+    void on_addNewPortfolioBtn_clicked();   // 添加组合按钮槽函数
+    void on_portfolioComboBox_currentIndexChanged(int index);           // 组合下拉框索引变化槽函数
+    void on_delPortfolioBtn_clicked();      // 删除组合按钮槽函数
 
     void on_quoteProvider_updateQuotes(const QList<StockInfo> &infos);  // 行情更新槽函数
     void on_quoteProvider_error(const QString &stockCode, const QString &errReason); // 行情错误槽函数
@@ -54,19 +57,19 @@ private slots:
     
 private:
 
-    void uiInit();   // 初始化 UI 组件
+    void uiInit();                                      // 初始化 UI 组件
     int isStockCode(const QString& rawInput, QString& outNormalizedCode);  // 验证股票代码合法性
-    int getIndexOfPortfolio(const QString& name);       // 获取组合索引，找不到返回 -1
+    int getIndexOfPortfolio(const QString& name);       // 获取组合索引
     void updatePortfolioComboBox();                     // 更新组合下拉框显示
 
-    void printAllPortfolioList();                       // 打印所有组合列表，调试用
-    void printCurrentPortfolioStocks();                 // 打印当前组合的股票列表，调试用
+    void printAllPortfolioList();                       // 打印所有组合名称及其下的股票代码
+    void printCurrentPortfolioStocks();                 // 打印当前组合名称及其下的股票列表
 
     void saveAllPortfoliosToLocal();                    // 保存所有组合到本地
     void loadAllPortfoliosFromLocal();                  // 从本地加载所有组合
 
-    void refreshStockInfoDisplay();                     // 刷新股票信息显示
-    void updateStockBlocks();                           // 更新股票块
+    void refreshStockInfoDisplay();                     // 刷新当前组合下已有股票的信息显示
+    void updateStockBlocks();                           // 更新当前组合下的股票块
 
     void installScrollDragFilters();                    // 初始化滚动
 

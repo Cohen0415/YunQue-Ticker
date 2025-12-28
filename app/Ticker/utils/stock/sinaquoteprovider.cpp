@@ -1,7 +1,7 @@
 #include "sinaquoteprovider.h"
 #include "utils/log/logger.h"
 #include <QNetworkRequest>
-#include <QTextCodec>      // 新浪接口为GBK编码
+#include <QTextCodec>
 #include <QRegularExpression>
 #include <QDebug>
 
@@ -12,6 +12,7 @@ SinaQuoteProvider::SinaQuoteProvider(QObject *parent)
     connect(m_net, &QNetworkAccessManager::finished, this, &SinaQuoteProvider::onReplyFinished);
 }
 
+// 股票代码转换成新浪财经适用的，例如 600000.SH -> sh600000
 QString SinaQuoteProvider::codeToSinaSymbol(const QString& code)
 {
     // 支持 SH/SZ/BJ 三市代码转换
@@ -27,6 +28,7 @@ QString SinaQuoteProvider::codeToSinaSymbol(const QString& code)
     return code; // 默认原样返回
 }
 
+// 新浪财经股票代码转成要显示的，例如 sh600183 -> 600183.SH
 QString SinaQuoteProvider::codeToDisplay(const QString& sinaSymbol)
 {
     // 逆向转换
@@ -54,7 +56,7 @@ void SinaQuoteProvider::fetchQuotes(const QList<QString> &stockCodes)
         urlCodes << codeToSinaSymbol(code);
     }
     QString fullCodes = urlCodes.join(',');
-    QUrl url("http://hq.sinajs.cn/list=" + fullCodes);  // 新浪行情接口
+    QUrl url("http://hq.sinajs.cn/list=" + fullCodes);  // 新浪行情接口，例如 http://hq.sinajs.cn/list=sh600000,sz000001
 
     QNetworkRequest req(url);
     req.setRawHeader("referer", "https://finance.sina.com.cn/");    // 新浪接口要加这个 header
@@ -65,9 +67,8 @@ void SinaQuoteProvider::fetchQuotes(const QList<QString> &stockCodes)
     req.setRawHeader("User-Agent", "Mozilla/5.0");
 #endif
 
-    QNetworkReply* reply = m_net->get(req);     // 发起请求
-    // 记录本次归属的所有 code，用于回调时解析
-    m_replyCodes[reply] = urlCodes;
+    QNetworkReply* reply = m_net->get(req);     // 发起异步 HTTP GET 请求，reply 为 HTTP GET 请求所得到的结果对象
+    m_replyCodes[reply] = urlCodes;             // 记录本次归属的所有 code，用于回调时解析
 }
 
 // 处理网络回复
