@@ -28,6 +28,7 @@ HomePage::HomePage(QWidget *parent)
 
     m_currentPortfolio = nullptr;
 
+    // 连接行情更新定时器槽函数
     connect(m_quoteUpdateTimer, &QTimer::timeout, this, &HomePage::on_quoteUpdateTimer_timeout);
 }
 
@@ -522,7 +523,7 @@ void HomePage::loadAllPortfoliosFromLocal()
             s.currentPrice = st["currentPrice"].toDouble();
             s.risePrice = st["risePrice"].toDouble();
             s.risePct = st["risePct"].toDouble();
-            s.isRise = st["isRise"].toBool();
+            s.isRise = static_cast<stockPriceFlag>(st["isRise"].toInt());
             port->addStock(s);
         }
         m_portfolioList.append(port);
@@ -572,6 +573,8 @@ void HomePage::updateStockBlocks()
     {
         const StockInfo &info = stocks[i];
         StockBlock *block = new StockBlock(ui->scrollArea->widget());
+        // 连接删除股票块请求槽函数
+        connect(block, &StockBlock::deleteRequested, this, &HomePage::on_delStockBlock_requested);
         block->setStockInfo(info);
         stockBlocksLayout->insertWidget(0, block); // 新的在左
     }
@@ -643,4 +646,25 @@ void HomePage::on_quoteUpdateTimer_timeout()
 
     // 请求行情更新
     m_quoteProvider->fetchQuotes(codes);
+}
+
+// 股票块删除请求槽函数
+void HomePage::on_delStockBlock_requested(const QString &code)
+{
+    if (!m_currentPortfolio)
+        return;
+
+    // 从当前组合删除股票
+    bool success = m_currentPortfolio->delStock(code);
+    if (success)
+    {
+        // 更新股票块显示
+        updateStockBlocks();
+
+        // 保存所有组合到本地
+        saveAllPortfoliosToLocal();
+
+        // 打印
+        printCurrentPortfolioStocks();
+    }
 }

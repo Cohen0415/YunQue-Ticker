@@ -152,7 +152,12 @@ StockInfo SinaQuoteProvider::parseSinaLine(const QString &line, const QString &c
     info.risePrice = std::abs(risePrice);
     if (yestClose > 0.00001)
         info.risePct = std::abs(risePrice / yestClose) * 100.0;
-    info.isRise = risePrice >= 0;
+    if (risePrice > 0.00001)
+        info.isRise = RISE;
+    else if (risePrice < -0.00001)
+        info.isRise = FALL;
+    else
+        info.isRise = NORMAL;
 
     return info;
 }

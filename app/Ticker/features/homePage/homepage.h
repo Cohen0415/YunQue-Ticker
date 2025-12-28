@@ -55,6 +55,8 @@ private slots:
     void on_quoteProvider_error(const QString &stockCode, const QString &errReason); // 行情错误槽函数
     void on_quoteUpdateTimer_timeout();                                 // 行情定时更新槽函数
     
+    void on_delStockBlock_requested(const QString& code);               // 股票块删除请求槽函数
+
 private:
 
     void uiInit();                                      // 初始化 UI 组件

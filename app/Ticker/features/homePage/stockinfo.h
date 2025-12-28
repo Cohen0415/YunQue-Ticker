@@ -3,21 +3,28 @@
 
 #include <QString>
 
+// 股票价格标志位
+enum stockPriceFlag {
+    NORMAL = 0,     // 价格不变
+    RISE,           // 价格上涨
+    FALL            // 价格下跌
+};
+
 struct StockInfo {
     QString code;         // 股票代码
     QString name;         // 股票名称
     double currentPrice;  // 当前价格
     double risePrice;     // 涨跌价格
     double risePct;       // 涨跌幅%
-    bool isRise;          // 涨（true）/跌（false）标志
+    stockPriceFlag isRise;// 股票价格标志位
 
     StockInfo()
         : code(""), name(""),
-        currentPrice(0), risePrice(0), risePct(0), isRise(false)
+        currentPrice(0), risePrice(0), risePct(0), isRise(NORMAL)
     {}
     explicit StockInfo(const QString& c)
         : code(c), name(""),
-        currentPrice(0), risePrice(0), risePct(0), isRise(false)
+        currentPrice(0), risePrice(0), risePct(0), isRise(NORMAL)
     {}
 };
 
