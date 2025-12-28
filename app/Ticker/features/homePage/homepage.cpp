@@ -322,6 +322,18 @@ void HomePage::on_addNewPortfolioBtn_clicked()
         return;
     }
 
+    // 检查是否有已存在的组合
+    int size = m_portfolioList.size();
+    for (int i = 0; i < size; i++)
+    {
+        if (m_portfolioList[i]->name() == portfolioName)
+        {
+            ui->inputErrHintLabel->setText("组合名已存在！");
+            ui->inputErrHintLabel->setVisible(true);
+            return;
+        }
+    }
+
     // 创建新组合并添加到列表
     StockPortfolio* newPortfolio = new StockPortfolio(portfolioName, this);
     m_portfolioList.append(newPortfolio);
