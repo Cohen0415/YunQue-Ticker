@@ -89,6 +89,8 @@ void HomePage::init()
     m_quoteProvider = new SinaQuoteProvider(this);
     connect(m_quoteProvider, &SinaQuoteProvider::quotesReady,
             this, &HomePage::on_quoteProvider_updateQuotes);
+    connect(m_quoteProvider, &SinaQuoteProvider::quoteReady,
+            this, &HomePage::on_quoteProvider_updateQuote);
     connect(m_quoteProvider, &SinaQuoteProvider::quoteError,
             this, &HomePage::on_quoteProvider_error);
 }
@@ -310,6 +312,9 @@ void HomePage::on_addNewStockBtn_clicked()
     // 清除输入框和错误提示
     ui->inputLineEdit->setText("");
     ui->inputErrHintLabel->setVisible(false);
+
+    // 手动触发一次数据请求，避免因为在收盘时间内，导致新加股票不显示数据
+    m_quoteProvider->fetchQuote(newCode);
 
     // 更新股票块显示
     updateStockBlocks();
@@ -613,7 +618,7 @@ void HomePage::installScrollDragFilters()
     }
 }
 
-// 行情更新槽函数
+// 接收最新行情槽函数
 void HomePage::on_quoteProvider_updateQuotes(const QList<StockInfo> &infos)
 {
     if (!m_currentPortfolio)
@@ -699,13 +704,22 @@ void HomePage::on_quoteProvider_updateQuotes(const QList<StockInfo> &infos)
     }
 }
 
+// 接收单只股票行情槽函数
+void HomePage::on_quoteProvider_updateQuote(const StockInfo &info)
+{
+    QList<StockInfo> infos;
+    infos.append(info);
+
+    on_quoteProvider_updateQuotes(infos);
+}
+
 // 行情错误槽函数
 void HomePage::on_quoteProvider_error(const QString &stockCode, const QString &errReason)
 {
     LOG_DEBUG("Quote error for %s: %s", stockCode.toStdString().c_str(), errReason.toStdString().c_str());
 }
 
-// 行情定时更新槽函数
+// 行情定时请求更新槽函数
 void HomePage::on_quoteUpdateTimer_timeout()
 {
     if (!m_currentPortfolio)
@@ -717,6 +731,17 @@ void HomePage::on_quoteUpdateTimer_timeout()
     for (const StockInfo& stock : stocks)
     {
         codes.append(stock.code);
+    }
+
+    // 只在开盘时间段内请求数据（为了避免错过数据，上下加多1分钟。即 9.14 ~ 11:31, 12:59 ~ 15:01 时间段内请求数据）
+    QTime currentTime = QTime::currentTime();
+    int hour = currentTime.hour();
+    int minute = currentTime.minute();
+    if ((hour < 9) || (hour == 9 && minute < 14) ||
+        (hour == 11 && minute > 31) || (hour > 11 && hour < 13) ||
+        (hour == 13 && minute > 0) || (hour > 15) || (hour == 15 && minute > 1))
+    {
+        return;
     }
 
     // 请求行情更新
