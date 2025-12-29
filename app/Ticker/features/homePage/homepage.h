@@ -82,6 +82,8 @@ private:
 
     void refreshTitleLabel();                           // 刷新标题标签显示
 
+    void emitFetchQuotesInCurPortfolio();               // 触发行情请求
+
     Ui::HomePage *ui;
     QHBoxLayout *stockBlocksLayout;                     // 股票块水平布局
 
@@ -98,6 +100,8 @@ private:
     QTimer *m_quoteUpdateTimer;                          // 定时更新行情 Timer
 
     QSequentialAnimationGroup *m_breathAnimation = nullptr; // 呼吸灯动画
+
+    int initFlag = 0;                                 // 初始化标志
 };
 
 #endif // HOMEPAGE_H

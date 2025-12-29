@@ -67,12 +67,24 @@ void HomePage::init()
     // UI 初始化
     uiInit();
 
-    //
+    // 安装滚动拖拽过滤器
     installScrollDragFilters();
+
+    // 初始化行情提供者
+    m_quoteProvider = new SinaQuoteProvider(this);
+    connect(m_quoteProvider, &SinaQuoteProvider::quotesReady,
+            this, &HomePage::on_quoteProvider_updateQuotes);
+    connect(m_quoteProvider, &SinaQuoteProvider::quoteReady,
+            this, &HomePage::on_quoteProvider_updateQuote);
+    connect(m_quoteProvider, &SinaQuoteProvider::quoteError,
+            this, &HomePage::on_quoteProvider_error);
 
     // 从本地获取组合数据
     loadAllPortfoliosFromLocal();
+
+    // 更新组合下拉框
     updatePortfolioComboBox();
+    initFlag = 1;
 
     // 自动切换到第一个组合
     if (!m_portfolioList.isEmpty())
@@ -84,15 +96,6 @@ void HomePage::init()
     {
         m_currentPortfolio = nullptr;
     }
-
-    // 初始化行情提供者
-    m_quoteProvider = new SinaQuoteProvider(this);
-    connect(m_quoteProvider, &SinaQuoteProvider::quotesReady,
-            this, &HomePage::on_quoteProvider_updateQuotes);
-    connect(m_quoteProvider, &SinaQuoteProvider::quoteReady,
-            this, &HomePage::on_quoteProvider_updateQuote);
-    connect(m_quoteProvider, &SinaQuoteProvider::quoteError,
-            this, &HomePage::on_quoteProvider_error);
 }
 
 bool HomePage::eventFilter(QObject *obj, QEvent *event)
@@ -388,6 +391,9 @@ void HomePage::on_portfolioComboBox_currentIndexChanged(int index)
 
     // 更新股票块显示
     updateStockBlocks();
+
+    // 请求当前组合下所有股票的最新行情
+    emitFetchQuotesInCurPortfolio();
 }
 
 // 删除组合按钮点击槽函数
@@ -690,14 +696,6 @@ void HomePage::on_quoteUpdateTimer_timeout()
     if (!m_currentPortfolio)
         return;
 
-    // 收集当前组合内的股票代码
-    QStringList codes;
-    QList<StockInfo> stocks = m_currentPortfolio->stocks();
-    for (const StockInfo& stock : stocks)
-    {
-        codes.append(stock.code);
-    }
-
     /*  只在开盘时间段内请求数据
         上午：09:14 ~ 11:31（含 11:31 整）；上下多加1分钟缓冲，避免时间点切换时请求遗漏
         下午：12:59 ~ 15:01（含 15:01 整）；上下多加1分钟缓冲，避免时间点切换时请求遗漏
@@ -716,7 +714,7 @@ void HomePage::on_quoteUpdateTimer_timeout()
     }
 
     // 请求行情更新
-    m_quoteProvider->fetchQuotes(codes);
+    emitFetchQuotesInCurPortfolio();
 }
 
 // 股票块删除请求槽函数
@@ -821,4 +819,24 @@ void HomePage::refreshTitleLabel()
         // 启动呼吸灯动画
         startBreathAnimation();
     }
+}
+
+// 触发行情请求
+void HomePage::emitFetchQuotesInCurPortfolio()
+{
+    if (initFlag == 0)
+        return;
+
+    if (!m_currentPortfolio)
+        return;
+
+    // 收集当前组合内的股票代码
+    QStringList codes;
+    QList<StockInfo> stocks = m_currentPortfolio->stocks();
+    for (const StockInfo& stock : stocks)
+    {
+        codes.append(stock.code);
+    }
+
+    m_quoteProvider->fetchQuotes(codes);
 }
