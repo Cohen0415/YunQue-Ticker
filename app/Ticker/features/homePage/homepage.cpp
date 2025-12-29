@@ -402,8 +402,13 @@ void HomePage::on_delPortfolioBtn_clicked()
     // 切换当前组合
     if (!m_portfolioList.isEmpty())
     {
-        ui->portfolioComboBox->setCurrentIndex(0);
-        m_currentPortfolio = m_portfolioList[0];
+        // 如果删除的是最后一个组合，切换到前一个
+        if (index >= m_portfolioList.size())
+        {
+            index = m_portfolioList.size() - 1;
+        }
+        ui->portfolioComboBox->setCurrentIndex(index);
+        m_currentPortfolio = m_portfolioList[index];
     }
     else
     {
@@ -656,14 +661,14 @@ void HomePage::on_quoteProvider_updateQuotes(const QList<StockInfo> &infos)
     // 如果当前时间在 9:15 到 9:25 之间，显示集合竞价提示
     if (hour == 9 && minute >= 15 && minute < 25)
     {
-        ui->titleLabel->setText("集合竞价时间");
+        ui->titleLabel->setText("集合竞价中");
         // 设置橙色
         ui->titleLabel->setStyleSheet("color: #FFA500;");
     }
     // 如果在 11:30 到 13:00 之间，显示午休提示
     else if (hour == 11 && minute >= 30 || hour == 12 || (hour == 13 && minute < 0))
     {
-        ui->titleLabel->setText("中午收盘");
+        ui->titleLabel->setText("中午休盘");
         // 设置灰色
         ui->titleLabel->setStyleSheet("color: #808080;");
     }
