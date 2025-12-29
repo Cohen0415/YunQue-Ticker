@@ -11,7 +11,9 @@
 #include <QStandardPaths>
 #include <QScrollBar>
 #include <QMouseEvent>
-#include <QToolTip>
+#include <QVBoxLayout>
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
 
 static QString getAllPortfolioFilePath()
 {
@@ -274,7 +276,6 @@ void HomePage::on_addNewStockBtn_clicked()
     if (m_currentPortfolio == nullptr)
     {
         ui->inputErrHintLabel->setText("请先创建股票组合！");
-        QToolTip::showText(QCursor::pos(), "这是一个悬浮提示");
         ui->inputErrHintLabel->setVisible(true);
         return;
     }
@@ -663,30 +664,38 @@ void HomePage::on_quoteProvider_updateQuotes(const QList<StockInfo> &infos)
     // 如果当前时间在 9:15 到 9:25 之间，显示集合竞价提示
     if (hour == 9 && minute >= 15 && minute < 25)
     {
-        ui->titleLabel->setText("集合竞价中");
+        ui->titleLabel->setText("集合竞价");
         // 设置橙色
         ui->titleLabel->setStyleSheet("background-color: #FFA500; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
+        // 启动呼吸灯动画
+        startBreathAnimation();
     }
     // 如果在 11:30 到 13:00 之间，显示午休提示
     else if (hour == 11 && minute >= 30 || hour == 12 || (hour == 13 && minute < 0))
     {
-        ui->titleLabel->setText("中午休盘");
+        ui->titleLabel->setText("午间休市");
         // 设置灰色
         ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
+        // 停止呼吸灯动画
+        stopBreathAnimation();
     }
     // 如果在 15:00 之后，显示今日收盘提示
     else if (hour >= 15)
     {
-        ui->titleLabel->setText("今日已收盘");
+        ui->titleLabel->setText("已收盘");
         // 设置灰色
         ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
+        // 停止呼吸灯动画
+        stopBreathAnimation();
     }
     // 其它时间
     else
     {
-        ui->titleLabel->setText("交易时间");
+        ui->titleLabel->setText("交易进行中");
         // 设置绿色
         ui->titleLabel->setStyleSheet("background-color: #28a745; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
+        // 启动呼吸灯动画
+        startBreathAnimation();
     }
 }
 
@@ -732,5 +741,42 @@ void HomePage::on_delStockBlock_requested(const QString &code)
 
         // 打印
         printCurrentPortfolioStocks();
+    }
+}
+
+// 启动呼吸灯动画
+void HomePage::startBreathAnimation() 
+{
+    if (m_breathAnimation) 
+        return;
+
+    auto *effect = new QGraphicsOpacityEffect(this);
+    ui->titleLabel->setGraphicsEffect(effect);
+    auto *fadeOut = new QPropertyAnimation(effect, "opacity", this);
+    fadeOut->setDuration(1500);
+    fadeOut->setStartValue(1.0);
+    fadeOut->setEndValue(0.0);
+
+    auto *fadeIn = new QPropertyAnimation(effect, "opacity", this);
+    fadeIn->setDuration(1500);
+    fadeIn->setStartValue(0.0);
+    fadeIn->setEndValue(1.0);
+
+    m_breathAnimation = new QSequentialAnimationGroup(this);
+    m_breathAnimation->addAnimation(fadeOut);
+    m_breathAnimation->addAnimation(fadeIn);
+    m_breathAnimation->setLoopCount(-1);
+    m_breathAnimation->start();
+}
+
+// 停止呼吸灯动画
+void HomePage::stopBreathAnimation() 
+{
+    if (m_breathAnimation) 
+    {
+        m_breathAnimation->stop();
+        m_breathAnimation->deleteLater();
+        m_breathAnimation = nullptr;
+        ui->titleLabel->setGraphicsEffect(nullptr);
     }
 }

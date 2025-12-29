@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QScrollBar>
 #include <QTimer>
+#include <QSequentialAnimationGroup>
 
 #include "features/pagelifecycleaware.h"
 #include "features/homePage/stockportfolio.h"
@@ -75,6 +76,9 @@ private:
 
     void installScrollDragFilters();                    // 初始化滚动
 
+    void startBreathAnimation();                        // 启动呼吸灯动画
+    void stopBreathAnimation();                         // 停止呼吸灯动画
+
     Ui::HomePage *ui;
     QHBoxLayout *stockBlocksLayout;                     // 股票块水平布局
 
@@ -89,6 +93,8 @@ private:
 
     SinaQuoteProvider *m_quoteProvider;                  // 新浪行情提供者
     QTimer *m_quoteUpdateTimer;                          // 定时更新行情 Timer
+
+    QSequentialAnimationGroup *m_breathAnimation = nullptr; // 呼吸灯动画
 };
 
 #endif // HOMEPAGE_H
