@@ -783,41 +783,76 @@ void HomePage::refreshTitleLabel()
     int hour = currentTime.hour();
     int minute = currentTime.minute();
 
-    // 如果当前时间在 9:15 到 9:25 之间，显示集合竞价提示
-    if (hour == 9 && minute >= 15 && minute < 25)
+    /*
+        时间段划分：
+        1、09:15 – 09:25：开盘集合竞价（橙色背景，呼吸灯动画）
+        2、09:25 – 09:30：开市前休市（橙色背景，常亮）
+        3、09:30 – 11:30：连续竞价（绿色背景，呼吸灯动画）
+        4、11:30 – 13:00：午间休市（灰色背景，常亮）
+        5、13:00 – 14:57：连续竞价（绿色背景，呼吸灯动画）
+        6、14:57 – 15:00：收盘集合竞价（橙色背景，呼吸灯动画）
+        7、15:00 起：已收盘（灰色背景，常亮）
+    */
+
+    // 1. 开盘集合竞价：09:15 – 09:24（含）
+    if (hour == 9 && minute >= 15 && minute <= 24)
     {
-        ui->titleLabel->setText("集合竞价");
-        // 设置橙色
+        ui->titleLabel->setText("开盘集合竞价");
         ui->titleLabel->setStyleSheet("background-color: #FFA500; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        // 启动呼吸灯动画
         startBreathAnimation();
     }
-    // 如果在 11:30 到 13:00 之间，显示午休提示
-    else if (hour == 11 && minute >= 30 || hour == 12 || (hour == 13 && minute < 0))
+    // 2. 开市前休市：09:25 – 09:29（含）
+    else if (hour == 9 && minute >= 25 && minute <= 29)
+    {
+        ui->titleLabel->setText("开市前休市");
+        ui->titleLabel->setStyleSheet("background-color: #FFA500; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
+        stopBreathAnimation(); // 常亮，不呼吸
+    }
+    // 3. 上午连续竞价：09:30 – 11:29（含）
+    else if ((hour == 9 && minute >= 30) ||
+             (hour == 10) ||
+             (hour == 11 && minute <= 29))
+    {
+        ui->titleLabel->setText("交易进行中");
+        ui->titleLabel->setStyleSheet("background-color: #28a745; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
+        startBreathAnimation();
+    }
+    // 4. 午间休市：11:30 – 12:59（含）
+    else if ((hour == 11 && minute >= 30) ||
+             (hour == 12))
     {
         ui->titleLabel->setText("午间休市");
-        // 设置灰色
         ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        // 停止呼吸灯动画
         stopBreathAnimation();
     }
-    // 如果在 15:00 之后，显示今日收盘提示
+    // 5. 下午连续竞价：13:00 – 14:56（含）
+    else if ((hour == 13) ||
+             (hour == 14 && minute <= 56))
+    {
+        ui->titleLabel->setText("交易进行中");
+        ui->titleLabel->setStyleSheet("background-color: #28a745; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
+        startBreathAnimation();
+    }
+    // 6. 收盘集合竞价：14:57 – 14:59（含）
+    else if (hour == 14 && minute >= 57 && minute <= 59)
+    {
+        ui->titleLabel->setText("收盘集合竞价");
+        ui->titleLabel->setStyleSheet("background-color: #FFA500; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
+        startBreathAnimation();
+    }
+    // 7. 已收盘：15:00 起
     else if (hour >= 15)
     {
         ui->titleLabel->setText("已收盘");
-        // 设置灰色
         ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        // 停止呼吸灯动画
         stopBreathAnimation();
     }
-    // 其它时间
+    // 其他时间（如夜间、早盘前）：默认“已收盘”或可自定义
     else
     {
-        ui->titleLabel->setText("交易进行中");
-        // 设置绿色
-        ui->titleLabel->setStyleSheet("background-color: #28a745; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        // 启动呼吸灯动画
-        startBreathAnimation();
+        ui->titleLabel->setText("已收盘");
+        ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
+        stopBreathAnimation();
     }
 }
 
