@@ -176,8 +176,13 @@ void HomePage::uiInit()
     // 用户输入框初始化
     ui->inputLineEdit->setText("");
 
+    // 默认清空标题语
+    ui->titleLabel->setText("");
+
     // 清除组合下拉框
     ui->portfolioComboBox->clear();
+    ui->portfolioComboBox->setMaxVisibleItems(5);
+    ui->portfolioComboBox->setStyleSheet("QComboBox{combobox-popup:0;}");
 
     // 按钮不显示聚焦框
     ui->addNewPortfolioBtn->setFocusPolicy(Qt::NoFocus);
@@ -606,7 +611,31 @@ void HomePage::on_quoteProvider_updateQuotes(const QList<StockInfo> &infos)
     if (!m_currentPortfolio)
         return; 
     
-    // 更新当前组合内的股票数据
+    // 获取当前系统时间
+    QTime currentTime = QTime::currentTime();
+    int hour = currentTime.hour();
+    int minute = currentTime.minute();
+
+    // 如果在 9:15 到 9:25 之间，显示集合竞价，不更新数据
+    if (hour == 9 && minute >= 15 && minute < 25)
+    {
+        LOG_DEBUG("During pre-market auction time (9:15-9:25), skipping quote update.");
+
+        for (const StockInfo& updatedInfo : infos)
+        {
+            StockInfo* stock = m_currentPortfolio->getStock(updatedInfo.code);
+            if (stock)
+            {
+                stock->name = updatedInfo.name;
+                stock->currentPrice = updatedInfo.previousClose; // 显示昨日收盘价作为当前价
+                stock->isRise = CALL_AUCTION; // 标记为集合竞价状态
+            }
+        }
+
+        return;
+    }
+
+    // 除了每天的集合竞价 9.15~9.25 之外，更新当前组合内的股票数据
     for (const StockInfo& updatedInfo : infos)
     {
         StockInfo* stock = m_currentPortfolio->getStock(updatedInfo.code);
@@ -622,6 +651,34 @@ void HomePage::on_quoteProvider_updateQuotes(const QList<StockInfo> &infos)
 
     // 刷新显示
     refreshStockInfoDisplay();
+
+    // 更新标题语显示
+    // 如果当前时间在 9:15 到 9:25 之间，显示集合竞价提示
+    if (hour == 9 && minute >= 15 && minute < 25)
+    {
+        ui->titleLabel->setText("集合竞价时间");
+        // 设置橙色
+        ui->titleLabel->setStyleSheet("color: #FFA500;");
+    }
+    // 如果在 11:30 到 13:00 之间，显示午休提示
+    else if (hour == 11 && minute >= 30 || hour == 12 || (hour == 13 && minute < 0))
+    {
+        ui->titleLabel->setText("中午收盘");
+        // 设置灰色
+        ui->titleLabel->setStyleSheet("color: #808080;");
+    }
+    // 如果在 15:00 之后，显示今日收盘提示
+    else if (hour >= 15)
+    {
+        ui->titleLabel->setText("今日已收盘");
+        // 设置灰色
+        ui->titleLabel->setStyleSheet("color: #808080;");
+    }
+    // 其它时间，不显示
+    else
+    {
+        ui->titleLabel->setText("");
+    }
 }
 
 // 行情错误槽函数

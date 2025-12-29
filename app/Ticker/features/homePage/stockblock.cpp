@@ -115,6 +115,18 @@ void StockBlock::updateUI()
 
     ui->priceLabel->setText(QString::number(m_stockInfo.currentPrice, 'f', 2)); // 当前价格
 
+    if (m_stockInfo.isRise == CALL_AUCTION)
+    {
+        ui->risePriceLabel->setText("集合竞价");
+        ui->risePctLabel->setText("集合竞价");
+        
+        ui->priceLabel->setStyleSheet("color: #FFA500;"); // 橙色
+        ui->risePriceLabel->setStyleSheet("color: #FFA500;");
+        ui->risePctLabel->setStyleSheet("color: #FFA500;");
+        ui->riseIconLabel->setPixmap(QPixmap(":/res/icon/pageIcon/homePage/orangeCir.png"));
+        return;
+    }
+
     QString prefixSymbol = "";
     switch (m_stockInfo.isRise)
     {

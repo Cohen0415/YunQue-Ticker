@@ -41,5 +41,6 @@
         <file>res/qss/pageQss/homePage.qss</file>
         <file>res/qss/pageQss/stockBlock.qss</file>
         <file>res/icon/pageIcon/homePage/grayCir.png</file>
+        <file>res/icon/pageIcon/homePage/orangeCir.png</file>
     </qresource>
 </RCC>

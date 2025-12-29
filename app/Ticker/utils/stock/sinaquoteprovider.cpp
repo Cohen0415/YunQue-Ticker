@@ -134,6 +134,45 @@ void SinaQuoteProvider::onReplyFinished(QNetworkReply *reply)
 // 解析新浪单行数据
 StockInfo SinaQuoteProvider::parseSinaLine(const QString &line, const QString &code)
 {
+    /*
+        例如："生益科技,54.400,55.340,57.930,58.200,54.170,57.930,57.950,32971357,1871113251.000,4000,57.930,27800,57.920,2000,57.900,500,57.890,100,57.880,600,57.950,1700,57.960,700,57.970,400,57.980,500,57.990,2025-11-26,11:29:11,00,"
+
+        解析：
+            股票名称：生益科技
+            今日开盘价：54.400
+            昨日收盘价：55.340
+            当前价格：57.930
+            今日最高价：58.200
+            今日最低价：54.170
+            竞买价：57.930
+            竞卖价：57.950
+            成交量：32971357
+            成交金额：1871113251.000
+            买一量：4000
+            买一价：57.930
+            买二量：27800
+            买二价：57.920
+            买三量：2000
+            买三价：57.900
+            买四量：500
+            买四价：57.890
+            买五量：100
+            买五价：57.880
+            卖一量：600
+            卖一价：57.950
+            卖二量：1700
+            卖二价：57.960
+            卖三量：700
+            卖三价：57.970
+            卖四量：400
+            卖四价：57.980
+            卖五量：500
+            卖五价：57.990
+            日期：2025-11-26
+            时间：11:29:11
+            状态：00
+    */
+    
     LOG_DEBUG("stockLine = %s", line.toStdString().c_str());
 
     auto list = line.split(',');
@@ -143,7 +182,8 @@ StockInfo SinaQuoteProvider::parseSinaLine(const QString &line, const QString &c
         return info;
 
     info.name = list[0];
-    info.currentPrice = list[3].toDouble();
+    info.currentPrice = list[3].toDouble();             // 当前价格
+    info.previousClose = list[2].toDouble();            // 昨日收盘价
 
     double yestClose = list[2].toDouble();
     double risePrice = info.currentPrice - yestClose;
