@@ -11,6 +11,7 @@
 #include <QStandardPaths>
 #include <QScrollBar>
 #include <QMouseEvent>
+#include <QToolTip>
 
 static QString getAllPortfolioFilePath()
 {
@@ -273,6 +274,7 @@ void HomePage::on_addNewStockBtn_clicked()
     if (m_currentPortfolio == nullptr)
     {
         ui->inputErrHintLabel->setText("请先创建股票组合！");
+        QToolTip::showText(QCursor::pos(), "这是一个悬浮提示");
         ui->inputErrHintLabel->setVisible(true);
         return;
     }
@@ -663,26 +665,28 @@ void HomePage::on_quoteProvider_updateQuotes(const QList<StockInfo> &infos)
     {
         ui->titleLabel->setText("集合竞价中");
         // 设置橙色
-        ui->titleLabel->setStyleSheet("color: #FFA500;");
+        ui->titleLabel->setStyleSheet("background-color: #FFA500; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
     }
     // 如果在 11:30 到 13:00 之间，显示午休提示
     else if (hour == 11 && minute >= 30 || hour == 12 || (hour == 13 && minute < 0))
     {
         ui->titleLabel->setText("中午休盘");
         // 设置灰色
-        ui->titleLabel->setStyleSheet("color: #808080;");
+        ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
     }
     // 如果在 15:00 之后，显示今日收盘提示
     else if (hour >= 15)
     {
         ui->titleLabel->setText("今日已收盘");
         // 设置灰色
-        ui->titleLabel->setStyleSheet("color: #808080;");
+        ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
     }
-    // 其它时间，不显示
+    // 其它时间
     else
     {
-        ui->titleLabel->setText("");
+        ui->titleLabel->setText("交易时间");
+        // 设置绿色
+        ui->titleLabel->setStyleSheet("background-color: #28a745; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
     }
 }
 

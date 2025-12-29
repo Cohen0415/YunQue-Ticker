@@ -8,7 +8,11 @@
 }
 
 #inputErrHintLabel {
-	color: #fa5555;
+    background-color: #fa5555;
+	color: #ffffff;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 16px;
 }
 
 /* 添加自选按钮、添加组合按钮 */
@@ -18,7 +22,6 @@
     border: none;
     border-radius: 5px;
     font-size: 16px;
-    margin-right: 10px;
 }
 #addNewPortfolioBtn:hover, #addNewStockBtn:hover {
     background-color: #096dd9;
@@ -40,7 +43,6 @@
     border: none;
     border-radius: 5px;
     font-size: 16px;
-    margin-left: 10px;
 }
 #delPortfolioBtn:hover {
     background-color: #c32222;
