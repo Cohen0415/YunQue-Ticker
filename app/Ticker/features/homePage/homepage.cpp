@@ -664,44 +664,6 @@ void HomePage::on_quoteProvider_updateQuotes(const QList<StockInfo> &infos)
 
     // 刷新显示
     refreshStockInfoDisplay();
-
-    // 更新标题语显示
-    // 如果当前时间在 9:15 到 9:25 之间，显示集合竞价提示
-    if (hour == 9 && minute >= 15 && minute < 25)
-    {
-        ui->titleLabel->setText("集合竞价");
-        // 设置橙色
-        ui->titleLabel->setStyleSheet("background-color: #FFA500; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        // 启动呼吸灯动画
-        startBreathAnimation();
-    }
-    // 如果在 11:30 到 13:00 之间，显示午休提示
-    else if (hour == 11 && minute >= 30 || hour == 12 || (hour == 13 && minute < 0))
-    {
-        ui->titleLabel->setText("午间休市");
-        // 设置灰色
-        ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        // 停止呼吸灯动画
-        stopBreathAnimation();
-    }
-    // 如果在 15:00 之后，显示今日收盘提示
-    else if (hour >= 15)
-    {
-        ui->titleLabel->setText("已收盘");
-        // 设置灰色
-        ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        // 停止呼吸灯动画
-        stopBreathAnimation();
-    }
-    // 其它时间
-    else
-    {
-        ui->titleLabel->setText("交易进行中");
-        // 设置绿色
-        ui->titleLabel->setStyleSheet("background-color: #28a745; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        // 启动呼吸灯动画
-        startBreathAnimation();
-    }
 }
 
 // 接收单只股票行情槽函数
@@ -722,6 +684,9 @@ void HomePage::on_quoteProvider_error(const QString &stockCode, const QString &e
 // 行情定时请求更新槽函数
 void HomePage::on_quoteUpdateTimer_timeout()
 {
+    // 刷新标题标签显示
+    refreshTitleLabel();
+
     if (!m_currentPortfolio)
         return;
 
@@ -803,5 +768,51 @@ void HomePage::stopBreathAnimation()
         m_breathAnimation->deleteLater();
         m_breathAnimation = nullptr;
         ui->titleLabel->setGraphicsEffect(nullptr);
+    }
+}
+
+// 刷新标题标签显示
+void HomePage::refreshTitleLabel()
+{
+    // 获取当前系统时间
+    QTime currentTime = QTime::currentTime();
+    int hour = currentTime.hour();
+    int minute = currentTime.minute();
+
+    // 如果当前时间在 9:15 到 9:25 之间，显示集合竞价提示
+    if (hour == 9 && minute >= 15 && minute < 25)
+    {
+        ui->titleLabel->setText("集合竞价");
+        // 设置橙色
+        ui->titleLabel->setStyleSheet("background-color: #FFA500; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
+        // 启动呼吸灯动画
+        startBreathAnimation();
+    }
+    // 如果在 11:30 到 13:00 之间，显示午休提示
+    else if (hour == 11 && minute >= 30 || hour == 12 || (hour == 13 && minute < 0))
+    {
+        ui->titleLabel->setText("午间休市");
+        // 设置灰色
+        ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
+        // 停止呼吸灯动画
+        stopBreathAnimation();
+    }
+    // 如果在 15:00 之后，显示今日收盘提示
+    else if (hour >= 15)
+    {
+        ui->titleLabel->setText("已收盘");
+        // 设置灰色
+        ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
+        // 停止呼吸灯动画
+        stopBreathAnimation();
+    }
+    // 其它时间
+    else
+    {
+        ui->titleLabel->setText("交易进行中");
+        // 设置绿色
+        ui->titleLabel->setStyleSheet("background-color: #28a745; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
+        // 启动呼吸灯动画
+        startBreathAnimation();
     }
 }

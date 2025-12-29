@@ -80,6 +80,8 @@ private:
     void startBreathAnimation();                        // 启动呼吸灯动画
     void stopBreathAnimation();                         // 停止呼吸灯动画
 
+    void refreshTitleLabel();                           // 刷新标题标签显示
+
     Ui::HomePage *ui;
     QHBoxLayout *stockBlocksLayout;                     // 股票块水平布局
 
