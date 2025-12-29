@@ -698,15 +698,21 @@ void HomePage::on_quoteUpdateTimer_timeout()
         codes.append(stock.code);
     }
 
-    // 只在开盘时间段内请求数据（为了避免错过数据，上下加多1分钟。即 9.14 ~ 11:31, 12:59 ~ 15:01 时间段内请求数据）
+    /*  只在开盘时间段内请求数据
+        上午：09:14 ~ 11:31（含 11:31 整）；上下多加1分钟缓冲，避免时间点切换时请求遗漏
+        下午：12:59 ~ 15:01（含 15:01 整）；上下多加1分钟缓冲，避免时间点切换时请求遗漏
+    */
     QTime currentTime = QTime::currentTime();
-    int hour = currentTime.hour();
-    int minute = currentTime.minute();
-    if ((hour < 9) || (hour == 9 && minute < 14) ||
-        (hour == 11 && minute > 31) || (hour > 11 && hour < 13) ||
-        (hour == 13 && minute > 0) || (hour > 15) || (hour == 15 && minute > 1))
+    // 定义有效时间段（包含端点）
+    QTime morningStart(9, 14);
+    QTime morningEnd(11, 31);   // 包含 11:31:00
+    QTime afternoonStart(12, 59);
+    QTime afternoonEnd(15, 1);  // 包含 15:01:00
+    bool inMorning = (currentTime >= morningStart) && (currentTime <= morningEnd);
+    bool inAfternoon = (currentTime >= afternoonStart) && (currentTime <= afternoonEnd);
+    if (!inMorning && !inAfternoon) 
     {
-        return;
+        return; // 不在有效时段，跳过
     }
 
     // 请求行情更新
