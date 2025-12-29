@@ -103,8 +103,26 @@ void StockBlock::onDelBtnPress()
 // 设置股票信息并更新 UI
 void StockBlock::setStockInfo(const StockInfo &info)
 {
+    bool priceChanged = (info.currentPrice != m_lastPrice);
+    bool riseChanged = (info.risePrice != m_lastRise);
+    bool pctChanged  = (info.risePct != m_lastRisePct);
+
+    // 更新 UI
     m_stockInfo = info;
     updateUI();
+
+    if (priceChanged)
+        breathOpacityOn(ui->priceLabel, m_priceOpacityEff);
+    if (riseChanged)
+        breathOpacityOn(ui->risePriceLabel, m_riseOpacityEff);
+    if (pctChanged)
+        breathOpacityOn(ui->risePctLabel, m_pctOpacityEff);
+    if (priceChanged || riseChanged || pctChanged)
+        breathOpacityOn(ui->riseIconLabel, m_iconOpacityEff);
+
+    m_lastPrice = info.currentPrice;
+    m_lastRise = info.risePrice;
+    m_lastRisePct = info.risePct;
 }
 
 // 更新 UI 显示
@@ -117,8 +135,8 @@ void StockBlock::updateUI()
 
     if (m_stockInfo.isRise == CALL_AUCTION)
     {
-        ui->risePriceLabel->setText("集合竞价");
-        ui->risePctLabel->setText("集合竞价");
+        ui->risePriceLabel->setText("0.00");
+        ui->risePctLabel->setText("0.00");
         
         ui->priceLabel->setStyleSheet("color: #FFA500;"); // 橙色
         ui->risePriceLabel->setStyleSheet("color: #FFA500;");
@@ -165,4 +183,30 @@ void StockBlock::updateUI()
         // 不变显示灰色 Icon
         ui->riseIconLabel->setPixmap(QPixmap(":/res/icon/pageIcon/homePage/grayCir.png"));
     }
+}
+
+// 呼吸灯效果
+void StockBlock::breathOpacityOn(QWidget *label, QGraphicsOpacityEffect*& eff)
+{
+    // 懒加载
+    if (!eff)
+    {
+        eff = new QGraphicsOpacityEffect(label);
+        label->setGraphicsEffect(eff);
+    }
+    eff->setOpacity(1.0);
+
+    QPropertyAnimation *anim = new QPropertyAnimation(eff, "opacity");
+    anim->setDuration(500);
+    anim->setEasingCurve(QEasingCurve::InOutQuad);
+    anim->setKeyValueAt(0.0, 1.0);
+    anim->setKeyValueAt(0.3, 0.2);  // 低透明
+    anim->setKeyValueAt(0.7, 0.2);  // 低透明
+    anim->setKeyValueAt(1.0, 1.0);
+    anim->start(QAbstractAnimation::DeleteWhenStopped);
+
+    // 动画结束后恢复原状
+    connect(anim, &QPropertyAnimation::finished, label, [eff]() {
+        eff->setOpacity(1.0);
+    });
 }

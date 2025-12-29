@@ -4,6 +4,9 @@
 #include <QWidget>
 #include <QTimer>
 #include <QPushButton>
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
+
 #include "features/homePage/stockinfo.h"
 
 #define LONG_PRESS_THRESHOLD_MS    (800)   // 长按阈值，单位毫秒
@@ -42,12 +45,19 @@ private:
 
     void updateUI();                            // 渲染UI
     void ensureDeleteBtn();                     // 创建删除按钮
+    void breathOpacityOn(QWidget *label, QGraphicsOpacityEffect*& eff); // 呼吸灯效果
 
     Ui::StockBlock *ui;
     StockInfo m_stockInfo;
 
     QTimer m_longPressTimer;                    // 长按定时器
     QPushButton *m_deleteBtn = nullptr;         // 删除按钮
+
+    double m_lastPrice = 0, m_lastRise = 0, m_lastRisePct = 0;  // 上次的价格数据，用于判断是否变化
+    QGraphicsOpacityEffect *m_priceOpacityEff = nullptr;        // 价格呼吸灯效果
+    QGraphicsOpacityEffect *m_riseOpacityEff = nullptr;         // 涨跌呼吸灯效果
+    QGraphicsOpacityEffect *m_pctOpacityEff = nullptr;          // 涨跌幅呼吸灯效果
+    QGraphicsOpacityEffect *m_iconOpacityEff = nullptr;         // 涨跌图标呼吸灯效果
 };
 
 #endif // STOCKBLOCK_H
