@@ -563,9 +563,6 @@ void HomePage::refreshStockInfoDisplay()
 // 更新当前组合下的股票块
 void HomePage::updateStockBlocks()
 {
-    if (!m_currentPortfolio)
-        return;
-
     // 清除原有所有股票块
     QLayoutItem *item;
     while ((item = stockBlocksLayout->takeAt(0)) != nullptr)
@@ -576,6 +573,9 @@ void HomePage::updateStockBlocks()
         delete item;
     }
     stockBlocksLayout->update();
+
+    if (!m_currentPortfolio)
+        return;
 
     // 遍历当前组合，生成新的股票块
     QList<StockInfo> stocks = m_currentPortfolio->stocks();
