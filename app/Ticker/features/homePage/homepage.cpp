@@ -34,7 +34,7 @@ HomePage::HomePage(QWidget *parent)
     m_currentPortfolio = nullptr;
 
     // 连接行情更新定时器槽函数
-    connect(m_quoteUpdateTimer, &QTimer::timeout, this, &HomePage::on_quoteUpdateTimer_timeout);
+    connect(m_quoteUpdateTimer, &QTimer::timeout, this, &HomePage::onQuoteUpdateTimerTimeout);
 }
 
 HomePage::~HomePage()
@@ -75,11 +75,11 @@ void HomePage::init()
     // 初始化行情提供者
     m_quoteProvider = new SinaQuoteProvider(this);
     connect(m_quoteProvider, &SinaQuoteProvider::quotesReady,
-            this, &HomePage::on_quoteProvider_updateQuotes);
+            this, &HomePage::onQuoteProviderUpdateQuotes);
     connect(m_quoteProvider, &SinaQuoteProvider::quoteReady,
-            this, &HomePage::on_quoteProvider_updateQuote);
+            this, &HomePage::onQuoteProviderUpdateQuote);
     connect(m_quoteProvider, &SinaQuoteProvider::quoteError,
-            this, &HomePage::on_quoteProvider_error);
+            this, &HomePage::onQuoteProviderError);
 
     // 从本地获取组合数据
     loadAllPortfoliosFromLocal();
@@ -608,7 +608,7 @@ void HomePage::updateStockBlocks()
         const StockInfo &info = stocks[i];
         StockBlock *block = new StockBlock(ui->scrollArea->widget());
         // 连接删除股票块请求槽函数
-        connect(block, &StockBlock::deleteRequested, this, &HomePage::on_delStockBlock_requested);
+        connect(block, &StockBlock::deleteRequested, this, &HomePage::onDelStockBlockRequested);
         block->setStockInfo(info);
         stockBlocksLayout->insertWidget(0, block); // 新的在左
     }
@@ -635,7 +635,7 @@ void HomePage::installScrollDragFilters()
 }
 
 // 接收最新行情槽函数
-void HomePage::on_quoteProvider_updateQuotes(const QList<StockInfo> &infos)
+void HomePage::onQuoteProviderUpdateQuotes(const QList<StockInfo> &infos)
 {
     if (!m_currentPortfolio)
         return; 
@@ -686,22 +686,22 @@ void HomePage::on_quoteProvider_updateQuotes(const QList<StockInfo> &infos)
 }
 
 // 接收单只股票行情槽函数
-void HomePage::on_quoteProvider_updateQuote(const StockInfo &info)
+void HomePage::onQuoteProviderUpdateQuote(const StockInfo &info)
 {
     QList<StockInfo> infos;
     infos.append(info);
 
-    on_quoteProvider_updateQuotes(infos);
+    onQuoteProviderUpdateQuotes(infos);
 }
 
 // 行情错误槽函数
-void HomePage::on_quoteProvider_error(const QString &stockCode, const QString &errReason)
+void HomePage::onQuoteProviderError(const QString &stockCode, const QString &errReason)
 {
     LOG_DEBUG("Quote error for %s: %s", stockCode.toStdString().c_str(), errReason.toStdString().c_str());
 }
 
 // 行情定时请求更新槽函数
-void HomePage::on_quoteUpdateTimer_timeout()
+void HomePage::onQuoteUpdateTimerTimeout()
 {
     // 刷新标题标签显示
     refreshTitleLabel();
@@ -731,7 +731,7 @@ void HomePage::on_quoteUpdateTimer_timeout()
 }
 
 // 股票块删除请求槽函数
-void HomePage::on_delStockBlock_requested(const QString &code)
+void HomePage::onDelStockBlockRequested(const QString &code)
 {
     if (!m_currentPortfolio)
         return;
