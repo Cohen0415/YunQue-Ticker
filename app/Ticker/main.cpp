@@ -14,6 +14,9 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     Widget w;
 
+    // 打印版本号
+    qDebug() << "App Version: " << APP_GIT_VERSION;
+
     // 1、安装自定义日志系统
     installCustomLogger();
 

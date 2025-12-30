@@ -36,6 +36,9 @@ void SysinfoPage::init()
     emit getBjTimeRequested();
     // 更新系统运行时间
     updateSysRunTime();
+
+    // 更新 app 版本
+    updateAppVersion();
 }
 
 // 页面进入回调
@@ -150,4 +153,19 @@ void SysinfoPage::updateSysRunTime()
         }
         file.close();
     }
+}
+
+// 更新 app 版本号
+void SysinfoPage::updateAppVersion()
+{
+    QString ver = QString::fromUtf8(APP_GIT_VERSION);
+
+    int idx = ver.indexOf('-');
+    if (idx > 0)
+    {
+        ver = ver.left(idx);
+    }
+
+    LOG_DEBUG("App Version: %s", ver.toUtf8().constData());
+    ui->appVerLabel->setText(m_infoAppVerPrefixStr + ver);
 }
