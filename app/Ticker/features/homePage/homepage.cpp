@@ -2,6 +2,7 @@
 #include "ui_homepage.h"
 #include "utils/log/logger.h"
 #include "utils/qssload/qssloader.h"
+#include "utils/confirmDialog/confirmdialog.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -14,6 +15,7 @@
 #include <QVBoxLayout>
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
+#include <QMessageBox>
 
 static QString getAllPortfolioFilePath()
 {
@@ -399,9 +401,17 @@ void HomePage::on_portfolioComboBox_currentIndexChanged(int index)
 // 删除组合按钮点击槽函数
 void HomePage::on_delPortfolioBtn_clicked()
 {
+    // 如果当前没有组合，直接返回
     int index = ui->portfolioComboBox->currentIndex();
     if (index < 0 || index >= m_portfolioList.size())
     {
+        return;
+    }
+
+    // 弹出确认对话框
+    if (!ConfirmDialog::ask(this, "是否删除该组合？"))
+    {
+        // 用户取消删除
         return;
     }
 
