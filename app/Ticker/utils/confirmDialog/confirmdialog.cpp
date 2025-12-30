@@ -30,6 +30,8 @@ ConfirmDialog::ConfirmDialog(const QString &text, QWidget *parent)
 
     m_btnCancel = new QPushButton("取消", content);
     m_btnOk = new QPushButton("确定", content);
+    m_btnCancel->setFocusPolicy(Qt::NoFocus);
+    m_btnOk->setFocusPolicy(Qt::NoFocus);
 
     QHBoxLayout *hLayout = new QHBoxLayout;
     hLayout->addStretch();
@@ -45,7 +47,6 @@ ConfirmDialog::ConfirmDialog(const QString &text, QWidget *parent)
     content->setStyleSheet(R"(
         QWidget#content {
             background: white;
-            border-radius: 14px;
         }
         QLabel { color:#222; font-size:18px; }
         QPushButton {
