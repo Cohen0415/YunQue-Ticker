@@ -638,7 +638,7 @@ void HomePage::on_quoteProvider_updateQuotes(const QList<StockInfo> &infos)
     // 如果在 9:15 到 9:25 之间，显示集合竞价，不更新数据
     if (hour == 9 && minute >= 15 && minute < 25)
     {
-        LOG_DEBUG("During pre-market auction time (9:15-9:25), skipping quote update.");
+        // LOG_DEBUG("During pre-market auction time (9:15-9:25), skipping quote update.");
 
         for (const StockInfo& updatedInfo : infos)
         {
@@ -650,6 +650,9 @@ void HomePage::on_quoteProvider_updateQuotes(const QList<StockInfo> &infos)
                 stock->isRise = CALL_AUCTION; // 标记为集合竞价状态
             }
         }
+
+        // 刷新显示
+        refreshStockInfoDisplay();
 
         return;
     }
