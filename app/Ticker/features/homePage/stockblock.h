@@ -46,6 +46,7 @@ private:
     void updateUI();                            // 渲染UI
     void ensureDeleteBtn();                     // 创建删除按钮
     void breathOpacityOn(QWidget *label, QGraphicsOpacityEffect*& eff); // 呼吸灯效果
+    void showDeleteBtnWithAnim();               // 删除按钮的缩放动画
 
     Ui::StockBlock *ui;
     StockInfo m_stockInfo;
@@ -58,6 +59,10 @@ private:
     QGraphicsOpacityEffect *m_riseOpacityEff = nullptr;         // 涨跌呼吸灯效果
     QGraphicsOpacityEffect *m_pctOpacityEff = nullptr;          // 涨跌幅呼吸灯效果
     QGraphicsOpacityEffect *m_iconOpacityEff = nullptr;         // 涨跌图标呼吸灯效果
+
+    QGraphicsOpacityEffect *m_delOpacityEff = nullptr;
+    QPropertyAnimation *m_delOpacityAnim = nullptr;
+    QPropertyAnimation *m_delScaleAnim = nullptr;
 };
 
 #endif // STOCKBLOCK_H

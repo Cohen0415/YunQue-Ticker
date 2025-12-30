@@ -90,7 +90,7 @@ void StockBlock::leaveEvent(QEvent *event)
 void StockBlock::onLongPress()
 {
     ensureDeleteBtn();
-    m_deleteBtn->show();
+    showDeleteBtnWithAnim();
 }
 
 // 删除按钮点击槽函数
@@ -209,4 +209,57 @@ void StockBlock::breathOpacityOn(QWidget *label, QGraphicsOpacityEffect*& eff)
     connect(anim, &QPropertyAnimation::finished, label, [eff]() {
         eff->setOpacity(1.0);
     });
+}
+
+// 删除按钮的缩放动画
+void StockBlock::showDeleteBtnWithAnim()
+{
+    if (!m_deleteBtn)
+        return;
+
+    // 透明度效果（懒加载）
+    if (!m_delOpacityEff)
+    {
+        m_delOpacityEff = new QGraphicsOpacityEffect(m_deleteBtn);
+        m_deleteBtn->setGraphicsEffect(m_delOpacityEff);
+    }
+
+    // 初始状态
+    m_delOpacityEff->setOpacity(0.0);
+
+    const int btnW = m_deleteBtn->width();
+    const int btnH = m_deleteBtn->height();
+    const QPoint finalPos = m_deleteBtn->pos();
+
+    // 90% 缩放的起始矩形
+    QRect startRect(
+        finalPos.x() + btnW * 0.05,
+        finalPos.y() + btnH * 0.05,
+        btnW * 0.9,
+        btnH * 0.9
+    );
+
+    QRect endRect(finalPos, QSize(btnW, btnH));
+
+    m_deleteBtn->setGeometry(startRect);
+    m_deleteBtn->show();
+    m_deleteBtn->raise();
+
+    // 透明度动画
+    m_delOpacityAnim = new QPropertyAnimation(m_delOpacityEff, "opacity", this);
+    m_delOpacityAnim->setDuration(180);
+    m_delOpacityAnim->setStartValue(0.0);
+    m_delOpacityAnim->setEndValue(1.0);
+    m_delOpacityAnim->setEasingCurve(QEasingCurve::OutCubic);
+
+    // 缩放动画（geometry）
+    m_delScaleAnim = new QPropertyAnimation(m_deleteBtn, "geometry", this);
+    m_delScaleAnim->setDuration(220);
+    m_delScaleAnim->setStartValue(startRect);
+    m_delScaleAnim->setEndValue(endRect);
+    m_delScaleAnim->setEasingCurve(QEasingCurve::OutBack);
+
+    // 启动
+    m_delOpacityAnim->start(QAbstractAnimation::DeleteWhenStopped);
+    m_delScaleAnim->start(QAbstractAnimation::DeleteWhenStopped);
 }
