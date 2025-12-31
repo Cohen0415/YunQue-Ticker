@@ -3,6 +3,7 @@
 #include "utils/log/logger.h"
 #include "utils/qssload/qssloader.h"
 #include "utils/confirmDialog/confirmdialog.h"
+#include "features/pagemsgmanager.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -68,6 +69,11 @@ void HomePage::init()
 {
     // UI 初始化
     uiInit();
+    /*
+     *  在 uiInit() 中，会初始化 combobox，从而导致 currentIndexChanged 信号触发，
+     *  而 currentIndexChanged 里会获取最新行情，但此时还没有更新 combobox。
+    */
+    uiInitFlag = 1;
 
     // 安装滚动拖拽过滤器
     installScrollDragFilters();
@@ -81,12 +87,15 @@ void HomePage::init()
     connect(m_quoteProvider, &SinaQuoteProvider::quoteError,
             this, &HomePage::onQuoteProviderError);
 
+    // 连接 wifi 状态变化信号槽
+    connect(PageMsgManager::getInstance(), &PageMsgManager::wifiStatusChanged,
+            this, &HomePage::onWifiStatusChanged);
+
     // 从本地获取组合数据
     loadAllPortfoliosFromLocal();
 
     // 更新组合下拉框
     updatePortfolioComboBox();
-    initFlag = 1;
 
     // 自动切换到第一个组合
     if (!m_portfolioList.isEmpty())
@@ -188,6 +197,10 @@ void HomePage::uiInit()
 
     // 默认清空标题语
     ui->titleLabel->setText("");
+
+    // 默认开启显示网络错误提示
+    ui->networkErrLabel->setVisible(true);
+    startBreathAnimation(ui->networkErrLabel, m_networkErrAnimation);
 
     // 清除组合下拉框
     ui->portfolioComboBox->clear();
@@ -751,40 +764,60 @@ void HomePage::onDelStockBlockRequested(const QString &code)
     }
 }
 
-// 启动呼吸灯动画
-void HomePage::startBreathAnimation() 
+// WiFi 状态变化槽函数
+void HomePage::onWifiStatusChanged(bool isConnected)
 {
-    if (m_breathAnimation) 
+    if (isConnected)
+    {
+        ui->networkErrLabel->setVisible(false);
+        // 停止网络错误动画
+        stopBreathAnimation(ui->networkErrLabel, m_networkErrAnimation);
+    }
+    else
+    {
+        ui->networkErrLabel->setVisible(true);
+        // 启动网络错误动画
+        startBreathAnimation(ui->networkErrLabel, m_networkErrAnimation);
+    }
+}
+
+// 启动呼吸灯动画
+void HomePage::startBreathAnimation(QWidget *target, QSequentialAnimationGroup *&holder)
+{
+    if (holder)
         return;
 
-    auto *effect = new QGraphicsOpacityEffect(this);
-    ui->titleLabel->setGraphicsEffect(effect);
-    auto *fadeOut = new QPropertyAnimation(effect, "opacity", this);
+    auto *effect = new QGraphicsOpacityEffect(target);
+    target->setGraphicsEffect(effect);
+
+    auto *fadeOut = new QPropertyAnimation(effect, "opacity", target);
     fadeOut->setDuration(1500);
     fadeOut->setStartValue(1.0);
     fadeOut->setEndValue(0.0);
 
-    auto *fadeIn = new QPropertyAnimation(effect, "opacity", this);
+    auto *fadeIn = new QPropertyAnimation(effect, "opacity", target);
     fadeIn->setDuration(1500);
     fadeIn->setStartValue(0.0);
     fadeIn->setEndValue(1.0);
 
-    m_breathAnimation = new QSequentialAnimationGroup(this);
-    m_breathAnimation->addAnimation(fadeOut);
-    m_breathAnimation->addAnimation(fadeIn);
-    m_breathAnimation->setLoopCount(-1);
-    m_breathAnimation->start();
+    auto *seq = new QSequentialAnimationGroup(target);
+    seq->addAnimation(fadeOut);
+    seq->addAnimation(fadeIn);
+    seq->setLoopCount(-1);
+    seq->start();
+
+    holder = seq;
 }
 
 // 停止呼吸灯动画
-void HomePage::stopBreathAnimation() 
+void HomePage::stopBreathAnimation(QWidget *target, QSequentialAnimationGroup *&holder)
 {
-    if (m_breathAnimation) 
+    if (holder)
     {
-        m_breathAnimation->stop();
-        m_breathAnimation->deleteLater();
-        m_breathAnimation = nullptr;
-        ui->titleLabel->setGraphicsEffect(nullptr);
+        holder->stop();
+        holder->deleteLater();
+        target->setGraphicsEffect(nullptr);
+        holder = nullptr;
     }
 }
 
@@ -795,7 +828,7 @@ void HomePage::refreshTitleLabel()
     QTime currentTime = QTime::currentTime();
     int hour = currentTime.hour();
     int minute = currentTime.minute();
-
+    hour = 13;
     /*
         时间段划分：
         1、09:15 – 09:25：开盘集合竞价（橙色背景，呼吸灯动画）
@@ -812,14 +845,14 @@ void HomePage::refreshTitleLabel()
     {
         ui->titleLabel->setText("开盘集合竞价");
         ui->titleLabel->setStyleSheet("background-color: #FFA500; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        startBreathAnimation();
+        startBreathAnimation(ui->titleLabel, m_titleBreathAnimation);
     }
     // 2. 开市前休市：09:25 – 09:29（含）
     else if (hour == 9 && minute >= 25 && minute <= 29)
     {
         ui->titleLabel->setText("开市前休市");
         ui->titleLabel->setStyleSheet("background-color: #FFA500; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        stopBreathAnimation(); // 常亮，不呼吸
+        stopBreathAnimation(ui->titleLabel, m_titleBreathAnimation); // 常亮，不呼吸
     }
     // 3. 上午连续竞价：09:30 – 11:29（含）
     else if ((hour == 9 && minute >= 30) ||
@@ -828,7 +861,7 @@ void HomePage::refreshTitleLabel()
     {
         ui->titleLabel->setText("交易进行中");
         ui->titleLabel->setStyleSheet("background-color: #28a745; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        startBreathAnimation();
+        startBreathAnimation(ui->titleLabel, m_titleBreathAnimation);
     }
     // 4. 午间休市：11:30 – 12:59（含）
     else if ((hour == 11 && minute >= 30) ||
@@ -836,7 +869,7 @@ void HomePage::refreshTitleLabel()
     {
         ui->titleLabel->setText("午间休市");
         ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        stopBreathAnimation();
+        stopBreathAnimation(ui->titleLabel, m_titleBreathAnimation);
     }
     // 5. 下午连续竞价：13:00 – 14:56（含）
     else if ((hour == 13) ||
@@ -844,35 +877,35 @@ void HomePage::refreshTitleLabel()
     {
         ui->titleLabel->setText("交易进行中");
         ui->titleLabel->setStyleSheet("background-color: #28a745; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        startBreathAnimation();
+        startBreathAnimation(ui->titleLabel, m_titleBreathAnimation);
     }
     // 6. 收盘集合竞价：14:57 – 14:59（含）
     else if (hour == 14 && minute >= 57 && minute <= 59)
     {
         ui->titleLabel->setText("收盘集合竞价");
         ui->titleLabel->setStyleSheet("background-color: #FFA500; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        startBreathAnimation();
+        startBreathAnimation(ui->titleLabel, m_titleBreathAnimation);
     }
     // 7. 已收盘：15:00 起
     else if (hour >= 15)
     {
         ui->titleLabel->setText("已收盘");
         ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        stopBreathAnimation();
+        stopBreathAnimation(ui->titleLabel, m_titleBreathAnimation);
     }
     // 其他时间（如夜间、早盘前）：默认“已收盘”或可自定义
     else
     {
         ui->titleLabel->setText("已收盘");
         ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
-        stopBreathAnimation();
+        stopBreathAnimation(ui->titleLabel, m_titleBreathAnimation);
     }
 }
 
 // 触发行情请求
 void HomePage::emitFetchQuotesInCurPortfolio()
 {
-    if (initFlag == 0)
+    if (uiInitFlag == 0)
         return;
 
     if (!m_currentPortfolio)

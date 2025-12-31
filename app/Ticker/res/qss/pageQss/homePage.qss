@@ -15,6 +15,15 @@
     font-size: 16px;
 }
 
+/* 错误网络连接提示语 */
+#networkErrLabel {
+    background-color: #fa5555; 
+    color: #ffffff; 
+    border-radius: 4px; 
+    padding: 4px 8px; 
+    font-size: 16px;
+}
+
 /* 添加自选按钮、添加组合按钮 */
 #addNewPortfolioBtn, #addNewStockBtn {
     background-color: #238dfa;

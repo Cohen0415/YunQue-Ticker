@@ -59,6 +59,8 @@ private slots:
     
     void onDelStockBlockRequested(const QString& code);               // 股票块删除请求槽函数
 
+    void onWifiStatusChanged(bool isConnected);                       // WiFi 状态变化槽函数
+
 private:
 
     void uiInit();                                      // 初始化 UI 组件
@@ -77,8 +79,8 @@ private:
 
     void installScrollDragFilters();                    // 初始化滚动
 
-    void startBreathAnimation();                        // 启动呼吸灯动画
-    void stopBreathAnimation();                         // 停止呼吸灯动画
+    void startBreathAnimation(QWidget *target, QSequentialAnimationGroup *&holder);    // 启动呼吸灯动画
+    void stopBreathAnimation(QWidget *target, QSequentialAnimationGroup *&holder);     // 停止呼吸灯动画
 
     void refreshTitleLabel();                           // 刷新标题标签显示
 
@@ -99,9 +101,10 @@ private:
     SinaQuoteProvider *m_quoteProvider;                  // 新浪行情提供者
     QTimer *m_quoteUpdateTimer;                          // 定时更新行情 Timer
 
-    QSequentialAnimationGroup *m_breathAnimation = nullptr; // 呼吸灯动画
+    QSequentialAnimationGroup *m_titleBreathAnimation = nullptr; // 交易时间段标题的呼吸灯动画
+    QSequentialAnimationGroup *m_networkErrAnimation = nullptr;  // 网络错误提示的呼吸灯动画
 
-    int initFlag = 0;                                 // 初始化标志
+    int uiInitFlag = 0;                                 // 初始化标志
 };
 
 #endif // HOMEPAGE_H
