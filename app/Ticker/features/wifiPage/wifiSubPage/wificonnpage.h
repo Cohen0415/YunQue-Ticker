@@ -49,7 +49,8 @@ private slots:
     void on_ssidClearButton_clicked();  // SSID 清除按钮槽函数
     void on_pwdClearButton_clicked();   // 密码清除按钮槽函数
     
-    void onStatusTimerTimeout();        // 定时器槽函数
+    void onStatusTimerTimeout();        // wifi连接超时定时器槽函数
+    void onInitTimerTimeout();          // 初始化轮询定时器槽函数
 
 private:
 
@@ -58,10 +59,12 @@ private:
 
     Ui::WifiConnPageWidget *ui;
 
-    QTimer *m_statusTimer = nullptr;    // 轮询定时器
+    QTimer *m_statusTimer = nullptr;    // 点击“连接”按钮后的，用于检测连接状态的定时器
     int m_elapsed = 0;                  // 已用时ms
     int m_checkInterval;                // 检测间隔ms
     int m_timeoutMs;                    // 超时ms，可调
+
+    QTimer *m_initTimer = nullptr;      // app 启动后，用于轮询获取 wifi 状态的定时器，当用户主动点击“连接”按钮后，该定时器完成使命即停止
 };
 
 #endif // WIFICONNPAGE_H

@@ -9,6 +9,7 @@ WifiConnPage::WifiConnPage(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::WifiConnPageWidget)
     , m_statusTimer(new QTimer(this))
+    , m_initTimer(new QTimer(this))
 {
     ui->setupUi(this);
 
@@ -28,12 +29,13 @@ void WifiConnPage::init()
 {
     // 连接定时器槽函数
     connect(m_statusTimer, &QTimer::timeout, this, &WifiConnPage::onStatusTimerTimeout);
+    connect(m_initTimer, &QTimer::timeout, this, &WifiConnPage::onInitTimerTimeout);
 
     // UI 初始化
     uiInit();
 
-    // 初始化时，请求获取一次当前的 wifi 连接状态
-    emit getWifiStatusRequested();
+    // app 启动后，轮询获取当前的 wifi 连接状态
+    m_initTimer->start(m_checkInterval);
 }
 
 // 页面进入回调
@@ -59,6 +61,8 @@ void WifiConnPage::onGetWifiStatusResult(bool success, bool connected, QString &
         // 连接成功，停止定时器
         if (m_statusTimer->isActive())
             m_statusTimer->stop();
+        if (m_initTimer->isActive())
+            m_initTimer->stop();
 
         // 向 PageMsgManager 发送已连接信号
         emit PageMsgManager::getInstance()->wifiStatusChanged(true);
@@ -100,6 +104,10 @@ void WifiConnPage::on_connButton_clicked()
     // 获取用户输入的 ssid 和 pwd
     QString ssid = ui->ssidLineEdit->text();
     QString password = ui->pwdLineEdit->text();
+
+    // 关闭初始化轮询定时器
+    if (m_initTimer->isActive())
+        m_initTimer->stop();
 
     // 禁用按钮
     ui->connButton->setEnabled(false);
@@ -232,6 +240,12 @@ void WifiConnPage::onStatusTimerTimeout()
         ui->connButton->setEnabled(true);
         ui->connButton->setText("连 接");
     }
+}
+
+// 初始化轮询定时器槽函数
+void WifiConnPage::onInitTimerTimeout()
+{
+    emit getWifiStatusRequested();  // 轮询请求主页面
 }
 
 // SSID 清除按钮槽函数
