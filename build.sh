@@ -3,6 +3,9 @@
 # 顶层目录路径
 TOPDIR=$(pwd)
 
+# 编译输出目录
+OUTDIR=${TOPDIR}/out
+
 # 工具链相关路径
 PLATFORM=""
 TOOLCHAIN_TOPDIR=${TOPDIR}/toolchain
@@ -95,6 +98,9 @@ build_qt()
     ${QMAKE_PATH} ${QT_PRJ_DIR}/Ticker.pro
     make -j12
 
+    # 复制编译结果到输出目录，并统一重命名为 Ticker-app
+    cp -r ${QT_DIR}/build-${PLATFORM}/Ticker ${OUTDIR}/Ticker-app
+
     log_info " =========================== QT Client built successfully for ${PLATFORM} ==========================="
 }
 
@@ -110,6 +116,9 @@ build_service()
     cd ${SERVICE_DIR}
     make clean
     make -j12
+
+    # 复制编译结果到输出目录，并统一重命名为 Ticker-service
+    cp ${SERVICE_DIR}/dev-service ${OUTDIR}/Ticker-service
 
     log_info " =========================== Service built successfully for ${PLATFORM} ==========================="
 }
@@ -132,6 +141,9 @@ build_client()
         log_error "Failed to build Client Test."
         exit 1
     fi
+
+    # 复制编译结果到输出目录，并统一重命名为 Ticker-client-test
+    cp ${SERVICE_DIR}/client-${PLATFORM} ${OUTDIR}/Ticker-client-test
 
     log_info " =========================== Client Test built successfully for ${PLATFORM} ==========================="
 }
@@ -208,6 +220,11 @@ if [ ${DO_CLEAN} -eq 1 ]; then
 fi
 
 prepare_toolchain
+
+# 检查并创建输出目录
+if [ ! -d ${OUTDIR} ]; then
+    mkdir ${OUTDIR}
+fi
 
 [ ${BUILD_SERVICE} -eq 1 ] && build_service
 [ ${BUILD_CLIENT}  -eq 1 ] && build_client
