@@ -828,7 +828,7 @@ void HomePage::refreshTitleLabel()
     QTime currentTime = QTime::currentTime();
     int hour = currentTime.hour();
     int minute = currentTime.minute();
-    hour = 13;
+
     /*
         时间段划分：
         1、09:15 – 09:25：开盘集合竞价（橙色背景，呼吸灯动画）
