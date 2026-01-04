@@ -96,13 +96,14 @@ private:
     bool m_isHContentDragging = false;
     int m_hDragThreshold = 5;
 
-    SinaQuoteProvider *m_quoteProvider;                  // 新浪行情提供者
-    QTimer *m_quoteUpdateTimer;                          // 定时更新行情 Timer
+    SinaQuoteProvider *m_quoteProvider;                             // 新浪行情提供者
+    QTimer *m_quoteUpdateTimer;                                     // 定时更新行情 Timer
 
-    QSequentialAnimationGroup *m_titleBreathAnimation = nullptr; // 交易时间段标题的呼吸灯动画
-    QSequentialAnimationGroup *m_networkErrAnimation = nullptr;  // 网络错误提示的呼吸灯动画
+    QSequentialAnimationGroup *m_titleBreathAnimation = nullptr;    // 交易时间段标题的呼吸灯动画
+    QSequentialAnimationGroup *m_networkErrAnimation = nullptr;     // 网络错误提示的呼吸灯动画
 
-    int uiInitFlag = 0;                                 // 初始化标志
+    int uiInitFlag = 0;                                             // 初始化标志
+    bool m_isOpenMarket = false;                                    // 是否在交易日
 };
 
 #endif // HOMEPAGE_H

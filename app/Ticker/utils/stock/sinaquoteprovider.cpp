@@ -56,7 +56,7 @@ void SinaQuoteProvider::fetchQuotes(const QList<QString> &stockCodes)
         urlCodes << codeToSinaSymbol(code);
     }
     QString fullCodes = urlCodes.join(',');
-    QUrl url("http://hq.sinajs.cn/list=" + fullCodes);  // 新浪行情接口，例如 http://hq.sinajs.cn/list=sh600000,sz000001
+    QUrl url(SINA_API_URL + fullCodes);  // 新浪行情接口，例如 http://hq.sinajs.cn/list=sh600000,sz000001
 
     QNetworkRequest req(url);
     req.setRawHeader("referer", "https://finance.sina.com.cn/");    // 新浪接口要加这个 header
@@ -193,11 +193,26 @@ StockInfo SinaQuoteProvider::parseSinaLine(const QString &line, const QString &c
     if (yestClose > 0.00001)
         info.risePct = std::abs(risePrice / yestClose) * 100.0;
     if (risePrice > 0.00001)
-        info.isRise = RISE;
+        info.isRise = PRICE_RISE;
     else if (risePrice < -0.00001)
-        info.isRise = FALL;
+        info.isRise = PRICE_FALL;
     else
-        info.isRise = NORMAL;
+        info.isRise = PRICE_NORMAL;
+
+    // 市场日期
+    QString dateStr = list[30];
+
+    // 状态码判断股票状态
+    QString statusCode = list[32];
+    if (statusCode == SINA_STATUS_NORMAL)
+        info.status = STATUS_NORMAL;
+    else if (statusCode == SINA_STATUS_SUSPEND1 || statusCode == SINA_STATUS_SUSPEND2 ||
+             statusCode == SINA_STATUS_SUSPEND3 || statusCode == SINA_STATUS_SUSPEND4 ||
+             statusCode == SINA_STATUS_SUSPEND5 || statusCode == SINA_STATUS_PAUSE)
+        info.status = STATUS_SUSPEND;
+    else if (statusCode == SINA_STATUS_DELISTED1 || statusCode == SINA_STATUS_DELISTED2 ||
+             statusCode == SINA_STATUS_DELISTED3)
+        info.status = STATUS_DELISTED;
 
     return info;
 }

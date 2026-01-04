@@ -15,9 +15,12 @@ StockBlock::StockBlock(QWidget *parent)
     if (!qss.isEmpty())
         this->setStyleSheet(qss);
 
-    m_longPressTimer.setSingleShot(true);   // 单次触发
-    m_longPressTimer.setInterval(LONG_PRESS_THRESHOLD_MS); // 长按阈值
+    m_longPressTimer.setSingleShot(true);                   // 单次触发
+    m_longPressTimer.setInterval(LONG_PRESS_THRESHOLD_MS);  // 长按阈值
     connect(&m_longPressTimer, &QTimer::timeout, this, &StockBlock::onLongPress);
+
+    ui->susDelistLabel->setText("");                        // 设置停牌/摘牌文本
+    ui->susDelistLabel->setVisible(false);                  // 默认不可见
 }
 
 StockBlock::~StockBlock()
@@ -133,18 +136,40 @@ void StockBlock::updateUI()
 
     ui->priceLabel->setText(QString::number(m_stockInfo.currentPrice, 'f', 2)); // 当前价格
 
+    // 股票状态处理
+    ui->susDelistLabel->setVisible(false);
+    if (m_stockInfo.status != STATUS_NORMAL)
+    {
+        ui->risePriceLabel->setText("--");
+        ui->risePctLabel->setText("--");
+        ui->risePriceLabel->setStyleSheet("color: #707070;");
+        ui->risePctLabel->setStyleSheet("color: #707070;");
+        ui->susDelistLabel->setStyleSheet("color: #707070;");
+        ui->susDelistLabel->setVisible(true);
+    }
+    if (m_stockInfo.status == STATUS_SUSPEND)   // 停牌
+    {
+        ui->susDelistLabel->setText("停牌中");
+        return;
+    }
+    else if (m_stockInfo.status == STATUS_DELISTED)     // 摘牌
+    {
+        ui->susDelistLabel->setText("已退市");
+        return;
+    }
+
     QString prefixSymbol = "";
     switch (m_stockInfo.isRise)
     {
-        case NORMAL: prefixSymbol = "";  break;
-        case RISE:   prefixSymbol = "+"; break;
-        case FALL:   prefixSymbol = "-"; break;
+        case PRICE_NORMAL: prefixSymbol = "";  break;
+        case PRICE_RISE:   prefixSymbol = "+"; break;
+        case PRICE_FALL:   prefixSymbol = "-"; break;
     }
     ui->risePriceLabel->setText(QString("%1 %2").arg(prefixSymbol, QString::number(m_stockInfo.risePrice, 'f', 2)));
     ui->risePctLabel->setText(QString("%1 %2%").arg(prefixSymbol, QString::number(m_stockInfo.risePct, 'f', 2)));
 
     // 根据涨跌状态设置颜色
-    if (m_stockInfo.isRise == RISE)     // 上涨
+    if (m_stockInfo.isRise == PRICE_RISE)     // 上涨 
     {
         ui->priceLabel->setStyleSheet("color: #E33C64;");
         ui->risePriceLabel->setStyleSheet("color: #E33C64;");
@@ -153,7 +178,7 @@ void StockBlock::updateUI()
         // 上涨显示红色 Icon
         ui->riseIconLabel->setPixmap(QPixmap(":/res/icon/pageIcon/homePage/redCir.png"));
     }
-    else if (m_stockInfo.isRise == FALL)    // 下跌
+    else if (m_stockInfo.isRise == PRICE_FALL)    // 下跌
     {
         ui->priceLabel->setStyleSheet("color: #43CF7C;");
         ui->risePriceLabel->setStyleSheet("color: #43CF7C;");
@@ -162,7 +187,7 @@ void StockBlock::updateUI()
         // 上涨显示绿色 Icon
         ui->riseIconLabel->setPixmap(QPixmap(":/res/icon/pageIcon/homePage/greenCir.png"));
     }
-    else if (m_stockInfo.isRise == NORMAL)  // 不变
+    else if (m_stockInfo.isRise == PRICE_NORMAL)  // 不变
     {
         ui->priceLabel->setStyleSheet("color: #707070;");
         ui->risePriceLabel->setStyleSheet("color: #707070;");

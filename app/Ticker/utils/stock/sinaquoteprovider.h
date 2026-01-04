@@ -8,6 +8,31 @@
 #include "features/homePage/stockinfo.h"
 #include "stockquoteprovider.h"
 
+#define SINA_API_URL               "http://hq.sinajs.cn/list="    // 新浪财经股票行情API基础URL
+
+/* 状态码 
+    00	正常
+    01	停牌一小时
+    02	停牌一天
+    03	连续停牌
+    04	盘中停牌
+    05	停牌半天
+    07	暂停
+    -1	无该记录
+    -2	未上市
+    -3	退市
+*/
+#define SINA_STATUS_NORMAL        "00"    // 正常交易
+#define SINA_STATUS_SUSPEND1      "01"    // 停牌一小时
+#define SINA_STATUS_SUSPEND2      "02"    // 停牌一天
+#define SINA_STATUS_SUSPEND3      "03"    // 连续停牌
+#define SINA_STATUS_SUSPEND4      "04"    // 盘中停牌
+#define SINA_STATUS_SUSPEND5      "05"    // 停牌半天
+#define SINA_STATUS_PAUSE         "07"    // 暂停
+#define SINA_STATUS_DELISTED1     "-1"    // 无该记录
+#define SINA_STATUS_DELISTED2     "-2"    // 未上市
+#define SINA_STATUS_DELISTED3     "-3"    // 退市
+
 // SinaQuoteProvider 利用新浪财经API拉取实时行情
 class SinaQuoteProvider : public StockQuoteProvider
 {

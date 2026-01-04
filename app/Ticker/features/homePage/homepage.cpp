@@ -200,7 +200,7 @@ void HomePage::uiInit()
     ui->inputLineEdit->setText("");
 
     // 默认清空标题语
-    ui->titleLabel->setText("");
+    ui->titleLabel->setText("已收盘");
 
     // 默认开启显示网络错误提示
     ui->networkErrLabel->setVisible(true);
@@ -505,6 +505,8 @@ void HomePage::saveAllPortfoliosToLocal()
             st["risePrice"] = s.risePrice;
             st["risePct"] = s.risePct;
             st["isRise"] = s.isRise;
+            st["status"] = s.status;
+            st["marketDate"] = s.marketDate;
             stockArray.append(st);
         }
         obj["stocks"] = stockArray;
@@ -564,6 +566,8 @@ void HomePage::loadAllPortfoliosFromLocal()
             s.risePrice = st["risePrice"].toDouble();
             s.risePct = st["risePct"].toDouble();
             s.isRise = static_cast<stockPriceFlag>(st["isRise"].toInt());
+            s.status = static_cast<stockStatus>(st["status"].toInt());
+            s.marketDate = st["marketDate"].toString();
             port->addStock(s);
         }
         m_portfolioList.append(port);
@@ -652,9 +656,10 @@ void HomePage::onQuoteProviderUpdateQuotes(const QList<StockInfo> &infos)
     int minute = currentTime.minute();
 
     // 更新当前组合内的股票数据
+    StockInfo* stock = nullptr;
     for (const StockInfo& updatedInfo : infos)
     {
-        StockInfo* stock = m_currentPortfolio->getStock(updatedInfo.code);
+        stock = m_currentPortfolio->getStock(updatedInfo.code);
         if (stock)
         {
             stock->name = updatedInfo.name;
@@ -662,7 +667,21 @@ void HomePage::onQuoteProviderUpdateQuotes(const QList<StockInfo> &infos)
             stock->risePrice = updatedInfo.risePrice;
             stock->risePct = updatedInfo.risePct;
             stock->isRise = updatedInfo.isRise;
+            stock->marketDate = updatedInfo.marketDate;     // 2025-12-31
+            stock->status = updatedInfo.status;
         }
+    }
+
+    // 交易日判断
+    // 若当前日期与股票的最后获取时间一致，则说明今天是交易日
+    QString currentDateStr = QDate::currentDate().toString("yyyy-MM-dd");
+    if (stock && stock->marketDate == currentDateStr)
+    {
+        m_isOpenMarket = true;
+    }
+    else
+    {
+        m_isOpenMarket = false;
     }
 
     // 刷新显示
@@ -786,6 +805,15 @@ void HomePage::stopBreathAnimation(QWidget *target, QSequentialAnimationGroup *&
 // 刷新标题标签显示
 void HomePage::refreshTitleLabel()
 {
+    // 休市状态判断
+    if (!m_isOpenMarket)
+    {
+        ui->titleLabel->setText("已收盘");
+        ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");
+        stopBreathAnimation(ui->titleLabel, m_titleBreathAnimation);
+        return;
+    }
+
     // 获取当前系统时间
     QTime currentTime = QTime::currentTime();
     int hour = currentTime.hour();
