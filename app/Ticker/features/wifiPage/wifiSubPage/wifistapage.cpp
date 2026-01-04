@@ -34,7 +34,6 @@ void WifiStaPage::onPageEnter()
     LOG_DEBUG("WifiStaPage entered.");
 
     // 启动状态轮询定时器
-    onStatusTimerTimeout(); // 立即请求一次
     if (!m_statusTimer->isActive())
         m_statusTimer->start(REFRESH_WIFI_STA_MS);
 }
