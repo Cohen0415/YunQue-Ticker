@@ -651,29 +651,7 @@ void HomePage::onQuoteProviderUpdateQuotes(const QList<StockInfo> &infos)
     int hour = currentTime.hour();
     int minute = currentTime.minute();
 
-    // 如果在 9:15 到 9:25 之间，显示集合竞价，不更新数据
-    if (hour == 9 && minute >= 15 && minute < 25)
-    {
-        // LOG_DEBUG("During pre-market auction time (9:15-9:25), skipping quote update.");
-
-        for (const StockInfo& updatedInfo : infos)
-        {
-            StockInfo* stock = m_currentPortfolio->getStock(updatedInfo.code);
-            if (stock)
-            {
-                stock->name = updatedInfo.name;
-                stock->currentPrice = updatedInfo.previousClose; // 显示昨日收盘价作为当前价
-                stock->isRise = CALL_AUCTION; // 标记为集合竞价状态
-            }
-        }
-
-        // 刷新显示
-        refreshStockInfoDisplay();
-
-        return;
-    }
-
-    // 除了每天的集合竞价 9.15~9.25 之外，更新当前组合内的股票数据
+    // 更新当前组合内的股票数据
     for (const StockInfo& updatedInfo : infos)
     {
         StockInfo* stock = m_currentPortfolio->getStock(updatedInfo.code);

@@ -6,7 +6,6 @@
 // 股票价格标志位
 enum stockPriceFlag {
     NORMAL = 0,     // 价格不变
-    CALL_AUCTION,   // 集合竞价
     RISE,           // 价格上涨
     FALL,           // 价格下跌
 };
