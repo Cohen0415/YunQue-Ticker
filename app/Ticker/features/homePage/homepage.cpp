@@ -501,12 +501,6 @@ void HomePage::saveAllPortfoliosToLocal()
             QJsonObject st;
             st["code"] = s.code;
             st["name"] = s.name;
-            st["currentPrice"] = s.currentPrice;
-            st["risePrice"] = s.risePrice;
-            st["risePct"] = s.risePct;
-            st["isRise"] = s.isRise;
-            st["status"] = s.status;
-            st["marketDate"] = s.marketDate;
             stockArray.append(st);
         }
         obj["stocks"] = stockArray;
@@ -562,12 +556,6 @@ void HomePage::loadAllPortfoliosFromLocal()
             StockInfo s;
             s.code = st["code"].toString();
             s.name = st["name"].toString();
-            s.currentPrice = st["currentPrice"].toDouble();
-            s.risePrice = st["risePrice"].toDouble();
-            s.risePct = st["risePct"].toDouble();
-            s.isRise = static_cast<stockPriceFlag>(st["isRise"].toInt());
-            s.status = static_cast<stockStatus>(st["status"].toInt());
-            s.marketDate = st["marketDate"].toString();
             port->addStock(s);
         }
         m_portfolioList.append(port);
