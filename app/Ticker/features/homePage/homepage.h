@@ -54,7 +54,6 @@ private slots:
 
     void onQuoteUpdateTimerTimeout();                                 // 行情定时请求更新槽函数
     void onQuoteProviderUpdateQuotes(const QList<StockInfo> &infos);  // 接收最新行情槽函数
-    void onQuoteProviderUpdateQuote(const StockInfo &info);           // 接收单只股票行情槽函数
     void onQuoteProviderError(const QString &stockCode, const QString &errReason); // 行情错误槽函数
     
     void onDelStockBlockRequested(const QString& code);               // 股票块删除请求槽函数
@@ -66,7 +65,6 @@ private:
     void uiInit();                                      // 初始化 UI 组件
     int isStockCode(const QString& rawInput, QString& outNormalizedCode);  // 验证股票代码合法性
     int getIndexOfPortfolio(const QString& name);       // 获取组合索引
-    void updatePortfolioComboBox();                     // 更新组合下拉框显示
 
     void printAllPortfolioList();                       // 打印所有组合名称及其下的股票代码
     void printCurrentPortfolioStocks();                 // 打印当前组合名称及其下的股票列表

@@ -48,6 +48,7 @@ void HomePage::onPageEnter()
 {
     LOG_DEBUG("HomePage entered.");
 
+    onQuoteUpdateTimerTimeout(); // 立即请求一次
     if (!m_quoteUpdateTimer->isActive())
     {
         m_quoteUpdateTimer->start(1000); // 1秒更新一次
@@ -82,8 +83,6 @@ void HomePage::init()
     m_quoteProvider = new SinaQuoteProvider(this);
     connect(m_quoteProvider, &SinaQuoteProvider::quotesReady,
             this, &HomePage::onQuoteProviderUpdateQuotes);
-    connect(m_quoteProvider, &SinaQuoteProvider::quoteReady,
-            this, &HomePage::onQuoteProviderUpdateQuote);
     connect(m_quoteProvider, &SinaQuoteProvider::quoteError,
             this, &HomePage::onQuoteProviderError);
 
@@ -95,7 +94,12 @@ void HomePage::init()
     loadAllPortfoliosFromLocal();
 
     // 更新组合下拉框
-    updatePortfolioComboBox();
+    ui->portfolioComboBox->clear();
+    for (int i = 0; i < m_portfolioList.size(); ++i)
+    {
+        const StockPortfolio* portfolio = m_portfolioList[i];
+        ui->portfolioComboBox->addItem(portfolio->name());
+    }
 
     // 自动切换到第一个组合
     if (!m_portfolioList.isEmpty())
@@ -276,17 +280,6 @@ int HomePage::getIndexOfPortfolio(const QString& name)
     return -1;
 }
 
-// 更新组合下拉框显示
-void HomePage::updatePortfolioComboBox()
-{
-    ui->portfolioComboBox->clear();
-    for (int i = 0; i < m_portfolioList.size(); ++i)
-    {
-        const StockPortfolio* portfolio = m_portfolioList[i];
-        ui->portfolioComboBox->addItem(portfolio->name());
-    }
-}
-
 // 添加新股票按钮点击槽函数
 void HomePage::on_addNewStockBtn_clicked()
 {
@@ -376,7 +369,7 @@ void HomePage::on_addNewPortfolioBtn_clicked()
     m_portfolioList.append(newPortfolio);
 
     // 更新组合下拉框
-    updatePortfolioComboBox();
+    ui->portfolioComboBox->addItem(portfolioName);
 
     // 切换到新创建的组合
     int index = getIndexOfPortfolio(portfolioName);
@@ -434,7 +427,7 @@ void HomePage::on_delPortfolioBtn_clicked()
     delete toDelete;
 
     // 更新组合下拉框
-    updatePortfolioComboBox();
+    ui->portfolioComboBox->removeItem(index);
 
     // 切换当前组合
     if (!m_portfolioList.isEmpty())
@@ -696,15 +689,6 @@ void HomePage::onQuoteProviderUpdateQuotes(const QList<StockInfo> &infos)
 
     // 刷新显示
     refreshStockInfoDisplay();
-}
-
-// 接收单只股票行情槽函数
-void HomePage::onQuoteProviderUpdateQuote(const StockInfo &info)
-{
-    QList<StockInfo> infos;
-    infos.append(info);
-
-    onQuoteProviderUpdateQuotes(infos);
 }
 
 // 行情错误槽函数
