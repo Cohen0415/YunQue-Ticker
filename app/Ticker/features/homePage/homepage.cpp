@@ -201,6 +201,7 @@ void HomePage::uiInit()
 
     // 默认清空标题语
     ui->titleLabel->setText("已收盘");
+    ui->titleLabel->setVisible(false);
 
     // 默认开启显示网络错误提示
     ui->networkErrLabel->setVisible(true);
@@ -793,6 +794,16 @@ void HomePage::stopBreathAnimation(QWidget *target, QSequentialAnimationGroup *&
 // 刷新标题标签显示
 void HomePage::refreshTitleLabel()
 {
+    if (!m_currentPortfolio || m_currentPortfolio->stocks().isEmpty())
+    {
+        ui->titleLabel->setVisible(false);
+        return;
+    }
+    else
+    {
+        ui->titleLabel->setVisible(true);
+    }
+
     // 休市状态判断
     if (!m_isOpenMarket)
     {
