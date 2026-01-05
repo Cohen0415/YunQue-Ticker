@@ -18,6 +18,13 @@
 /* 组合名词长度上限 */
 #define PORTFOLIO_NAME_MAX_LEN          (7)     // 组合名称最大长度
 
+/* 今日是否是交易日 */
+enum isOpenStatus {
+    OPEN_STATUS_UNKNOWN = 0,    // 未知
+    OPEN_STATUS_OPEN,           // 开市
+    OPEN_STATUS_CLOSED          // 收盘
+};
+
 namespace Ui {
 class HomePage;
 }
@@ -103,7 +110,7 @@ private:
     QSequentialAnimationGroup *m_networkErrAnimation = nullptr;     // 网络错误提示的呼吸灯动画
 
     int uiInitFlag = 0;                                             // 初始化标志
-    bool m_isOpenMarket = false;                                    // 是否在交易日
+    int m_isOpenMarket = OPEN_STATUS_UNKNOWN;                       // 是否在交易日
 };
 
 #endif // HOMEPAGE_H

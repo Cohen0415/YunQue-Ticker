@@ -111,6 +111,9 @@ void HomePage::init()
     {
         m_currentPortfolio = nullptr;
     }
+
+    // 初始时，交易日状态未知
+    m_isOpenMarket = OPEN_STATUS_UNKNOWN;
 }
 
 bool HomePage::eventFilter(QObject *obj, QEvent *event)
@@ -638,11 +641,6 @@ void HomePage::onQuoteProviderUpdateQuotes(const QList<StockInfo> &infos)
 {
     if (!m_currentPortfolio)
         return; 
-    
-    // 获取当前系统时间
-    QTime currentTime = QTime::currentTime();
-    int hour = currentTime.hour();
-    int minute = currentTime.minute();
 
     // 更新当前组合内的股票数据
     StockInfo* stock = nullptr;
@@ -666,11 +664,13 @@ void HomePage::onQuoteProviderUpdateQuotes(const QList<StockInfo> &infos)
     QString currentDateStr = QDate::currentDate().toString("yyyy-MM-dd");
     if (stock && stock->marketDate == currentDateStr)
     {
-        m_isOpenMarket = true;
+        // LOG_DEBUG("Market is open today, date: %s", currentDateStr.toStdString().c_str());
+        m_isOpenMarket = OPEN_STATUS_OPEN;
     }
     else
     {
-        m_isOpenMarket = false;
+        // LOG_DEBUG("Market is closed today, date: %s", currentDateStr.toStdString().c_str());
+        m_isOpenMarket = OPEN_STATUS_CLOSED;
     }
 
     // 刷新显示
@@ -706,11 +706,15 @@ void HomePage::onQuoteUpdateTimerTimeout()
     bool inAfternoon = (currentTime >= afternoonStart) && (currentTime <= afternoonEnd);
     if (!inMorning && !inAfternoon) 
     {
+        m_isOpenMarket = OPEN_STATUS_UNKNOWN;
         return; // 不在有效时段，跳过
     }
 
     // 请求行情更新
-    emitFetchQuotesInCurPortfolio();
+    if (m_isOpenMarket != OPEN_STATUS_CLOSED)
+    {
+        emitFetchQuotesInCurPortfolio();
+    }
 }
 
 // 股票块删除请求槽函数
@@ -794,6 +798,7 @@ void HomePage::stopBreathAnimation(QWidget *target, QSequentialAnimationGroup *&
 // 刷新标题标签显示
 void HomePage::refreshTitleLabel()
 {
+    // 只在有组合和有股票时，显示 titleLabel
     if (!m_currentPortfolio || m_currentPortfolio->stocks().isEmpty())
     {
         ui->titleLabel->setVisible(false);
@@ -804,8 +809,8 @@ void HomePage::refreshTitleLabel()
         ui->titleLabel->setVisible(true);
     }
 
-    // 休市状态判断
-    if (!m_isOpenMarket)
+    // 非交易日状态判断
+    if (m_isOpenMarket != OPEN_STATUS_OPEN)
     {
         ui->titleLabel->setText("已收盘");
         ui->titleLabel->setStyleSheet("background-color: #808080; color: #ffffff; border-radius: 4px; padding: 4px 8px; font-size: 16px;");

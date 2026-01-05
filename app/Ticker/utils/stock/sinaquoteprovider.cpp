@@ -200,7 +200,7 @@ StockInfo SinaQuoteProvider::parseSinaLine(const QString &line, const QString &c
         info.isRise = PRICE_NORMAL;
 
     // 市场日期
-    QString dateStr = list[30];
+    info.marketDate = list[30];
 
     // 状态码判断股票状态
     QString statusCode = list[32];
