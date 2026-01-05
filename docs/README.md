@@ -1,5 +1,9 @@
 【注：本仓库仅存储该项目的 APP 部分】
 
+# 项目展示
+
+【T113】云雀桌面股票看台： https://www.bilibili.com/video/BV1xNv4BqE4C/?share_source=copy_web&vd_source=4dc01caec2e7f09f3626bf6454d39450
+
 # 项目基本信息
 * 项目名称：云雀桌面股票看台
 * 项目编号：20250112-YQ-TICKER-001
