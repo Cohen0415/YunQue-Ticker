@@ -214,6 +214,37 @@
     "temp": 45493
   }
 }
+
+### 获取系统镜像版本号（sysinfo.version.get）
+
+```json
+// 请求
+/* 
+  cmd：string；sysinfo.version.get；命令名称
+  params
+  | - NULL
+*/
+{
+  "cmd": "sysinfo.version.get",
+  "params": {}
+}
+
+// 响应
+/* 
+  cmd：string；返回请求时使用的命令
+  status：int；0 表示成功，其它表示失败
+  msg：string；提示信息
+  data
+  | - version：string；v1.0.0
+*/
+{
+  "cmd": "sysinfo.version.get",
+  "status": 0,
+  "msg": "ok",
+  "data": {
+    "version": "v1.0.0"
+  }
+}
 ```
 
 ## 模块：Audio（音频）

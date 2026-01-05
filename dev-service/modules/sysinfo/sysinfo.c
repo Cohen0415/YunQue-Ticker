@@ -39,6 +39,62 @@ static int sysinfo_get_cpu_temp(void)
     return temp;   // 示例返回 45493
 }
 
+static int sysinfo_get_version(char *buf, int buf_size)
+{
+    /*
+        cat /proc/cpuinfo
+
+        version : v1.0.0-dirty
+        processor       : 0
+        BogoMIPS        : 48.00
+        Features        : fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+        CPU implementer : 0x41
+        CPU architecture: 8
+        CPU variant     : 0x2
+        CPU part        : 0xd05
+        CPU revision    : 0
+
+    */
+
+    if (!buf || buf_size < 64)
+        return -1;
+
+    FILE *fp = fopen(VER_PATH, "r");
+    if (!fp)
+        return -1;
+
+    char line[128];
+    while (fgets(line, sizeof(line), fp))
+    {
+        if (strncmp(line, "version", 7) == 0)
+        {
+            // v1.0.0-dirty
+            // v1.0.0-asbcdf-dirty
+            // 只提取版本号 v1.0.0
+            char *colon = strchr(line, ':');
+            if (colon)
+            {
+                char *version_start = colon + 1;
+                while (*version_start == ' ' || *version_start == '\t')
+                    version_start++;
+                char *version_end = version_start;
+                while (*version_end != '\0' && *version_end != '-' && *version_end != '\n')
+                    version_end++;
+                int version_length = version_end - version_start;
+                if (version_length > 0 && version_length < buf_size)
+                {
+                    strncpy(buf, version_start, version_length);
+                    buf[version_length] = '\0';
+                    fclose(fp);
+                    return 0;
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
 static rpc_result_t rpc_sysinfo_get_bjtime(cJSON *params)
 {   
     // 请求
@@ -123,17 +179,62 @@ static rpc_result_t rpc_sysinfo_get_cpu_temp(cJSON *params)
     return res;
 }
 
+static rpc_result_t rpc_sysinfo_get_version(cJSON *params)
+{
+    // 请求
+    /* 
+        cmd：string；sysinfo.version.get；命令名称
+        params
+        | - NULL
+    */
+
+    // 响应
+    /* 
+        cmd：string；返回请求时使用的命令
+        status：int；0 表示成功，其它表示失败
+        msg：string；提示信息
+        data
+        | - version：string；v1.0.0
+    */
+
+    rpc_result_t res = { 
+        .status = -1, 
+        .msg = "get system version failed, inspect log for details", 
+        .data_json = NULL 
+    };
+
+    char version_buf[64];
+    if (sysinfo_get_version(version_buf, sizeof(version_buf)) != 0)
+    {
+        LOGE("Failed to get system version");
+        return res;
+    }
+
+    cJSON *data = cJSON_CreateObject();
+    cJSON_AddStringToObject(data, "version", version_buf);
+
+    res.status = 0;
+    res.msg = "ok";
+    res.data_json = cJSON_PrintUnformatted(data);
+
+    cJSON_Delete(data);
+    return res;
+}
+
 int sysinfo_cmd_register()
 {
     int ret;
 
-    command_t cmd_get_bjtime, cmd_get_cpu_temp;
+    command_t cmd_get_bjtime, cmd_get_cpu_temp, cmd_get_version;
 
     cmd_get_bjtime.name = CMD_GET_BJTIME;
     cmd_get_bjtime.handler = rpc_sysinfo_get_bjtime;
 
     cmd_get_cpu_temp.name = CMD_GET_CPU_TEMP;
     cmd_get_cpu_temp.handler = rpc_sysinfo_get_cpu_temp;
+
+    cmd_get_version.name = CMD_GET_VERSION;
+    cmd_get_version.handler = rpc_sysinfo_get_version;
 
     ret = command_register(&cmd_get_bjtime);
     if (ret != 0) 
@@ -146,6 +247,13 @@ int sysinfo_cmd_register()
     if (ret != 0)
     {
         LOGE("Failed to register %s\n", cmd_get_cpu_temp.name);
+        return -1;
+    }
+
+    ret = command_register(&cmd_get_version);
+    if (ret != 0)
+    {
+        LOGE("Failed to register %s\n", cmd_get_version.name);
         return -1;
     }
 
