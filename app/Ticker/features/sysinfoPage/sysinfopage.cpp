@@ -39,6 +39,9 @@ void SysinfoPage::init()
 
     // 更新 app 版本
     updateAppVersion();
+
+    // 更新系统版本
+    emit getSysVersionRequested();
 }
 
 // 页面进入回调
@@ -80,6 +83,20 @@ void SysinfoPage::onBjTimeGetResult(bool success, const QString &value)
 {
     // 例如："2025-12-05T09:26:25+08:00"
     emit PageMsgManager::getInstance()->bjTimeUpdated(value);
+}
+
+// 接收到 presenter 的系统版本获取结果
+void SysinfoPage::onSysVersionGetResult(bool success, const QString &value)
+{
+    // 例如："v1.0.0"
+    if (success)
+    {
+        ui->sysVerLabel->setText(m_infoSysVerPrefixStr + value);
+    }
+    else
+    {
+        ui->sysVerLabel->setText(m_infoSysVerPrefixStr + "获取失败");
+    }
 }
 
 // 系统信息刷新定时器超时槽函数

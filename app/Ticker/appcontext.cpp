@@ -92,6 +92,9 @@ int AppContext::init()
     // bj time get
     QObject::connect(&m_sysinfoPresenter, &SysinfoPresenter::getBjTimeRequested, &m_sysinfoService, &SysinfoService::onGetBeijingTime);
     QObject::connect(&m_sysinfoService, &SysinfoService::beijingTimeResult, &m_sysinfoPresenter, &SysinfoPresenter::handleBjTimeGetResult);
+    // sys version get
+    QObject::connect(&m_sysinfoPresenter, &SysinfoPresenter::getSysVersionRequested, &m_sysinfoService, &SysinfoService::onGetSystemVersion);
+    QObject::connect(&m_sysinfoService, &SysinfoService::systemVersionResult, &m_sysinfoPresenter, &SysinfoPresenter::handleSysVersionGetResult);
 
     return 0;
 }

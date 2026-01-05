@@ -32,12 +32,14 @@ signals:
     // 向 presenter 发送的信号
     void getCpuTempRequested();     // 获取 CPU 温度请求
     void getBjTimeRequested();      // 获取北京时间请求
+    void getSysVersionRequested();  // 获取系统版本请求
 
 public slots:
 
     // 接收 presenter 发送的结果
-    void onCpuTempGetResult(bool success, double value);        // CPU 温度获取结果
-    void onBjTimeGetResult(bool success, const QString &value); // 北京时间获取结果
+    void onCpuTempGetResult(bool success, double value);            // CPU 温度获取结果
+    void onBjTimeGetResult(bool success, const QString &value);     // 北京时间获取结果
+    void onSysVersionGetResult(bool success, const QString &value); // 系统版本获取结果
 
     // 系统信息刷新定时器超时槽函数
     void onSysInfoRefreshTimeout(); // 系统信息刷新超时槽函数

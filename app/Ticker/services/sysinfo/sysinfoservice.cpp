@@ -13,44 +13,13 @@ QStringList SysinfoService::registeredCommands() const
 {
     return QStringList()
            << "sysinfo.bjtime.get"
-           << "sysinfo.temp.get";
+           << "sysinfo.temp.get"
+           << "sysinfo.version.get";
 }
 
 QString SysinfoService::serviceName() const
 {
     return QStringLiteral("SysinfoService");
-}
-
-void SysinfoService::getCpuTemperature()
-{
-    /*
-        {
-            "cmd": "sysinfo.temp.get",
-            "params": {}
-        }
-    */
-
-    QJsonObject request;
-    request["cmd"] = QStringLiteral("sysinfo.temp.get");
-    request["params"] = QJsonObject(); // 空的 params 对象
-
-    sendMessage(QJsonDocument(request));
-}
-
-void SysinfoService::getBeijingTime()
-{
-    /*
-        {
-            "cmd": "sysinfo.bjtime.get",
-            "params": {}
-        }
-    */
-
-    QJsonObject request;
-    request["cmd"] = QStringLiteral("sysinfo.bjtime.get");
-    request["params"] = QJsonObject(); // 空的 params 对象
-
-    sendMessage(QJsonDocument(request));
 }
 
 void SysinfoService::onMessageReceived(const QJsonDocument& doc)
@@ -149,10 +118,98 @@ void SysinfoService::onMessageReceived(const QJsonDocument& doc)
         // 发射信号通知调用者结果
         emit beijingTimeResult(success, timeString);;
     } 
+    else if (command == "sysinfo.version.get")
+    {
+        /*
+            {
+                "cmd": "sysinfo.version.get",
+                "status": 0,
+                "msg": "ok",
+                "data": {
+                    "version": "v1.0.0"
+                }
+            }
+        */
+        QString versionString;
+        if (success && dataValue.isObject())
+        {
+            QJsonObject dataObj = dataValue.toObject();
+            QJsonValue valueInData = dataObj["version"];
+            if (valueInData.isString())
+            {
+                versionString = valueInData.toString();
+            }
+            else
+            {
+                LOG_WARN("'sysinfo.version.get' response 'data.version' is missing or not a string.");
+                success = false; // 即使 status=0, 数据不对也认为失败
+            }
+        }
+        else if (!success)
+        {
+            LOG_WARN("'sysinfo.version.get' failed on server. Status: %d Msg: %s", status, msg.toLocal8Bit().constData());
+        }
+        else
+        {
+            LOG_WARN("'sysinfo.version.get' response 'data' is missing or not an object.");
+            success = false;
+        }
+
+        // 这里可以发射一个信号通知调用者结果，假设有相应的信号定义
+        emit systemVersionResult(success, versionString);
+    }
     else 
     {
         LOG_WARN("Received unknown command response: %s", command.toLocal8Bit().constData());
     }
+}
+
+void SysinfoService::getCpuTemperature()
+{
+    /*
+        {
+            "cmd": "sysinfo.temp.get",
+            "params": {}
+        }
+    */
+
+    QJsonObject request;
+    request["cmd"] = QStringLiteral("sysinfo.temp.get");
+    request["params"] = QJsonObject(); // 空的 params 对象
+
+    sendMessage(QJsonDocument(request));
+}
+
+void SysinfoService::getBeijingTime()
+{
+    /*
+        {
+            "cmd": "sysinfo.bjtime.get",
+            "params": {}
+        }
+    */
+
+    QJsonObject request;
+    request["cmd"] = QStringLiteral("sysinfo.bjtime.get");
+    request["params"] = QJsonObject(); // 空的 params 对象
+
+    sendMessage(QJsonDocument(request));
+}
+
+void SysinfoService::getSystemVersion()
+{
+    /*
+        {
+            "cmd": "sysinfo.version.get",
+            "params": {}
+        }
+    */
+
+    QJsonObject request;
+    request["cmd"] = QStringLiteral("sysinfo.version.get");
+    request["params"] = QJsonObject(); // 空的 params 对象
+
+    sendMessage(QJsonDocument(request));
 }
 
 void SysinfoService::onGetCpuTemperature()
@@ -163,4 +220,9 @@ void SysinfoService::onGetCpuTemperature()
 void SysinfoService::onGetBeijingTime()
 {
     getBeijingTime();
+}
+
+void SysinfoService::onGetSystemVersion()
+{
+    getSystemVersion();
 }

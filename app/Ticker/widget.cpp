@@ -378,6 +378,10 @@ void Widget::connectSignalAndSlot()
     // bj time get
     connect(m_sysinfoPageWidget, &SysinfoPage::getBjTimeRequested, sysinfoPresenter, &SysinfoPresenter::onGetBjTimeRequested);
     connect(sysinfoPresenter, &SysinfoPresenter::bjTimeGetResult, m_sysinfoPageWidget, &SysinfoPage::onBjTimeGetResult);
+    // system version get
+    connect(m_sysinfoPageWidget, &SysinfoPage::getSysVersionRequested, sysinfoPresenter, &SysinfoPresenter::onGetSysVersionRequested);
+    connect(sysinfoPresenter, &SysinfoPresenter::sysVersionGetResult, m_sysinfoPageWidget, &SysinfoPage::onSysVersionGetResult);
+
 
     // 订阅 PageMsgManager 的信号槽连接
     PageMsgManager *pageMsgManager = PageMsgManager::getInstance();
