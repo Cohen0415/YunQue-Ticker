@@ -1,3 +1,5 @@
+include($$PWD/appOtaSubPage/appOtaSubPage.pri)
+
 FORMS += \
     $$PWD/sysinfopage.ui
 
