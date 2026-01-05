@@ -28,7 +28,7 @@ void SettingPage::init()
 void SettingPage::uiInit()
 {
     // 初始化背光滑动条的范围为 0～100
-    ui->backlightHarSlider->setMinimum(0);
+    ui->backlightHarSlider->setMinimum(1);
     ui->backlightHarSlider->setMaximum(100);
 
     // 初始化音量滑动条的范围为 0～100
