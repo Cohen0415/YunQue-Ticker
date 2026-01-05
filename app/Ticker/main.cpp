@@ -4,6 +4,7 @@
 #include <QFontDatabase>
 #include <QFont>
 #include <QtGlobal>
+#include <QFile>
 
 #include "widget.h"
 #include "utils/log/logger.h"
@@ -16,6 +17,20 @@ int main(int argc, char *argv[])
 
     // 打印版本号
     qDebug() << "App Version: " << APP_GIT_VERSION;
+
+    // 打印系统运行至今的时间，以此判断设备从上电到进入桌面花了多长时间
+    QFile file("/proc/uptime");
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QByteArray line = file.readLine();
+        QList<QByteArray> parts = line.split(' ');
+        if (parts.size() >= 1)
+        {
+            double uptimeSeconds = parts[0].toDouble();
+            LOG_DEBUG("System Uptime : %d s", uptimeSeconds);
+        }
+        file.close();
+    }
 
     // 1、安装自定义日志系统
     installCustomLogger();
