@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     Widget w;
 
     // 打印版本号
-    qDebug() << "App Version: " << APP_GIT_VERSION;
+    LOG_DEBUG("App Version: %s", APP_GIT_VERSION);
 
     // 打印系统运行至今的时间，以此判断设备从上电到进入桌面花了多长时间
     QFile file("/proc/uptime");
