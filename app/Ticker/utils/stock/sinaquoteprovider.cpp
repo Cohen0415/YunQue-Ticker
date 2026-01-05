@@ -181,24 +181,45 @@ StockInfo SinaQuoteProvider::parseSinaLine(const QString &line, const QString &c
     if (list.size() < 32)
         return info;
 
+    // 获取股票名称
     info.name = list[0];
-    info.currentPrice = list[3].toDouble();             // 当前价格
-    info.previousClose = list[2].toDouble();            // 昨日收盘价
+    // 昨日收盘价
+    info.previousClose = list[2].toDouble();            
 
-    double yestClose = list[2].toDouble();
-    double risePrice = info.currentPrice - yestClose;
-
-    // 这里 risePrice/risePct 直接保存为绝对值
-    info.risePrice = std::abs(risePrice);
-    if (yestClose > 0.00001)
-        info.risePct = std::abs(risePrice / yestClose) * 100.0;
-    if (risePrice > 0.00001)
-        info.isRise = PRICE_RISE;
-    else if (risePrice < -0.00001)
-        info.isRise = PRICE_FALL;
-    else
+    // 早盘集合竞价期间，全部设置为 0.00
+    QTime currentTime = QTime::currentTime();
+    int hour = currentTime.hour();
+    int minute = currentTime.minute();
+    if (hour == 9 && minute >= 15 && minute <= 24) 
+    {
+        info.currentPrice = 0.00;
+        info.risePrice = 0.00;
+        info.risePct = 0.00;
         info.isRise = PRICE_NORMAL;
+    }
+    else
+    {
+        // 获取当前价格
+        info.currentPrice = list[3].toDouble();             
 
+        // 计算涨跌价格
+        double yestClose = info.previousClose;
+        double risePrice = info.currentPrice - yestClose;
+
+        // 计算涨跌幅
+        info.risePrice = std::abs(risePrice);
+        if (yestClose > 0.00001)
+            info.risePct = std::abs(risePrice / yestClose) * 100.0;
+
+        // 涨跌标志位
+        if (risePrice > 0.00001)
+            info.isRise = PRICE_RISE;
+        else if (risePrice < -0.00001)
+            info.isRise = PRICE_FALL;
+        else
+            info.isRise = PRICE_NORMAL;
+    }
+    
     // 市场日期
     info.marketDate = list[30];
 
