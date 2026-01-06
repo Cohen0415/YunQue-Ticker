@@ -17,6 +17,7 @@
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
 #include <QMessageBox>
+#include <QSaveFile>
 
 static QString getAllPortfolioFilePath()
 {
@@ -541,13 +542,17 @@ void HomePage::printCurrentPortfolioStocks()
     }
 }
 
-// 保存所有组合到本地
+// 保存所有组合到本地（原子写）
 void HomePage::saveAllPortfoliosToLocal()
 {
     QJsonArray arr;
+
     for (int i = 0; i < m_portfolioList.size(); ++i)
     {
         StockPortfolio* portfolio = m_portfolioList[i];
+        if (!portfolio)
+            continue;
+
         QJsonObject obj;
         obj["name"] = portfolio->name();
 
@@ -561,20 +566,30 @@ void HomePage::saveAllPortfoliosToLocal()
             st["name"] = s.name;
             stockArray.append(st);
         }
+
         obj["stocks"] = stockArray;
         arr.append(obj);
     }
 
     QJsonDocument doc(arr);
     QString path = getAllPortfolioFilePath();
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
+
+    QSaveFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        LOG_DEBUG("Failed to open portfolio file: %s", path.toStdString().c_str());
         return;
+    }
 
     file.write(doc.toJson(QJsonDocument::Indented));
-    file.close();
 
-    LOG_DEBUG("All portfolios saved to local, path: %s", path.toStdString().c_str());
+    if (!file.commit())
+    {
+        LOG_DEBUG("Failed to commit portfolio file: %s", path.toStdString().c_str());
+        return;
+    }
+
+    LOG_DEBUG("All portfolios saved and synced, path: %s", path.toStdString().c_str());
 }
 
 // 从本地加载所有组合
