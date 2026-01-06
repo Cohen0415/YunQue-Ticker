@@ -283,7 +283,7 @@ void Widget::menuBarUIInit()
 // 北京时间 UI 初始化
 void Widget::bjTimeUIInit()
 {
-    ui->bjTimeLabel->setText("1219 - 13:53");
+    ui->bjTimeLabel->setText("xxxx - xx:xx");
 }
 
 // 状态栏 UI 初始化
