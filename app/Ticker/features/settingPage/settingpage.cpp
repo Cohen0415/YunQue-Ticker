@@ -3,7 +3,21 @@
 #include "utils/log/logger.h"
 #include "utils/qssload/qssloader.h"
 #include "features/pagemsgmanager.h"
+
 #include <QFile>
+#include <QStandardPaths>
+#include <QDir>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QSaveFile>
+
+static QString getSettingFilePath()
+{
+    QString baseDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(baseDir); // 确保路径存在
+    return baseDir + "/setting.json";
+}
 
 SettingPage::SettingPage(QWidget *parent)
     : QWidget(parent)
@@ -22,6 +36,22 @@ void SettingPage::init()
 {
     // 初始化 UI
     uiInit();
+
+    // 如果本地配置文件不存在，则使用默认值
+    QString path = getSettingFilePath();
+    QFile file(path);
+    if (!file.exists())
+    {
+        LOG_DEBUG("Setting file does not exist, using default settings.");
+        ui->backlightHarSlider->setValue(80); // 默认背光 80
+        ui->soundHarSlider->setValue(50);     // 默认音量 50
+        return;
+    }
+
+    // 从本地加载设置
+    loadSettingFromLocal();
+    emit setBacklightRequested(ui->backlightHarSlider->value());
+    emit setVolumeRequested(ui->soundHarSlider->value());
 }
 
 // UI 初始化
@@ -39,10 +69,6 @@ void SettingPage::uiInit()
     QString qss = QssLoader::load(":/res/qss/pageQss/settingPage.qss");
     if (!qss.isEmpty())
         this->setStyleSheet(qss);
-
-    // 通过发送信号初始化背光值和音量值
-    emit getBacklightRequested();
-    emit getVolumeRequested();
 }
 
 // 更新背光相关控件的 UI 显示
@@ -105,6 +131,9 @@ void SettingPage::onBacklightSetResult(bool success, int value)
     {
         // 更新背光相关控件的 UI 显示
         updateBacklightUI(value);
+
+        // 保存设置到本地
+        saveSettingToLocal();
     }
 }
 
@@ -115,6 +144,9 @@ void SettingPage::onBacklightGetResult(bool success, int value)
     {
         // 更新背光相关控件的 UI 显示
         updateBacklightUI(value);
+
+        // 保存设置到本地
+        saveSettingToLocal();
     }
 }
 
@@ -125,6 +157,9 @@ void SettingPage::onVolumeSetResult(bool success, int value)
     {
         // 更新音量相关控件的 UI 显示
         updateVolumeUI(value);
+
+        // 保存设置到本地
+        saveSettingToLocal();
     }
 }
 
@@ -135,6 +170,9 @@ void SettingPage::onVolumeGetResult(bool success, int value)
     {
         // 更新音量相关控件的 UI 显示
         updateVolumeUI(value);
+
+        // 保存设置到本地
+        saveSettingToLocal();
     }
 }
 
@@ -258,4 +296,63 @@ void SettingPage::onPageEnter()
 void SettingPage::onPageLeave()
 {
     LOG_DEBUG("SettingPage left.");
+}
+
+// 保存设置到本地
+void SettingPage::saveSettingToLocal()
+{
+    QJsonObject settingObj;
+    settingObj["backlight"] = ui->backlightHarSlider->value();
+    settingObj["volume"]   = ui->soundHarSlider->value();
+
+    QJsonDocument doc(settingObj);
+    QString path = getSettingFilePath();
+
+    QSaveFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        LOG_DEBUG("Failed to open setting file: %s", path.toStdString().c_str());
+        return;
+    }
+
+    file.write(doc.toJson(QJsonDocument::Indented));
+
+    if (!file.commit())   // 内部：fsync + rename（原子替换）
+    {
+        LOG_DEBUG("Failed to commit setting file: %s", path.toStdString().c_str());
+        return;
+    }
+
+    LOG_DEBUG("Settings saved and synced, path: %s", path.toStdString().c_str());
+}
+
+// 从本地加载设置
+void SettingPage::loadSettingFromLocal()
+{
+    QString path = getSettingFilePath();
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    QByteArray data = file.readAll();
+    file.close();
+
+    QJsonParseError err;
+    QJsonDocument doc = QJsonDocument::fromJson(data, &err);
+    if (err.error != QJsonParseError::NoError || !doc.isObject())
+        return;
+
+    QJsonObject settingObj = doc.object();
+    if (settingObj.contains("backlight") && settingObj["backlight"].isDouble())
+    {
+        int backlightValue = settingObj["backlight"].toInt();
+        updateBacklightUI(backlightValue);
+    }
+    if (settingObj.contains("volume") && settingObj["volume"].isDouble())
+    {
+        int volumeValue = settingObj["volume"].toInt();
+        updateVolumeUI(volumeValue);
+    }
+
+    LOG_DEBUG("Settings loaded from local, path: %s", path.toStdString().c_str());
 }
