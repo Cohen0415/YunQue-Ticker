@@ -28,6 +28,7 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
+    void init0();
     void init();
 
 protected:

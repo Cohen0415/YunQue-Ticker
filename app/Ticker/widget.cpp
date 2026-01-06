@@ -27,12 +27,16 @@ Widget::~Widget()
     delete ui;
 }
 
-// 初始化函数
-void Widget::init()
+// 只先初始化 UI，用于快速桌面显示
+void Widget::init0()
 {
     // 初始化 UI
     uiInit();
+}
 
+// 初始化函数
+void Widget::init()
+{
     // 初始化 stackedWidget 页面
     stackedWidgetPageInit();
 

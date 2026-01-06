@@ -15,6 +15,10 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     Widget w;
 
+    // 先初始化 UI，快速显示桌面
+    w.init0();
+    w.show();
+
     // 初始化 AppContext
 #if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86_64)
 
@@ -28,7 +32,6 @@ int main(int argc, char *argv[])
 
     // 初始化 Widget
     w.init();
-    w.show();
 
     // 打印版本号
     LOG_DEBUG("App Version: %s", APP_GIT_VERSION);
