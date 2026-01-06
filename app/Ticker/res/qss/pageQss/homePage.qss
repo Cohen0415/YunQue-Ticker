@@ -56,3 +56,15 @@
 #delPortfolioBtn:hover {
     background-color: #c32222;
 }
+
+/* 重命名组合按钮 */
+#renameBtn {
+    background-color: #ffa940;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+}       
+#renameBtn:hover {
+    background-color: #d48806;
+}

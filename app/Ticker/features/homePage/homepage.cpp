@@ -453,6 +453,60 @@ void HomePage::on_delPortfolioBtn_clicked()
     saveAllPortfoliosToLocal();
 }
 
+// 重命名组合按钮槽函数
+void HomePage::on_renameBtn_clicked()
+{
+    // 如果当前没有组合，直接返回
+    int index = ui->portfolioComboBox->currentIndex();
+    if (index < 0 || index >= m_portfolioList.size())
+    {
+        ui->inputErrHintLabel->setText("没有可重命名的组合！");
+        ui->inputErrHintLabel->setVisible(true);
+        return;
+    }
+
+    // 检查用户输入，最多不可超过 7 个字符
+    QString newName = ui->inputLineEdit->text().trimmed();
+    if (newName.isEmpty())
+    {
+        ui->inputErrHintLabel->setText("组合名不能为空！");
+        ui->inputErrHintLabel->setVisible(true);
+        return;
+    }
+    if (newName.length() > PORTFOLIO_NAME_MAX_LEN)
+    {
+        ui->inputErrHintLabel->setText("组合名不能超过7个字符！");
+        ui->inputErrHintLabel->setVisible(true);
+        return;
+    }
+
+    // 检查是否有已存在的组合
+    int size = m_portfolioList.size();
+    for (int i = 0; i < size; i++)
+    {
+        if (i != index && m_portfolioList[i]->name() == newName)
+        {
+            ui->inputErrHintLabel->setText("组合名已存在！");
+            ui->inputErrHintLabel->setVisible(true);
+            return;
+        }
+    }
+
+    // 重命名当前组合
+    StockPortfolio* currentPortfolio = m_portfolioList[index];
+    currentPortfolio->setName(newName);
+
+    // 更新组合下拉框显示
+    ui->portfolioComboBox->setItemText(index, newName);
+
+    // 清除输入框和错误提示
+    ui->inputLineEdit->setText("");
+    ui->inputErrHintLabel->setVisible(false);
+
+    // 保存所有组合到本地
+    saveAllPortfoliosToLocal();
+}
+
 // 打印所有组合名称及其下的股票代码
 void HomePage::printAllPortfolioList()
 {

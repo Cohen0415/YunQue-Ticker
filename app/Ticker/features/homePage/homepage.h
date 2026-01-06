@@ -58,7 +58,8 @@ private slots:
     void on_addNewPortfolioBtn_clicked();   // 添加组合按钮槽函数
     void on_portfolioComboBox_currentIndexChanged(int index);           // 组合下拉框索引变化槽函数
     void on_delPortfolioBtn_clicked();      // 删除组合按钮槽函数
-
+    void on_renameBtn_clicked();            // 重命名组合按钮槽函数
+    
     void onQuoteUpdateTimerTimeout();                                 // 行情定时请求更新槽函数
     void onQuoteProviderUpdateQuotes(const QList<StockInfo> &infos);  // 接收最新行情槽函数
     void onQuoteProviderError(const QString &stockCode, const QString &errReason); // 行情错误槽函数
