@@ -19,20 +19,6 @@ int main(int argc, char *argv[])
     w.init0();
     w.show();
 
-    // 初始化 AppContext
-#if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86_64)
-
-#else
-    if (AppContext::getInstance()->init() != 0)
-    {
-        LOG_ERROR("Failed to initialize application context.");
-        return -1;
-    }
-#endif
-
-    // 初始化 Widget
-    w.init();
-
     // 打印版本号
     LOG_DEBUG("App Version: %s", APP_GIT_VERSION);
 
@@ -51,6 +37,20 @@ int main(int argc, char *argv[])
     {
         LOG_DEBUG("Faild to load custom font.");
     }
+
+    // 初始化 AppContext
+#if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86_64)
+
+#else
+    if (AppContext::getInstance()->init() != 0)
+    {
+        LOG_ERROR("Failed to initialize application context.");
+        return -1;
+    }
+#endif
+
+    // 初始化 Widget
+    w.init();
 
     return app.exec();
 }
