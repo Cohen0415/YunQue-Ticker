@@ -144,7 +144,7 @@ static void wifi_parse_status(const char *status_reply)
     else 
     {
         g_connected_info.connected = WPA_WIFI_UNKNOWN;
-        LOGW("Unknown or unhandled wpa_state in STATUS reply: %s", status_reply);
+        // LOGW("Unknown or unhandled wpa_state in STATUS reply: %s", status_reply);
     }
 
     // 解析 ssid
@@ -257,7 +257,7 @@ static void wifi_update_status()
     if (wifi_send_cmd("STATUS", reply_buf, &reply_len) == 0) 
     {
         wifi_parse_status(reply_buf);
-        LOGD("Updated Wi-Fi Connection Status");
+        // LOGD("Updated Wi-Fi Connection Status");
     } 
     else 
     {
@@ -273,7 +273,7 @@ static void wifi_update_rssi()
     if (wifi_send_cmd("SIGNAL_POLL", reply_buf, &reply_len) == 0) 
     {
         wifi_parese_rssi(reply_buf);
-        LOGD("Updated Wi-Fi RSSI");
+        // LOGD("Updated Wi-Fi RSSI");
     } 
     else 
     {
@@ -283,7 +283,7 @@ static void wifi_update_rssi()
 
 static void wifi_handle_event(const char *event)
 {
-    LOGI("Received Wi-Fi Event: %s", event);
+    // LOGI("Received Wi-Fi Event: %s", event);
 
     // Wi-Fi 连接成功
     if (strstr(event, "CTRL-EVENT-CONNECTED") != NULL)  
@@ -329,7 +329,7 @@ static void wifi_handle_event(const char *event)
     // 其他 Wi-Fi 事件
     else 
     {
-        LOGD("Unhandled Wi-Fi Event: %s", event);
+        // LOGD("Unhandled Wi-Fi Event: %s", event);
     }
 
     // 更新连接状态

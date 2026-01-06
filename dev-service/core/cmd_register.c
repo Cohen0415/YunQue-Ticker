@@ -57,7 +57,7 @@ int command_register(command_t *cmd)
         return -1; // Return error if adding to linked list fails
     }
 
-    LOGI("Registered command: %s", new_cmd->name);
+    // LOGI("Registered command: %s", new_cmd->name);
 
     return 0; // Return 0 on success
 }
