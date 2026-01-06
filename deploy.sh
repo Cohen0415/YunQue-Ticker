@@ -2,7 +2,7 @@
 
 ################################
 BOARD_USER=root
-BOARD_IP=192.168.2.100
+BOARD_IP=192.168.2.102
 BOARD_BASE_DIR=/app
 
 SERVICE_REMOTE_DIR=/opt/Ticker/current/bin
