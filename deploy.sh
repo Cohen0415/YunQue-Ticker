@@ -5,14 +5,15 @@ BOARD_USER=root
 BOARD_IP=192.168.2.100
 BOARD_BASE_DIR=/app
 
-SERVICE_REMOTE_DIR=${BOARD_BASE_DIR}/
-CLIENT_REMOTE_DIR=${BOARD_BASE_DIR}/
-QT_REMOTE_DIR=/opt/Ticker/bin/
+SERVICE_REMOTE_DIR=/opt/Ticker/current/bin
+CLIENT_REMOTE_DIR=/opt/Ticker/current/bin
+QT_REMOTE_DIR=/opt/Ticker/current/bin
 ################################
 
 TOPDIR=$(pwd)
-SERVICE_DIR=${TOPDIR}/dev-service
-QT_DIR=${TOPDIR}/app
+SERVICE_BIN=${TOPDIR}/out/Ticker-service
+CLIENT_BIN=${TOPDIR}/out/Ticker-client-test
+QT_BIN=${TOPDIR}/out/Ticker-app
 
 PLATFORM=""
 DEPLOY_SERVICE=0
@@ -61,40 +62,37 @@ ping -c 1 ${BOARD_IP} >/dev/null 2>&1 || \
 
 # 部署 Service
 if [ ${DEPLOY_SERVICE} -eq 1 ]; then
-    SERVICE_BIN=${SERVICE_DIR}/dev-service 
 
     [ ! -f ${SERVICE_BIN} ] && \
         log_error "Service binary not found: ${SERVICE_BIN}"
 
     log_info "Deploying service..."
     scp ${SERVICE_BIN} \
-        ${BOARD_USER}@${BOARD_IP}:${SERVICE_REMOTE_DIR}/
+        ${BOARD_USER}@${BOARD_IP}:${SERVICE_REMOTE_DIR}
 fi
 
 
 # 部署 Client
 if [ ${DEPLOY_CLIENT} -eq 1 ]; then
-    CLIENT_BIN=${SERVICE_DIR}/client-${PLATFORM}
 
     [ ! -f ${CLIENT_BIN} ] && \
         log_error "Client binary not found: ${CLIENT_BIN}"
 
     log_info "Deploying client test..."
     scp ${CLIENT_BIN} \
-        ${BOARD_USER}@${BOARD_IP}:${CLIENT_REMOTE_DIR}/
+        ${BOARD_USER}@${BOARD_IP}:${CLIENT_REMOTE_DIR}
 fi
 
 
 # 部署 QT
 if [ ${DEPLOY_QT} -eq 1 ]; then
-    QT_BIN=${QT_DIR}/build-${PLATFORM}/Ticker
 
     [ ! -f ${QT_BIN} ] && \
         log_error "QT binary not found: ${QT_BIN}"
 
     log_info "Deploying QT app..."
     scp ${QT_BIN} \
-        ${BOARD_USER}@${BOARD_IP}:${QT_REMOTE_DIR}/
+        ${BOARD_USER}@${BOARD_IP}:${QT_REMOTE_DIR}
 fi
 
 log_info "Deploy finished successfully for ${PLATFORM}"
