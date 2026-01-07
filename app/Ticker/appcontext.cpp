@@ -1,4 +1,5 @@
 #include "appcontext.h"
+#include <QThread>
 
 AppContext* AppContext::m_instance = nullptr;
 
@@ -45,12 +46,20 @@ int AppContext::init()
         return -1;
     }
 
-    // 连接到服务器
-    ret = m_serviceManager.connectToServer();
-    if (ret == false)
+    // 循环连接服务器，直到连接成功
+    while (!m_serviceManager.isConnected())
     {
-        LOG_ERROR("Failed to connect Server");
-        return -1;
+        LOG_DEBUG("Attempting to connect to server...");
+        if (m_serviceManager.connectToServer())
+        {
+            LOG_INFO("Connected to server successfully.");
+            break;
+        }
+        else
+        {
+            LOG_WARN("Failed to connect to server. Retrying in 2 seconds...");
+            QThread::sleep(2);
+        }
     }
 
     // 添加各个服务到 ServiceManager
