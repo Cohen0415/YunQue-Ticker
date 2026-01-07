@@ -17,7 +17,8 @@ SysinfoPage::SysinfoPage(QWidget *parent)
     // 连接定时器信号槽
     connect(m_sysinfoRefreshTimer, &QTimer::timeout, this, &SysinfoPage::onSysInfoRefreshTimeout);
     connect(m_bjTimerRefreshTimer, &QTimer::timeout, this, &SysinfoPage::onBJTimeRefreshTimeout);
-    m_bjTimerRefreshTimer->start(BJTIME_REFRESH_INTERVAL_MS);
+    // 不再启动北京时间刷新定时器，由框架页自己使用 Qt 接口获取系统时间
+    // m_bjTimerRefreshTimer->start(BJTIME_REFRESH_INTERVAL_MS);
 }
 
 SysinfoPage::~SysinfoPage()

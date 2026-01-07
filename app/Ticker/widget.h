@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QPoint>
 #include <QScrollBar>
+#include <QTimer>
 
 #include "features/homePage/homepage.h"
 #include "features/settingPage/settingpage.h"
@@ -62,7 +63,7 @@ private slots:
 
     void onVolumeMuteStateChanged(bool isMuted);    // 音量静音状态改变
     void onWifiStatusChanged(bool connected);       // wifi 状态改变
-    void onBjTimeUpdated(const QString &bjTime);    // 北京时间更新
+    void onBjTimeUpdated();                         // 北京时间更新
 
 private:
 
@@ -85,6 +86,8 @@ private:
     bool m_isContentDragging = false;
 
     QWidget *m_lastPageWidget = nullptr;// 记录上一个页面指针
+
+    QTimer *bjTimeTimer;                // 北京时间刷新定时器
 
 };
 #endif // WIDGET_H

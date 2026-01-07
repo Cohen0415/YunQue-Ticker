@@ -18,8 +18,12 @@
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
+    , bjTimeTimer(new QTimer(this))
 {
     ui->setupUi(this);
+
+    connect(bjTimeTimer, &QTimer::timeout, this, &Widget::onBjTimeUpdated);
+    bjTimeTimer->start(1000); // 每秒更新一次北京时间
 }
 
 Widget::~Widget()
@@ -393,8 +397,6 @@ void Widget::connectSignalAndSlot()
     connect(pageMsgManager, &PageMsgManager::volumeMuteStateChanged, this, &Widget::onVolumeMuteStateChanged);
     // wifi 状态变化信号
     connect(pageMsgManager, &PageMsgManager::wifiStatusChanged, this, &Widget::onWifiStatusChanged);
-    // 北京时间更新信号
-    connect(pageMsgManager, &PageMsgManager::bjTimeUpdated, this, &Widget::onBjTimeUpdated);
 }
 
 void Widget::onHomePageButtonClicked()
@@ -448,16 +450,9 @@ void Widget::onWifiStatusChanged(bool connected)
 }
 
 // 收到北京时间更新
-void Widget::onBjTimeUpdated(const QString &bjTime)
+void Widget::onBjTimeUpdated()
 {
-    QDateTime dateTime = QDateTime::fromString(bjTime, Qt::ISODate);
-    if (dateTime.isValid())
-    {
-        // 指定北京时间时区
-        QTimeZone tz("Asia/Shanghai");
-        QDateTime localT = dateTime.toTimeZone(tz);
-        QString formattedTime = localT.toString("MMdd - HH:mm");
-
-        ui->bjTimeLabel->setText(formattedTime);
-    }
+    QDateTime bjTime = QDateTime::currentDateTimeUtc().toTimeZone(QTimeZone("Asia/Shanghai"));
+    QString bjTimeStr = bjTime.toString("MMdd - HH:mm");
+    ui->bjTimeLabel->setText(bjTimeStr);
 }
