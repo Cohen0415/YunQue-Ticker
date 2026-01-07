@@ -815,6 +815,8 @@ void HomePage::onWifiStatusChanged(bool isConnected)
         ui->networkErrLabel->setVisible(false);
         // 停止网络错误动画
         stopBreathAnimation(ui->networkErrLabel, m_networkErrAnimation);
+        // 立即请求一次行情
+        emitFetchQuotesInCurPortfolio();
     }
     else
     {
