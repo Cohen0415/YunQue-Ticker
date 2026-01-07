@@ -303,7 +303,8 @@ void SettingPage::saveSettingToLocal()
 {
     QJsonObject settingObj;
     settingObj["backlight"] = ui->backlightHarSlider->value();
-    settingObj["volume"]   = ui->soundHarSlider->value();
+    settingObj["volume"] = ui->soundHarSlider->value();
+    settingObj["volumeMuted"] = ui->soundCheckBox->isChecked();
 
     QJsonDocument doc(settingObj);
     QString path = getSettingFilePath();
@@ -352,6 +353,11 @@ void SettingPage::loadSettingFromLocal()
     {
         int volumeValue = settingObj["volume"].toInt();
         updateVolumeUI(volumeValue);
+    }
+    if (settingObj.contains("volumeMuted") && settingObj["volumeMuted"].isBool())
+    {
+        bool volumeMuted = settingObj["volumeMuted"].toBool();
+        ui->soundCheckBox->setChecked(volumeMuted);
     }
 
     LOG_DEBUG("Settings loaded from local, path: %s", path.toStdString().c_str());
