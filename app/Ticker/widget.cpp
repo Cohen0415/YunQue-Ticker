@@ -251,6 +251,15 @@ void Widget::menuBarUIInit()
     m_homePageBtn->setIconSize(QSize(64, 64));
     m_homePageBtn->setFixedSize(64, 64);
     m_homePageBtn->setFlat(true);    // 去掉按钮边框
+    m_homePageBtn->setStyleSheet(
+        "QPushButton {"
+        "    border: none;"             // 移除边框（可选）
+        "    background: transparent;"  // 背景透明
+        "}"
+        "QPushButton:pressed {"
+        "    background: transparent;"  // 按下时背景也透明
+        "}"
+    );
 
     // 添加 系统信息页面 按钮
     m_sysinfoPageBtn = new QPushButton(contentWidget);
@@ -258,6 +267,15 @@ void Widget::menuBarUIInit()
     m_sysinfoPageBtn->setIconSize(QSize(64, 64));
     m_sysinfoPageBtn->setFixedSize(64, 64);
     m_sysinfoPageBtn->setFlat(true);
+    m_sysinfoPageBtn->setStyleSheet(
+        "QPushButton {"
+        "    border: none;"             // 移除边框（可选）
+        "    background: transparent;"  // 背景透明
+        "}"
+        "QPushButton:pressed {"
+        "    background: transparent;"  // 按下时背景也透明
+        "}"
+    );
 
     // 添加 设置信息页面 按钮
     m_settingPageBtn = new QPushButton(contentWidget);
@@ -265,6 +283,15 @@ void Widget::menuBarUIInit()
     m_settingPageBtn->setIconSize(QSize(64, 64));
     m_settingPageBtn->setFixedSize(64, 64);
     m_settingPageBtn->setFlat(true);
+    m_settingPageBtn->setStyleSheet(
+        "QPushButton {"
+        "    border: none;"             // 移除边框（可选）
+        "    background: transparent;"  // 背景透明
+        "}"
+        "QPushButton:pressed {"
+        "    background: transparent;"  // 按下时背景也透明
+        "}"
+    );
 
     // 添加 wifi页面 按钮
     m_wifiPageBtn = new QPushButton(contentWidget);
@@ -272,6 +299,15 @@ void Widget::menuBarUIInit()
     m_wifiPageBtn->setIconSize(QSize(64, 64));
     m_wifiPageBtn->setFixedSize(64, 64);
     m_wifiPageBtn->setFlat(true);
+    m_wifiPageBtn->setStyleSheet(
+        "QPushButton {"
+        "    border: none;"             // 移除边框（可选）
+        "    background: transparent;"  // 背景透明
+        "}"
+        "QPushButton:pressed {"
+        "    background: transparent;"  // 按下时背景也透明
+        "}"
+    );
 
     // scrollWidget 添加按钮
     menuScrollWidgetLayout->addWidget(m_homePageBtn);
