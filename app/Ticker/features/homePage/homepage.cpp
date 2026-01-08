@@ -23,7 +23,7 @@ static QString getAllPortfolioFilePath()
 {
     QString baseDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QDir().mkpath(baseDir); // 确保路径存在
-    return baseDir + "/all_portfolios.json";
+    return baseDir + "/" + PORTFOLIO_SAVE_FILE_NAME;
 }
 
 HomePage::HomePage(QWidget *parent)

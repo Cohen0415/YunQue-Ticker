@@ -11,6 +11,8 @@
 #include "features/homePage/stockportfolio.h"
 #include "utils/stock/sinaquoteprovider.h"
 
+#define PORTFOLIO_SAVE_FILE_NAME       "all_portfolios.json"   // 组合保存文件名
+
 /* 股票代码错误 */
 #define STOCKCODE_ERR_LEN_INVALID       (-1)    // 股票代码长度无效
 #define STOCKCODE_ERR_ILLEGAL           (-2)    // 股票代码不合法

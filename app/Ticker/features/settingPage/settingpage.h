@@ -4,6 +4,15 @@
 #include <QWidget>
 #include "features/pagelifecycleaware.h"
 
+#define SETTING_INFO_CONFIG_FILE_NAME       "settinginfo.json"      // 设置项配置文件名
+
+#define BACKLIGHT_MIN_VALUE                 (1)                     // 背光最小值
+#define BACKLIGHT_MAX_VALUE                 (100)                   // 背光最大值
+#define BACKLIGHT_STEP_VALUE                (1)                     // 背光加减步进值
+#define VOLUME_MIN_VALUE                    (0)                     // 音量最小值
+#define VOLUME_MAX_VALUE                    (100)                   // 音量最大值
+#define VOLUME_STEP_VALUE                   (1)                     // 音量加减步进值
+
 namespace Ui {
 class SettingPage;
 }

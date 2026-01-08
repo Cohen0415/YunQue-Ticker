@@ -16,7 +16,7 @@ static QString getSettingFilePath()
 {
     QString baseDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QDir().mkpath(baseDir); // 确保路径存在
-    return baseDir + "/setting.json";
+    return baseDir + "/" + SETTING_INFO_CONFIG_FILE_NAME;
 }
 
 SettingPage::SettingPage(QWidget *parent)
@@ -58,12 +58,12 @@ void SettingPage::init()
 void SettingPage::uiInit()
 {
     // 初始化背光滑动条的范围为 0～100
-    ui->backlightHarSlider->setMinimum(1);
-    ui->backlightHarSlider->setMaximum(100);
+    ui->backlightHarSlider->setMinimum(BACKLIGHT_MIN_VALUE);
+    ui->backlightHarSlider->setMaximum(BACKLIGHT_MAX_VALUE);
 
     // 初始化音量滑动条的范围为 0～100
-    ui->soundHarSlider->setMinimum(0);
-    ui->soundHarSlider->setMaximum(100);
+    ui->soundHarSlider->setMinimum(VOLUME_MIN_VALUE);
+    ui->soundHarSlider->setMaximum(VOLUME_MAX_VALUE);
 
     // 加载样式表
     QString qss = QssLoader::load(":/res/qss/pageQss/settingPage.qss");
@@ -211,7 +211,7 @@ void SettingPage::on_backlightPreBtn_clicked()
     int currentValue = ui->backlightHarSlider->value();
     if (currentValue > ui->backlightHarSlider->minimum())
     {
-        currentValue--;
+        currentValue = currentValue - BACKLIGHT_STEP_VALUE;
         ui->backlightHarSlider->setValue(currentValue);
         ui->backlightValueLabel->setText(QString::number(currentValue));
 
@@ -227,7 +227,7 @@ void SettingPage::on_backlightNextBtn_clicked()
     int currentValue = ui->backlightHarSlider->value();
     if (currentValue < ui->backlightHarSlider->maximum())
     {
-        currentValue++;
+        currentValue = currentValue + BACKLIGHT_STEP_VALUE;
         ui->backlightHarSlider->setValue(currentValue);
         ui->backlightValueLabel->setText(QString::number(currentValue));
 
@@ -243,7 +243,7 @@ void SettingPage::on_soundPreBtn_clicked()
     int currentValue = ui->soundHarSlider->value();
     if (currentValue > ui->soundHarSlider->minimum())
     {
-        currentValue--;
+        currentValue = currentValue - VOLUME_STEP_VALUE;
         ui->soundHarSlider->setValue(currentValue);
         ui->soundValueLabel->setText(QString::number(currentValue));
 
@@ -259,7 +259,7 @@ void SettingPage::on_soundNextBtn_clicked()
     int currentValue = ui->soundHarSlider->value();
     if (currentValue < ui->soundHarSlider->maximum())
     {
-        currentValue++;
+        currentValue = currentValue + VOLUME_STEP_VALUE;
         ui->soundHarSlider->setValue(currentValue);
         ui->soundValueLabel->setText(QString::number(currentValue));
 
