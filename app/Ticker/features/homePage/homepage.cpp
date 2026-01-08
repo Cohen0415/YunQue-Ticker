@@ -18,6 +18,8 @@
 #include <QPropertyAnimation>
 #include <QMessageBox>
 #include <QSaveFile>
+#include <QScroller>
+#include <QAbstractItemView>
 
 static QString getAllPortfolioFilePath()
 {
@@ -215,6 +217,15 @@ void HomePage::uiInit()
     ui->portfolioComboBox->clear();
     ui->portfolioComboBox->setMaxVisibleItems(5);
     ui->portfolioComboBox->setStyleSheet("QComboBox{combobox-popup:0;}");
+    QAbstractItemView *view = ui->portfolioComboBox->view();
+    // 滚动条
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // 触摸滑动
+    view->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents, true);
+    // 惯性滑动
+    QScroller::grabGesture(view, QScroller::LeftMouseButtonGesture);
 
     // 按钮不显示聚焦框
     ui->addNewPortfolioBtn->setFocusPolicy(Qt::NoFocus);
