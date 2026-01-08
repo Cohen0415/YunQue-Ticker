@@ -20,6 +20,7 @@
 #include <QSaveFile>
 #include <QScroller>
 #include <QAbstractItemView>
+#include <QScroller>
 
 static QString getAllPortfolioFilePath()
 {
@@ -79,9 +80,6 @@ void HomePage::init()
     */
     uiInitFlag = 1;
 
-    // 安装滚动拖拽过滤器
-    installScrollDragFilters();
-
     // 初始化行情提供者
     m_quoteProvider = new SinaQuoteProvider(this);
     connect(m_quoteProvider, &SinaQuoteProvider::quotesReady,
@@ -117,83 +115,6 @@ void HomePage::init()
 
     // 初始时，交易日状态未知
     m_isOpenMarket = OPEN_STATUS_UNKNOWN;
-}
-
-bool HomePage::eventFilter(QObject *obj, QEvent *event)
-{
-    QWidget *relevantWidget = qobject_cast<QWidget*>(obj);
-    QWidget *contentWidget = ui->scrollArea->widget();
-
-    bool isRelevant = (relevantWidget &&
-                       (relevantWidget == contentWidget ||
-                        relevantWidget->isAncestorOf(contentWidget) ||
-                        contentWidget->isAncestorOf(relevantWidget)));
-
-    if (isRelevant && m_horizontalScrollBar)
-    {
-        if (event->type() == QEvent::MouseButtonPress)
-        {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-            if (mouseEvent->button() == Qt::LeftButton)
-            {
-                m_isHDragging = false;
-                m_isHContentDragging = false;
-                m_hDragStartPos = mouseEvent->globalPos();
-            }
-        }
-        else if (event->type() == QEvent::MouseMove)
-        {
-            if (!m_hDragStartPos.isNull())
-            {
-                QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-                QPoint currentPos = mouseEvent->globalPos();
-                int distance = std::abs(currentPos.x() - m_hDragStartPos.x());
-
-                // 横向判别阈值
-                if (!m_isHDragging && distance > m_hDragThreshold)
-                {
-                    m_isHDragging = true;
-                    m_isHContentDragging = true;
-                }
-
-                if (m_isHContentDragging)
-                {
-                    int deltaX = currentPos.x() - m_hDragStartPos.x();
-                    int newValue = m_horizontalScrollBar->value() - deltaX;
-                    m_horizontalScrollBar->setValue(newValue);
-                    // 更新起点，做“拖到哪跟到哪”的手感
-                    m_hDragStartPos = currentPos;
-                    return true;
-                }
-            }
-        }
-        else if (event->type() == QEvent::MouseButtonRelease)
-        {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-            if (mouseEvent->button() == Qt::LeftButton)
-            {
-                bool wasDragging = m_isHContentDragging;
-                m_isHDragging = false;
-                m_isHContentDragging = false;
-                m_hDragStartPos = QPoint();
-
-                if (wasDragging)
-                    return true;
-            }
-        }
-        else if (event->type() == QEvent::Leave)
-        {
-            if (!m_hDragStartPos.isNull())
-            {
-                m_isHDragging = false;
-                m_isHContentDragging = false;
-                m_hDragStartPos = QPoint();
-            }
-        }
-    }
-
-    // 其他方向或事件，走默认parent逻辑
-    return QWidget::eventFilter(obj, event);
 }
 
 // UI 初始化
@@ -244,6 +165,9 @@ void HomePage::uiInit()
     ui->scrollArea->setFrameShadow(QFrame::Plain);
     ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    // 触摸 / 惯性滚动
+    QScroller::grabGesture(ui->scrollArea->viewport(), QScroller::LeftMouseButtonGesture);
 
     // 加载样式表
     QString qss = QssLoader::load(":/res/qss/pageQss/homePage.qss");
@@ -693,26 +617,6 @@ void HomePage::updateStockBlocks()
         connect(block, &StockBlock::deleteRequested, this, &HomePage::onDelStockBlockRequested);
         block->setStockInfo(info);
         stockBlocksLayout->insertWidget(0, block); // 新的在左
-    }
-}
-
-// 安装滚动拖拽事件过滤器
-void HomePage::installScrollDragFilters()
-{
-    m_horizontalScrollBar = ui->scrollArea->horizontalScrollBar();
-    QWidget *contentWidget = ui->scrollArea->widget();
-
-    if (!contentWidget || !m_horizontalScrollBar)
-    {
-        LOG_WARN("ScrollArea or its content widget is null, cannot install drag filters.");
-        return;
-    }
-
-    contentWidget->installEventFilter(this);
-    QList<QPushButton*> buttons = contentWidget->findChildren<QPushButton*>();
-    for (QPushButton* button : qAsConst(buttons))
-    {
-        button->installEventFilter(this);
     }
 }
 
