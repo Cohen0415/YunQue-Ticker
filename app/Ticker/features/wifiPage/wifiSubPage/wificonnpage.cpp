@@ -53,6 +53,9 @@ void WifiConnPage::init()
     if (!wifiList.isEmpty())
     {
         // 加载第一个 Wi-Fi 信息到输入框
+        LOG_DEBUG("Load saved Wi-Fi config: SSID=%s, PWD=%s",
+                  wifiList.first().first.toStdString().c_str(),
+                  wifiList.first().second.toStdString().c_str());
         ui->ssidLineEdit->setText(wifiList.first().first);
         ui->pwdLineEdit->setText(wifiList.first().second);
     }
