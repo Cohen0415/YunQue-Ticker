@@ -4,13 +4,10 @@
 #include <QtGlobal>
 #include <QString>
 #include <QDebug>
+#include <cstdarg>
+#include <cstdio>
 
-// 强制开启日志上下文
-#ifndef QT_MESSAGELOGCONTEXT
-#define QT_MESSAGELOGCONTEXT
-#endif
-
-// 日志级别枚举 (从 0 开始)
+// 日志等级
 enum class LogLevel {
     DEBUG = 0,
     INFO  = 1,
@@ -18,35 +15,26 @@ enum class LogLevel {
     ERROR = 3
 };
 
-// 安装自定义消息处理器
+// 全局日志等级（默认 DEBUG）
+extern LogLevel g_logLevel;
+
+// 安装自定义 Qt 日志处理器
 void installCustomLogger();
 
-// 自定义消息处理函数 (内部使用)
-void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+// printf 风格日志函数
+void customLog(LogLevel level, const char* file, int line, const char* func, const char* fmt, ...);
 
-// 辅助函数 (内部使用)
-LogLevel qtMsgTypeToLogLevel(QtMsgType type);
-QString logLevelToString(LogLevel level);
+// 方便宏
+#define LOG_DEBUG(fmt, ...) \
+    do { if (LogLevel::DEBUG >= g_logLevel) customLog(LogLevel::DEBUG, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); } while(0)
 
-// 方便使用的宏定义
-#define LOG_DEBUG(...) \
-    do { \
-        qDebug(__VA_ARGS__); \
-    } while (0)
+#define LOG_INFO(fmt, ...) \
+    do { if (LogLevel::INFO >= g_logLevel) customLog(LogLevel::INFO, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); } while(0)
 
-#define LOG_INFO(...) \
-    do { \
-        qInfo(__VA_ARGS__); \
-    } while (0)
+#define LOG_WARN(fmt, ...) \
+    do { if (LogLevel::WARN >= g_logLevel) customLog(LogLevel::WARN, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); } while(0)
 
-#define LOG_WARN(...) \
-    do { \
-        qWarning(__VA_ARGS__); \
-    } while (0)
-
-#define LOG_ERROR(...) \
-    do { \
-        qCritical(__VA_ARGS__); \
-    } while (0)
+#define LOG_ERROR(fmt, ...) \
+    do { if (LogLevel::ERROR >= g_logLevel) customLog(LogLevel::ERROR, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); } while(0)
 
 #endif // LOGGER_H

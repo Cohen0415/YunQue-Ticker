@@ -21,6 +21,10 @@ int main(int argc, char *argv[])
 
     QTimer::singleShot(0, [&]() {
 
+        // 安装自定义日志系统
+        installCustomLogger();
+        g_logLevel = LogLevel::DEBUG;
+
         LOG_DEBUG("Starting application initialization...");
 
         // 初始化 AppContext
@@ -36,9 +40,6 @@ int main(int argc, char *argv[])
 
         // 初始化 Widget
         w.init();
-
-        // 安装自定义日志系统
-        installCustomLogger();
 
         // 设置字体
         int id = QFontDatabase::addApplicationFont(":/res/font/AlimamaShuHeiTi-Bold.ttf");
