@@ -46,6 +46,10 @@ public:
 
     void init();                            // 页面初始化，给 widget.cpp 调用
 
+protected:
+
+    bool eventFilter(QObject *obj, QEvent *event) override;             // 事件过滤器重载，用于实现滚动拖拽
+
 signals:
 
 public slots:
@@ -81,6 +85,8 @@ private:
     void refreshStockInfoDisplay();                     // 刷新当前组合下已有股票的信息显示
     void updateStockBlocks();                           // 更新当前组合下的股票块
 
+    void installScrollDragFilters();                    // 初始化滚动
+
     void startBreathAnimation(QWidget *target, QSequentialAnimationGroup *&holder);    // 启动呼吸灯动画
     void stopBreathAnimation(QWidget *target, QSequentialAnimationGroup *&holder);     // 停止呼吸灯动画
 
@@ -93,6 +99,12 @@ private:
 
     QList<StockPortfolio*> m_portfolioList;             // 所有组合
     StockPortfolio* m_currentPortfolio;                 // 当前选中
+
+    QScrollBar *m_horizontalScrollBar = nullptr;
+    bool m_isHDragging = false;
+    QPoint m_hDragStartPos;
+    bool m_isHContentDragging = false;
+    int m_hDragThreshold = 5;
 
     SinaQuoteProvider *m_quoteProvider;                             // 新浪行情提供者
     QTimer *m_quoteUpdateTimer;                                     // 定时更新行情 Timer
