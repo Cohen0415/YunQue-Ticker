@@ -135,6 +135,7 @@ void Widget::menuBarUIInit()
     m_homePageBtn->setIconSize(QSize(64, 64));
     m_homePageBtn->setFixedSize(64, 64);
     m_homePageBtn->setFlat(true);    // 去掉按钮边框
+    m_homePageBtn->setFocusPolicy(Qt::NoFocus);
     m_homePageBtn->setStyleSheet(
         "QPushButton {"
         "    border: none;"             // 移除边框（可选）
@@ -151,6 +152,7 @@ void Widget::menuBarUIInit()
     m_sysinfoPageBtn->setIconSize(QSize(64, 64));
     m_sysinfoPageBtn->setFixedSize(64, 64);
     m_sysinfoPageBtn->setFlat(true);
+    m_sysinfoPageBtn->setFocusPolicy(Qt::NoFocus);
     m_sysinfoPageBtn->setStyleSheet(
         "QPushButton {"
         "    border: none;"             // 移除边框（可选）
@@ -167,6 +169,7 @@ void Widget::menuBarUIInit()
     m_settingPageBtn->setIconSize(QSize(64, 64));
     m_settingPageBtn->setFixedSize(64, 64);
     m_settingPageBtn->setFlat(true);
+    m_settingPageBtn->setFocusPolicy(Qt::NoFocus);
     m_settingPageBtn->setStyleSheet(
         "QPushButton {"
         "    border: none;"             // 移除边框（可选）
@@ -183,6 +186,7 @@ void Widget::menuBarUIInit()
     m_wifiPageBtn->setIconSize(QSize(64, 64));
     m_wifiPageBtn->setFixedSize(64, 64);
     m_wifiPageBtn->setFlat(true);
+    m_wifiPageBtn->setFocusPolicy(Qt::NoFocus);
     m_wifiPageBtn->setStyleSheet(
         "QPushButton {"
         "    border: none;"             // 移除边框（可选）
