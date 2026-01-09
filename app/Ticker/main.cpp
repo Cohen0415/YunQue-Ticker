@@ -23,9 +23,10 @@ int main(int argc, char *argv[])
 
         // 安装自定义日志系统
         installCustomLogger();
-        g_logLevel = LogLevel::DEBUG;
+        g_logLevel = LogLevel::DEBUG; // 设置日志等级
 
-        LOG_DEBUG("Starting application initialization...");
+        LOG_INFO("App Version: %s", APP_GIT_VERSION);
+        LOG_INFO("Starting application initialization...");
 
         // 初始化 AppContext
 #if defined(Q_OS_LINUX) && defined(Q_PROCESSOR_X86_64)
@@ -40,6 +41,7 @@ int main(int argc, char *argv[])
 
         // 初始化 Widget
         w.init();
+        LOG_INFO("Widget initialized.");
 
         // 设置字体
         int id = QFontDatabase::addApplicationFont(":/res/font/AlimamaShuHeiTi-Bold.ttf");
@@ -51,11 +53,12 @@ int main(int argc, char *argv[])
         }
         else
         {
-            LOG_DEBUG("Faild to load custom font.");
+            LOG_WARN("Failed to load custom font.");
         }
+        LOG_INFO("Application font set.");
+
+        LOG_INFO("Application initialization completed.");
     });
 
-    // 打印版本号
-    LOG_DEBUG("App Version: %s", APP_GIT_VERSION);
     return app.exec();
 }

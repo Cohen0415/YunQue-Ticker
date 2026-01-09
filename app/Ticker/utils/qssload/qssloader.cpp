@@ -1,4 +1,6 @@
 #include "qssloader.h"
+#include "utils/log/logger.h"
+
 #include <QFile>
 #include <QTextStream>
 
@@ -17,5 +19,9 @@ QString QssLoader::load(const QString &path)
 
     QString style = in.readAll();
     file.close();
+
+    LOG_DEBUG("QSS loaded from %s, size: %d bytes",
+              path.toStdString().c_str(),
+              style.toUtf8().size());
     return style;
 }

@@ -42,7 +42,7 @@ void SettingPage::init()
     QFile file(path);
     if (!file.exists())
     {
-        LOG_DEBUG("Setting file does not exist, using default settings.");
+        LOG_WARN("Setting file does not exist, using default settings.");
         ui->backlightHarSlider->setValue(80); // 默认背光 80
         ui->soundHarSlider->setValue(50);     // 默认音量 50
         return;
@@ -312,7 +312,7 @@ void SettingPage::saveSettingToLocal()
     QSaveFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        LOG_DEBUG("Failed to open setting file: %s", path.toStdString().c_str());
+        LOG_WARN("Failed to open setting file: %s", path.toStdString().c_str());
         return;
     }
 
@@ -320,11 +320,11 @@ void SettingPage::saveSettingToLocal()
 
     if (!file.commit())   // 内部：fsync + rename（原子替换）
     {
-        LOG_DEBUG("Failed to commit setting file: %s", path.toStdString().c_str());
+        LOG_WARN("Failed to commit setting file: %s", path.toStdString().c_str());
         return;
     }
 
-    LOG_DEBUG("Settings saved and synced, path: %s", path.toStdString().c_str());
+    LOG_INFO("Settings saved and synced, path: %s", path.toStdString().c_str());
 }
 
 // 从本地加载设置
@@ -360,5 +360,5 @@ void SettingPage::loadSettingFromLocal()
         ui->soundCheckBox->setChecked(volumeMuted);
     }
 
-    LOG_DEBUG("Settings loaded from local, path: %s", path.toStdString().c_str());
+    LOG_INFO("Settings loaded from local, path: %s", path.toStdString().c_str());
 }

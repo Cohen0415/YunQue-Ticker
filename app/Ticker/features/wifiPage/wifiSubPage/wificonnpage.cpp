@@ -53,7 +53,7 @@ void WifiConnPage::init()
     if (!wifiList.isEmpty())
     {
         // 加载第一个 Wi-Fi 信息到输入框
-        LOG_DEBUG("Load saved Wi-Fi config: SSID=%s, PWD=%s",
+        LOG_INFO("Load saved Wi-Fi config: SSID=%s, PWD=%s",
                   wifiList.first().first.toStdString().c_str(),
                   wifiList.first().second.toStdString().c_str());
         ui->ssidLineEdit->setText(wifiList.first().first);
@@ -61,7 +61,7 @@ void WifiConnPage::init()
     }
     else
     {
-        LOG_DEBUG("No saved Wi-Fi config found.");
+        LOG_WARN("No saved Wi-Fi config found.");
     }
 
     // app 启动后，轮询获取当前的 wifi 连接状态
@@ -331,7 +331,7 @@ void WifiConnPage::saveWifiInfoToLocal(const QString &ssid, const QString &passw
     QSaveFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        LOG_DEBUG("Failed to open Wi-Fi config file: %s", path.toStdString().c_str());
+        LOG_WARN("Failed to open Wi-Fi config file: %s", path.toStdString().c_str());
         return;
     }
 
@@ -339,11 +339,11 @@ void WifiConnPage::saveWifiInfoToLocal(const QString &ssid, const QString &passw
 
     if (!file.commit())   // 内部：fsync + rename（原子替换）
     {
-        LOG_DEBUG("Failed to commit Wi-Fi config file: %s", path.toStdString().c_str());
+        LOG_WARN("Failed to commit Wi-Fi config file: %s", path.toStdString().c_str());
         return;
     }
 
-    LOG_DEBUG("Wi-Fi config saved and synced, path: %s", path.toStdString().c_str());
+    LOG_INFO("Wi-Fi config saved and synced, path: %s", path.toStdString().c_str());
 }
 
 // 从配置文件加载已保存的 Wi-Fi 凭据列表

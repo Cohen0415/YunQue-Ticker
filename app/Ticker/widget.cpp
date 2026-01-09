@@ -252,15 +252,19 @@ void Widget::pagesInit()
 {
     // homePage init
     m_homePageWidget->init();
+    LOG_INFO("HomePage initialized.");
 
     // settingPage init
     m_settingPageWidget->init();
+    LOG_INFO("SettingPage initialized.");
 
     // wifiPage init
     m_wifiPageWidget->init();
+    LOG_INFO("WifiPage initialized.");
 
     // sysinfoPage init
     m_sysinfoPageWidget->init();
+    LOG_INFO("SysinfoPage initialized.");
 }
 
 // 信号槽函数初始化

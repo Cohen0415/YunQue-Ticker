@@ -55,6 +55,7 @@ void HomePage::onPageEnter()
     onQuoteUpdateTimerTimeout(); // 立即请求一次
     if (!m_quoteUpdateTimer->isActive())
     {
+        LOG_DEBUG("start m_quoteUpdateTimer");
         m_quoteUpdateTimer->start(1000); // 1秒更新一次
     }
 }
@@ -65,6 +66,7 @@ void HomePage::onPageLeave()
     LOG_DEBUG("HomePage left.");
     if (m_quoteUpdateTimer->isActive())
     {
+        LOG_DEBUG("stop m_quoteUpdateTimer");
         m_quoteUpdateTimer->stop();
     }
 }
@@ -512,7 +514,7 @@ void HomePage::saveAllPortfoliosToLocal()
     QSaveFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        LOG_DEBUG("Failed to open portfolio file: %s", path.toStdString().c_str());
+        LOG_WARN("Failed to open portfolio file: %s", path.toStdString().c_str());
         return;
     }
 
@@ -520,11 +522,11 @@ void HomePage::saveAllPortfoliosToLocal()
 
     if (!file.commit())
     {
-        LOG_DEBUG("Failed to commit portfolio file: %s", path.toStdString().c_str());
+        LOG_WARN("Failed to commit portfolio file: %s", path.toStdString().c_str());
         return;
     }
 
-    LOG_DEBUG("All portfolios saved and synced, path: %s", path.toStdString().c_str());
+    LOG_INFO("All portfolios saved and synced, path: %s", path.toStdString().c_str());
 }
 
 // 从本地加载所有组合
@@ -569,7 +571,7 @@ void HomePage::loadAllPortfoliosFromLocal()
         m_portfolioList.append(port);
     }
 
-    LOG_DEBUG("All portfolios loaded from local, path: %s", path.toStdString().c_str());
+    LOG_INFO("All portfolios loaded from local, path: %s", path.toStdString().c_str());
     printAllPortfolioList();
 }
 

@@ -45,6 +45,7 @@ int AppContext::init()
         LOG_ERROR("Failed to initialize ServiceManager");
         return -1;
     }
+    LOG_INFO("ServiceManager initialized.");
 
     // 循环连接服务器，直到连接成功
     while (!m_serviceManager.isConnected())
@@ -67,6 +68,7 @@ int AppContext::init()
     m_serviceManager.addService(&m_audioService);
     m_serviceManager.addService(&m_sysinfoService);
     m_serviceManager.addService(&m_wifiService);
+    LOG_INFO("Services added to ServiceManager.");
 
     // presenters 和各个 services 的信号槽连接
     // settingPresenter
@@ -116,20 +118,3 @@ AppContext *AppContext::getInstance()
     }
     return m_instance;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
