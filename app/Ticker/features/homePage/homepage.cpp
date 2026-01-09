@@ -535,7 +535,10 @@ void HomePage::loadAllPortfoliosFromLocal()
     QString path = getAllPortfolioFilePath();
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        LOG_WARN("Failed to open portfolio file: %s", path.toStdString().c_str());
         return;
+    }
 
     QByteArray data = file.readAll();
     file.close();
@@ -543,7 +546,10 @@ void HomePage::loadAllPortfoliosFromLocal()
     QJsonParseError err;
     QJsonDocument doc = QJsonDocument::fromJson(data, &err);
     if (err.error != QJsonParseError::NoError || !doc.isArray())
+    {
+        LOG_WARN("Failed to parse portfolio file: %s", path.toStdString().c_str());
         return;
+    }
 
     QJsonArray arr = doc.array();
 
