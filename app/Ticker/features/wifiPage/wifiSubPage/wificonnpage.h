@@ -5,8 +5,13 @@
 #include <QTimer>
 #include "features/pagelifecycleaware.h"
 
-#define CHECK_WIFI_CONN_INTERVAL_MS    (1000)    // 检测连接状态间隔
-#define WIFI_CONN_TIMEOUT_MS           (15000)   // 连接超时
+#define CHECK_WIFI_CONN_INTERVAL_MS     (1000)      // 检测连接状态间隔
+#define WIFI_CONN_TIMEOUT_MS            (15000)     // 连接超时
+
+#define WIFI_SSID_MAX_LEN               (32)        // SSID 最大长度
+#define WIFI_PWD_MAX_LEN                (64)        // PWD 最大长度
+
+#define WIFI_INFO_CONFIG_FILE_NAME      "wifiinfo.json"    // Wi-Fi 信息配置文件名
 
 namespace Ui {
 class WifiConnPageWidget;
@@ -56,6 +61,9 @@ private:
 
     void uiInit();                              // UI 初始化
     bool inputLineInspect();                    // 用户输入框内容检测
+
+    void saveWifiInfoToLocal(const QString &ssid, const QString &password);     // 保存 Wi-Fi 凭据到配置文件
+    QList<QPair<QString, QString>> loadWifiInfoFromLocal();                     // 从配置文件加载已保存的 Wi-Fi 凭据列表
 
     Ui::WifiConnPageWidget *ui;
 

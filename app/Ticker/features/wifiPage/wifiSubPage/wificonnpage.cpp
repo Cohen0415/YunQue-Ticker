@@ -3,7 +3,21 @@
 #include "utils/log/logger.h"
 #include "utils/qssload/qssloader.h"
 #include "features/pagemsgmanager.h"
+
 #include <QFile>
+#include <QStandardPaths>
+#include <QDir>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QSaveFile>
+
+static QString getWifiInfoFilePath()
+{
+    QString baseDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(baseDir); // 确保路径存在
+    return baseDir + "/" + WIFI_INFO_CONFIG_FILE_NAME;
+}
 
 WifiConnPage::WifiConnPage(QWidget *parent)
     : QWidget(parent)
@@ -33,6 +47,19 @@ void WifiConnPage::init()
 
     // UI 初始化
     uiInit();
+
+    // 获取保存的 Wi-Fi 列表
+    QList<QPair<QString, QString>> wifiList = loadWifiInfoFromLocal();
+    if (!wifiList.isEmpty())
+    {
+        // 加载第一个 Wi-Fi 信息到输入框
+        ui->ssidLineEdit->setText(wifiList.first().first);
+        ui->pwdLineEdit->setText(wifiList.first().second);
+    }
+    else
+    {
+        LOG_DEBUG("No saved Wi-Fi config found.");
+    }
 
     // app 启动后，轮询获取当前的 wifi 连接状态
     m_initTimer->start(m_checkInterval);
@@ -70,8 +97,15 @@ void WifiConnPage::onGetWifiStatusResult(bool success, bool connected, QString &
         // 切换到sta页面
         emit switchToStaPageRequested();
 
+        // 保存 Wi-Fi 凭据到本地
+        saveWifiInfoToLocal(ssid, ui->pwdLineEdit->text());
+        
         // 复位提示语
         ui->inputHintLabel->setText("");
+
+        // 复位清除按钮的状态
+        ui->ssidClearButton->setEnabled(true);
+        ui->pwdClearButton->setEnabled(true);
 
         // 复位用户输入框
         ui->ssidLineEdit->setEnabled(true);
@@ -113,6 +147,10 @@ void WifiConnPage::on_connButton_clicked()
     ui->connButton->setEnabled(false);
     ui->connButton->setText("连 接 中...");
 
+    // 禁用输入框文本清除按钮
+    ui->ssidClearButton->setEnabled(false);
+    ui->pwdClearButton->setEnabled(false);
+
     // 禁用用户输入框
     ui->ssidLineEdit->setEnabled(false);
     ui->pwdLineEdit->setEnabled(false);
@@ -149,6 +187,8 @@ void WifiConnPage::uiInit()
     // 用户输入框默认为空
     ui->ssidLineEdit->setText("");
     ui->pwdLineEdit->setText("");
+    ui->ssidLineEdit->setMaxLength(WIFI_SSID_MAX_LEN);
+    ui->pwdLineEdit->setMaxLength(WIFI_PWD_MAX_LEN);
 
     // 提示语默认为空
     ui->inputHintLabel->setText("");
@@ -235,6 +275,10 @@ void WifiConnPage::onStatusTimerTimeout()
         // 复位用户输入框
         ui->ssidLineEdit->setEnabled(true);
         ui->pwdLineEdit->setEnabled(true);
+        
+        // 复位清除按钮的状态
+        ui->ssidClearButton->setEnabled(true);
+        ui->pwdClearButton->setEnabled(true);
 
         // 复位连接按钮
         ui->connButton->setEnabled(true);
@@ -258,4 +302,68 @@ void WifiConnPage::on_ssidClearButton_clicked()
 void WifiConnPage::on_pwdClearButton_clicked()
 {
     ui->pwdLineEdit->clear();
+}
+
+// 保存 Wi-Fi 凭据到配置文件
+void WifiConnPage::saveWifiInfoToLocal(const QString &ssid, const QString &password)
+{
+    // 先检查配置文件中是否保存过该 ssid 和密码组合，若已保存则不重复保存
+    QList<QPair<QString, QString>> wifiList = loadWifiInfoFromLocal();
+    for (const auto &pair : wifiList)
+    {
+        if (pair.first == ssid && pair.second == password)
+        {
+            LOG_DEBUG("Wi-Fi config already saved, ssid: %s", ssid.toStdString().c_str());
+            return;
+        }
+    }
+
+    QJsonObject wifiObj;
+    wifiObj["ssid"] = ssid;
+    wifiObj["password"] = password;
+
+    QJsonDocument doc(wifiObj);
+    QString path = getWifiInfoFilePath();
+
+    QSaveFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        LOG_DEBUG("Failed to open Wi-Fi config file: %s", path.toStdString().c_str());
+        return;
+    }
+
+    file.write(doc.toJson(QJsonDocument::Indented));
+
+    if (!file.commit())   // 内部：fsync + rename（原子替换）
+    {
+        LOG_DEBUG("Failed to commit Wi-Fi config file: %s", path.toStdString().c_str());
+        return;
+    }
+
+    LOG_DEBUG("Wi-Fi config saved and synced, path: %s", path.toStdString().c_str());
+}
+
+// 从配置文件加载已保存的 Wi-Fi 凭据列表
+QList<QPair<QString, QString>> WifiConnPage::loadWifiInfoFromLocal()
+{
+    QList<QPair<QString, QString>> wifiList;
+    QString path = getWifiInfoFilePath();
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return wifiList;
+
+    QByteArray data = file.readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (doc.isNull() || !doc.isObject())
+        return wifiList;
+
+    QJsonObject wifiObj = doc.object();
+    QString ssid = wifiObj.value("ssid").toString();
+    QString password = wifiObj.value("password").toString();
+    if (!ssid.isEmpty())
+    {
+        wifiList.append(qMakePair(ssid, password));
+    }   
+
+    return wifiList;
 }
