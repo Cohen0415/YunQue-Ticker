@@ -15,6 +15,17 @@
 // 全局日志等级定义
 LogLevel g_logLevel = LogLevel::DEBUG;
 
+static const char* logLevelToString(LogLevel level)
+{
+    switch (level) {
+    case LogLevel::DEBUG: return "DEBUG";
+    case LogLevel::INFO:  return "INFO ";
+    case LogLevel::WARN:  return "WARN ";
+    case LogLevel::ERROR: return "ERROR";
+    default:              return "UNKN ";
+    }
+}
+
 // 安装 Qt 自定义消息处理器
 void installCustomLogger()
 {
@@ -56,8 +67,13 @@ void customLog(LogLevel level, const char* file, int line, const char* func, con
     }
 
     QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    fprintf(stderr, "%s[%s] [%s:%d:%s] ",
-            color, timestamp.toLocal8Bit().data(), file, line, func);
+    fprintf(stderr, "%s[%s] [%s] [%s:%d:%s] ",
+            color,
+            timestamp.toLocal8Bit().data(),
+            logLevelToString(level),
+            file,
+            line,
+            func);
 
     vfprintf(stderr, fmt, args);
     fprintf(stderr, "%s\n", ANSI_COLOR_RESET);
