@@ -30,7 +30,7 @@ void WifiPage::onConnectWifiResult(bool success)
 // 接收 presenter 发送的 Wi-Fi 断开连接结果
 void WifiPage::onDisconnectWifiResult(bool success)
 {
-    // not todo
+    emit getWifiDisconnectResultToStaSubPage(success);
 }
 
 // 接收 presenter 发送的获取 Wi-Fi 状态结果
@@ -101,6 +101,7 @@ void WifiPage::subPageInit()
     connect(m_wifiStaPage, &WifiStaPage::disconnectWifiRequested, this, &WifiPage::onDisconnectRequestFromSubPage);
     connect(m_wifiStaPage, &WifiStaPage::getWifiStatusRequested, this, &WifiPage::onGetStatusRequestFromSubPage);
     connect(this, &WifiPage::getWifiStatusResultToStaSubPage, m_wifiStaPage, &WifiStaPage::onGetWifiStatusResult);
+    connect(this, &WifiPage::getWifiDisconnectResultToStaSubPage, m_wifiStaPage, &WifiStaPage::onGetWifiDisconnectResult);
     // 切换到 connPage 请求
     connect(m_wifiStaPage, &WifiStaPage::switchToConnPageRequested, this, &WifiPage::onSwitchToConnPageRequestFromStaSubPage);
     // 显示初始化

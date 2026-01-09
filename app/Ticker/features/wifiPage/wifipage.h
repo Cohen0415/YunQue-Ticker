@@ -36,6 +36,7 @@ signals:
     // 向子页面发送的结果信号
     void getWifiStatusResultToConnSubPage(bool success, bool connected, QString &ssid, QString &ip, QString &rssi); // 发送 wifi 状态给 conn 子页面
     void getWifiStatusResultToStaSubPage(bool success, bool connected, QString &ssid, QString &ip, QString &rssi);  // 发送 wifi 状态给 sta 子页面
+    void getWifiDisconnectResultToStaSubPage(bool success);    // 发送断开 wifi 结果给 sta 子页面
 
 public slots:
 

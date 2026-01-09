@@ -47,6 +47,7 @@ public slots:
 
     // 接收父页面发送的结果
     void onGetWifiStatusResult(bool success, bool connected, QString &ssid, QString &ip, QString &rssi);    // 接收父页面发送的获取 wifi 状态结果
+    void onGetWifiDisconnectResult(bool success);    // 接收父页面发送的断开 wifi 结果
 
     // 轮询定时器槽函数
     void onStatusTimerTimeout();            // 定时器槽函数

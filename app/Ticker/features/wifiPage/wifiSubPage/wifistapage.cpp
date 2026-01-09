@@ -33,9 +33,14 @@ void WifiStaPage::onPageEnter()
 {
     LOG_DEBUG("WifiStaPage entered.");
 
+    // 进入页面时，立即请求一次
+    emit getWifiStatusRequested();
     // 启动状态轮询定时器
     if (!m_statusTimer->isActive())
+    {
+        LOG_DEBUG("start m_statusTimer");
         m_statusTimer->start(REFRESH_WIFI_STA_MS);
+    }
 }
 
 // 页面离开回调
@@ -45,7 +50,10 @@ void WifiStaPage::onPageLeave()
 
     // 关闭状态轮询定时器
     if (m_statusTimer->isActive())
+    {
+        LOG_DEBUG("stop m_statusTimer");
         m_statusTimer->stop();
+    }
 }
 
 // 接收父页面发送的获取 wifi 状态结果
@@ -74,11 +82,15 @@ void WifiStaPage::onGetWifiStatusResult(bool success, bool connected, QString &s
         }
 
         // 如果是第一次启动，先停止轮询定时器
+        // 因为第一次初始化进入wifistapage时，会启动轮询定时器，但是用户并没有切换到wifistapage页面，所以先停止，避免一直轮询
         if (m_startFlag == 1)
         {
             if (m_statusTimer->isActive())
+            {
+                LOG_DEBUG("stop m_statusTimer first time");
                 m_statusTimer->stop();
-            m_startFlag == 0;
+            }
+            m_startFlag = 0;
         }
     }
     else if (success && !connected)
@@ -96,6 +108,15 @@ void WifiStaPage::onGetWifiStatusResult(bool success, bool connected, QString &s
         // 复位按钮
         ui->disconnButton->setText("断 开 连 接");
         ui->disconnButton->setEnabled(true);
+    }
+}
+
+// 接收父页面发送的断开 wifi 结果
+void WifiStaPage::onGetWifiDisconnectResult(bool success)
+{
+    if (success)
+    {
+        emit getWifiStatusRequested();
     }
 }
 
