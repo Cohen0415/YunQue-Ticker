@@ -31,13 +31,6 @@ void SysinfoPage::init()
 {
     uiInit();
 
-    // 请求获取 CPU 温度
-    emit getCpuTempRequested();
-    // 请求获取北京时间
-    emit getBjTimeRequested();
-    // 更新系统运行时间
-    updateSysRunTime();
-
     // 更新 app 版本
     updateAppVersion();
 
@@ -49,6 +42,12 @@ void SysinfoPage::init()
 void SysinfoPage::onPageEnter()
 {
     LOG_DEBUG("SysinfoPage entered.");
+    // 请求获取 CPU 温度
+    emit getCpuTempRequested();
+    // 请求获取北京时间
+    // emit getBjTimeRequested();
+    // 更新系统运行时间
+    updateSysRunTime();
     // 启动系统信息刷新定时器
     if (!m_sysinfoRefreshTimer->isActive())
         m_sysinfoRefreshTimer->start(SYSINFO_REFRESH_INTERVAL_MS);
