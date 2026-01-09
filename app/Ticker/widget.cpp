@@ -14,6 +14,7 @@
 #include <QLabel>
 #include <QDateTime>
 #include <QTimeZone>
+#include <QScroller>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -49,33 +50,6 @@ void Widget::init()
 
     // 在初始化信号后，再初始化 pages，因为 pages 初始化时可能会发送信号
     pagesInit();
-
-    // 安装滚动拖拽事件过滤器
-    installScrollDragFilters();
-}
-
-// 安装滚动拖拽事件过滤器
-void Widget::installScrollDragFilters()
-{
-    m_verticalScrollBar = ui->scrollArea->verticalScrollBar();
-    QWidget *contentWidget = ui->scrollArea->widget();
-
-    if (!contentWidget || !m_verticalScrollBar)
-    {
-        LOG_WARN("ScrollArea or its content widget is null, cannot install drag filters.");
-        return;
-    }
-
-    // 为核心内容部件安装事件过滤器
-    contentWidget->installEventFilter(this);
-
-    // 查找 contentWidget 下的所有 QPushButton 子控件
-    QList<QPushButton*> buttons = contentWidget->findChildren<QPushButton*>();
-    for (QPushButton* button : qAsConst(buttons))
-    {
-        // 为每一个按钮也安装相同的事件过滤器
-        button->installEventFilter(this);
-    }
 }
 
 // 加载样式表
@@ -118,96 +92,6 @@ void Widget::switchToPage(QWidget *target)
 
     // 更新last
     m_lastPageWidget = target;
-}
-
-// 事件过滤器重载，用于实现滚动拖拽
-bool Widget::eventFilter(QObject *obj, QEvent *event)
-{
-    // 确定事件相关的对象是否是我们关心的（scrollArea的内容部件或其子控件）
-    QWidget *relevantWidget = qobject_cast<QWidget*>(obj);
-    QWidget *contentWidget = ui->scrollArea->widget();
-
-    // 检查 obj 是否是 contentWidget 或其子级 (例如按钮)
-    bool isRelevant = (relevantWidget &&
-                       (relevantWidget == contentWidget ||
-                        relevantWidget->isAncestorOf(contentWidget) ||
-                        contentWidget->isAncestorOf(relevantWidget)));
-
-    if (isRelevant && m_verticalScrollBar)
-    {
-
-        if (event->type() == QEvent::MouseButtonPress)
-        {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-            if (mouseEvent->button() == Qt::LeftButton)
-            {
-                m_isDragging = false;           // 重置拖拽状态
-                m_isContentDragging = false;    // 重置内容拖拽状态
-                m_dragStartPos = mouseEvent->globalPos(); // 记录起始点
-            }
-        }
-        else if (event->type() == QEvent::MouseMove)
-        {
-            // 只要 m_dragStartPos 被设置（即开始了按压），就检查是否构成拖拽
-            if (!m_dragStartPos.isNull())
-            {
-                QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-                QPoint currentPos = mouseEvent->globalPos();
-                int distance = (currentPos - m_dragStartPos).manhattanLength();
-
-                // 如果尚未确定是拖拽，并且超过了阈值，则开始拖拽
-                if (!m_isDragging && distance > m_dragThreshold)
-                {
-                    m_isDragging = true;
-                    m_isContentDragging = true; // 标记为正在进行内容拖拽
-                }
-
-                // 如果确定是拖拽内容，则处理滚动
-                if (m_isContentDragging)
-                {
-                    int deltaY = currentPos.y() - m_dragStartPos.y();       // 使用起始点计算累积偏移
-                    int newValue = m_verticalScrollBar->value() - deltaY;   // 计算新值
-                    m_verticalScrollBar->setValue(newValue);                // 应用滚动
-                    return true;
-                }
-            }
-
-        }
-        else if (event->type() == QEvent::MouseButtonRelease)
-        {
-            QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
-            if (mouseEvent->button() == Qt::LeftButton)
-            {
-                bool wasContentDraggingTemp = m_isContentDragging;
-
-                // 重置所有拖拽相关状态
-                m_isDragging = false;
-                m_isContentDragging = false;
-                m_dragStartPos = QPoint();
-
-                // 如果发生了内容拖拽，消费 Release 事件，阻止按钮点击
-                if (wasContentDraggingTemp)
-                {
-                    return true;
-                }
-            }
-
-        }
-        else if (event->type() == QEvent::Leave)
-        {
-            // 如果鼠标离开了我们关心的区域，并且正处于潜在拖拽状态
-            if (!m_dragStartPos.isNull())
-            {
-                // 重置状态，但不一定消费事件
-                m_isDragging = false;
-                m_isContentDragging = false;
-                m_dragStartPos = QPoint();
-                QApplication::restoreOverrideCursor();
-            }
-        }
-    }
-
-    return QWidget::eventFilter(obj, event);
 }
 
 // UI 初始化
@@ -318,6 +202,9 @@ void Widget::menuBarUIInit()
     // 去除边框和阴影
     ui->scrollArea->setFrameShape(QFrame::NoFrame);
     ui->scrollArea->setFrameShadow(QFrame::Plain);
+
+    ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // 隐藏滚动条
+    QScroller::grabGesture(ui->scrollArea->viewport(), QScroller::LeftMouseButtonGesture);  // 触摸 / 惯性滚动
 }
 
 // 北京时间 UI 初始化
