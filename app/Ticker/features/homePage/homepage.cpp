@@ -698,7 +698,7 @@ void HomePage::onQuoteUpdateTimerTimeout()
     bool intradingDay = (currentTime >= tradingDayStart) && (currentTime <= tradingDayEnd);
     if (!intradingDay) // 不在有效时段
     {
-        LOG_DEBUG("Not in trading day");
+        LOG_DEBUG("Not in trading time, skip fetching quotes.");
         m_isOpenMarket = OPEN_STATUS_UNKNOWN;
         return;
     }
