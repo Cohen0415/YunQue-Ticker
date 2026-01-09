@@ -102,6 +102,8 @@ private:
 
     int uiInitFlag = 0;                                             // 初始化标志
     int m_isOpenMarket = OPEN_STATUS_UNKNOWN;                       // 是否在交易日
+
+    int m_wifiLastStatus = 0;                                       // 记录上一次的 wifi 状态，初始是未连接
 };
 
 #endif // HOMEPAGE_H

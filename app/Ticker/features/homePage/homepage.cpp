@@ -734,6 +734,15 @@ void HomePage::onDelStockBlockRequested(const QString &code)
 // WiFi 状态变化槽函数
 void HomePage::onWifiStatusChanged(bool isConnected)
 {
+    // 如果 wifi 状态变化了，才进行处理
+    if ((isConnected && m_wifiLastStatus == 1) ||
+        (!isConnected && m_wifiLastStatus == 0))
+    {
+        return;
+    }
+
+    m_wifiLastStatus = isConnected ? 1 : 0;
+
     if (isConnected)
     {
         ui->networkErrLabel->setVisible(false);
