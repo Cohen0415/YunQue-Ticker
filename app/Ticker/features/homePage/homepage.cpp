@@ -693,14 +693,12 @@ void HomePage::onQuoteUpdateTimerTimeout()
     */
     QTime currentTime = QTime::currentTime();
     // 定义有效时间段（包含端点）
-    QTime morningStart(9, 14);
-    QTime morningEnd(11, 31);   // 包含 11:31:00
-    QTime afternoonStart(12, 59);
-    QTime afternoonEnd(15, 1);  // 包含 15:01:00
-    bool inMorning = (currentTime >= morningStart) && (currentTime <= morningEnd);
-    bool inAfternoon = (currentTime >= afternoonStart) && (currentTime <= afternoonEnd);
-    if (!inMorning && !inAfternoon) // 不在有效时段
+    QTime tradingDayStart(9, 14);
+    QTime tradingDayEnd(15, 1);   
+    bool intradingDay = (currentTime >= tradingDayStart) && (currentTime <= tradingDayEnd);
+    if (!intradingDay) // 不在有效时段
     {
+        LOG_DEBUG("Not in trading day");
         m_isOpenMarket = OPEN_STATUS_UNKNOWN;
         return;
     }
@@ -708,6 +706,7 @@ void HomePage::onQuoteUpdateTimerTimeout()
     // 请求行情更新
     if (m_isOpenMarket != OPEN_STATUS_CLOSED)
     {
+        LOG_DEBUG("fetching quotes ...");
         emitFetchQuotesInCurPortfolio();
     }
 }
