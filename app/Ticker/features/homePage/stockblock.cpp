@@ -142,9 +142,11 @@ void StockBlock::updateUI()
     {
         ui->risePriceLabel->setText("--");
         ui->risePctLabel->setText("--");
+        ui->priceLabel->setStyleSheet("color: #707070;");
         ui->risePriceLabel->setStyleSheet("color: #707070;");
         ui->risePctLabel->setStyleSheet("color: #707070;");
         ui->susDelistLabel->setStyleSheet("color: #707070;");
+        ui->riseIconLabel->setPixmap(QPixmap(":/res/icon/pageIcon/homePage/grayCir.png"));
         ui->susDelistLabel->setVisible(true);
     }
     if (m_stockInfo.status == STATUS_SUSPEND)   // 停牌
