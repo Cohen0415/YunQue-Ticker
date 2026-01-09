@@ -114,14 +114,18 @@ void StockBlock::setStockInfo(const StockInfo &info)
     m_stockInfo = info;
     updateUI();
 
-    if (priceChanged)
-        breathOpacityOn(ui->priceLabel, m_priceOpacityEff);
-    if (riseChanged)
-        breathOpacityOn(ui->risePriceLabel, m_riseOpacityEff);
-    if (pctChanged)
-        breathOpacityOn(ui->risePctLabel, m_pctOpacityEff);
-    if (priceChanged || riseChanged || pctChanged)
-        breathOpacityOn(ui->riseIconLabel, m_iconOpacityEff);
+    if (priceChanged && riseChanged && pctChanged && m_stockInfo.isRise == PRICE_RISE)
+    {
+        flashColorOn(ui->priceLabel, QColor("#FF8FA3"), QColor("#E33C64"));
+        flashColorOn(ui->risePriceLabel, QColor("#FF8FA3"), QColor("#E33C64"));
+        flashColorOn(ui->risePctLabel, QColor("#FF8FA3"), QColor("#E33C64"));
+    }
+    else if (priceChanged && riseChanged && pctChanged && m_stockInfo.isRise == PRICE_FALL)
+    {
+        flashColorOn(ui->priceLabel, QColor("#9FF0C8"),QColor("#43CF7C"));
+        flashColorOn(ui->risePriceLabel, QColor("#9FF0C8"),QColor("#43CF7C"));
+        flashColorOn(ui->risePctLabel, QColor("#9FF0C8"),QColor("#43CF7C"));
+    }
 
     m_lastPrice = info.currentPrice;
     m_lastRise = info.risePrice;
@@ -200,32 +204,6 @@ void StockBlock::updateUI()
     }
 }
 
-// 呼吸灯效果
-void StockBlock::breathOpacityOn(QWidget *label, QGraphicsOpacityEffect*& eff)
-{
-    // 懒加载
-    if (!eff)
-    {
-        eff = new QGraphicsOpacityEffect(label);
-        label->setGraphicsEffect(eff);
-    }
-    eff->setOpacity(1.0);
-
-    QPropertyAnimation *anim = new QPropertyAnimation(eff, "opacity");
-    anim->setDuration(500);
-    anim->setEasingCurve(QEasingCurve::InOutQuad);
-    anim->setKeyValueAt(0.0, 1.0);
-    anim->setKeyValueAt(0.3, 0.2);  // 低透明
-    anim->setKeyValueAt(0.7, 0.2);  // 低透明
-    anim->setKeyValueAt(1.0, 1.0);
-    anim->start(QAbstractAnimation::DeleteWhenStopped);
-
-    // 动画结束后恢复原状
-    connect(anim, &QPropertyAnimation::finished, label, [eff]() {
-        eff->setOpacity(1.0);
-    });
-}
-
 // 删除按钮的缩放动画
 void StockBlock::showDeleteBtnWithAnim()
 {
@@ -277,4 +255,31 @@ void StockBlock::showDeleteBtnWithAnim()
     // 启动
     m_delOpacityAnim->start(QAbstractAnimation::DeleteWhenStopped);
     m_delScaleAnim->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+// 文字颜色闪烁效果
+void StockBlock::flashColorOn(QLabel *label, const QColor &flashColor, const QColor &normalColor, int durationMs)
+{
+    if (!label)
+        return;
+
+    // 使用 dynamic property 承载颜色
+    label->setProperty("animColor", normalColor);
+
+    auto *anim = new QPropertyAnimation(label, "animColor", label);
+    anim->setDuration(durationMs);
+    anim->setEasingCurve(QEasingCurve::InOutQuad);
+
+    anim->setKeyValueAt(0.0, normalColor);
+    anim->setKeyValueAt(0.3, flashColor);
+    anim->setKeyValueAt(1.0, normalColor);
+
+    // 颜色变化时更新样式
+    connect(anim, &QPropertyAnimation::valueChanged, this,
+            [label](const QVariant &value) {
+                QColor c = value.value<QColor>();
+                label->setStyleSheet(QString("color:%1;").arg(c.name()));
+            });
+
+    anim->start(QAbstractAnimation::DeleteWhenStopped);
 }

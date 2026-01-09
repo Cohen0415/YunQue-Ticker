@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
+#include <QLabel>
 
 #include "features/homePage/stockinfo.h"
 
@@ -45,8 +46,8 @@ private:
 
     void updateUI();                            // 渲染UI
     void ensureDeleteBtn();                     // 创建删除按钮
-    void breathOpacityOn(QWidget *label, QGraphicsOpacityEffect*& eff); // 呼吸灯效果
     void showDeleteBtnWithAnim();               // 删除按钮的缩放动画
+    void flashColorOn(QLabel *label, const QColor &flashColor, const QColor &normalColor, int durationMs = 400);    // 文字颜色闪烁效果
 
     Ui::StockBlock *ui;
     StockInfo m_stockInfo;
@@ -55,14 +56,10 @@ private:
     QPushButton *m_deleteBtn = nullptr;         // 删除按钮
 
     double m_lastPrice = 0, m_lastRise = 0, m_lastRisePct = 0;  // 上次的价格数据，用于判断是否变化
-    QGraphicsOpacityEffect *m_priceOpacityEff = nullptr;        // 价格呼吸灯效果
-    QGraphicsOpacityEffect *m_riseOpacityEff = nullptr;         // 涨跌呼吸灯效果
-    QGraphicsOpacityEffect *m_pctOpacityEff = nullptr;          // 涨跌幅呼吸灯效果
-    QGraphicsOpacityEffect *m_iconOpacityEff = nullptr;         // 涨跌图标呼吸灯效果
 
-    QGraphicsOpacityEffect *m_delOpacityEff = nullptr;
-    QPropertyAnimation *m_delOpacityAnim = nullptr;
-    QPropertyAnimation *m_delScaleAnim = nullptr;
+    QGraphicsOpacityEffect *m_delOpacityEff = nullptr;      // del 按钮透明度效果
+    QPropertyAnimation *m_delOpacityAnim = nullptr;         // del 按钮透明度动画
+    QPropertyAnimation *m_delScaleAnim = nullptr;           // del 按钮缩放动画
 };
 
 #endif // STOCKBLOCK_H
