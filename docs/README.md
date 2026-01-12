@@ -1,51 +1,205 @@
-【注：本仓库仅存储该项目的 APP 部分】
+# YunQue-Ticker
+
+YunQue-Ticker 是一款基于 Allwinner T113 + 嵌入式 Linux 的桌面型股票行情显示终端
+面向桌面场景的“常驻可见行情看台”
 
 # 项目展示
 
-【T113】云雀桌面股票看台： https://www.bilibili.com/video/BV1xNv4BqE4C/?share_source=copy_web&vd_source=4dc01caec2e7f09f3626bf6454d39450
+📺 演示视频（Bilibili）
+👉 https://www.bilibili.com/video/BV1xNv4BqE4C/
+<div align="center"><img src="docs/pic/logo.bmp" /></div>
 
-# 项目基本信息
-* 项目名称：云雀桌面股票看台
-* 项目编号：20250112-YQ-TICKER-001
-* 项目负责人：Cohen0415
-* 所属部门/团队：/
-* 立项日期：2025-11-26
-* 预计开始日期：2025-12-01
-* 预计结束日期：2025-02-01
-* 当前状态：进行中...
+# 项目简介
 
-# 项目背景
-随着个人投资和家庭理财需求的提升，用户对“随手可见的行情数据”需求逐渐增强。虽然手机 App 可以查看股票行情，但频繁解锁/打开 App 并不方便，尤其在办公或桌面场景下。
-为此，本项目计划基于全志 T113 平台 + 长条屏显示器，打造一个桌面型的“股票行情看台”（桌面电子摆件），让用户随时查看关注股票的实时行情、涨跌幅信息，兼具装饰与数据展示功能。
-该产品具有开发成本低、UI 灵活、可扩展性强等优势，适合作为创意产品、小型硬件产品或桌面外设推向市场。
+云雀桌面股票看台 是一款运行于嵌入式 Linux 平台的桌面级股票行情展示设备，
+通过长条屏常驻显示用户关注的股票价格、涨跌幅等核心信息，
+避免频繁解锁手机、打开 App 的操作成本，适用于办公桌、家庭桌面等场景。
 
-<div align="center">
-  <img src="docs/pic/logo.bmp" />
-</div>
+# 项目整体架构
 
-# 项目范围
-1. 本项目包含的工作
-* 基于 T113 的硬件设计
-* 系统层软件开发（外设驱动适配、Buildroot系统适配）
-* 应用层软件开发（C服务端程序、UI原型图设计、Qt前端程序）
-* 防抄板、快速启动
-* 系统镜像与 APP 的远程 OTA
-* 产品外观结构设计
-* 基础功能测试、老化测试、性能调优
-2. 本项目不包含的工作
-* 手机 App 开发
-* 高精度行情（如 Level-2）
-* 大规模商业量产成本优化
+本项目从工程角度分为三个层级：
 
-# 技术方案
-1. 平台与系统
-* 芯片：Allwinner T113
+```text
+┌──────────────┐
+│   应用层     │  Qt 股票行情 App（本仓库）
+├──────────────┤
+│   系统层     │  Buildroot 系统适配及外设驱动适配
+├──────────────┤
+│   硬件层     │  T113 硬件设计
+└──────────────┘
+```
+
+# 本仓库说明（重要）
+
+⚠️ 请务必阅读
+> 1、本仓库仅包含《云雀桌面股票看台》的应用层（APP）代码。
+>
+> 2、不包含 T113 Tina5 SDK。
+>
+> 3、完整的硬件设计可参考 [Bilibili 小智学长桌面智慧屏项目视频教程](https://www.bilibili.com/cheese/play/ep1811686?csource=Hp_searchresult&spm_id_from=333.337.0.0) 或 [小智学长硬件设计文档](https://x509p6c8to.feishu.cn/docx/A5xfd2VVeokJrkxf8M9cvJWCnXT)
+
+# 技术栈
+
+平台与系统
+
+* 芯片平台：Allwinner T113
+
 * 系统：Buildroot
-2. UI
-* Qt 5.15.2
 
-# 项目框架图
+应用层
 
-<div align="center">
-    <img src="docs/pic/frame-V020.png">
-</div>
+* GUI：Qt 5.15.9（Qt Widgets）
+
+* 行情接口：[新浪财经](https://www.sinacloud.com/doc/api.html)
+
+# YunQue-Ticker APP 项目框架图
+
+<div align="center"> <img src="docs/pic/frame-V020.png"> </div>
+
+APP 大致可以分为服务器和 Qt UI 客户端两部分。服务器提供基础的硬件访问能力，Qt 注重 UI 的搭建。
+
+# 系统镜像下载
+todo
+
+# 目录结构说明
+
+## 主目录
+
+```shell
+.
+├── app/            # Qt 应用源码（股票看台主程序，UI 与业务逻辑）
+│
+├── dev-service/    # 后端服务程序（提供基本的硬件操作接口）
+│
+├── build.sh        # 一键编译脚本
+│                   # - 交叉编译 Qt APP
+│                   # - 编译后端服务程序
+│
+├── deploy.sh       # 部署脚本
+│                   # - 将可执行文件推送至 T113 板卡
+│
+├── toolchain/      # 交叉编译工具链
+│
+├── out/            # 可执行文件的编译输出目录
+│
+├── ota/            # OTA / 应用更新相关文件（预留或实验性功能）
+│
+├── docs/           # 项目文档
+│                   # - 项目介绍
+│                   # - 版本迭代
+│                   # - 接口文档
+│                   # - 展示图片 / 演示素材
+│
+├── README.md       # 仓库入口说明（软链接至 docs/README.md）
+│   -> docs/README.md
+│
+└── .gitignore
+```
+
+## app 目录（Qt 应用源码）
+
+```shell
+app/Ticker
+├── main.cpp            # 程序入口
+│
+├── appcontext.h/.cpp   # 应用全局上下文
+│                       # - 连接服务器
+│                       # - 建立服务器与 Presenters 的连接
+│
+├── widget.h/.cpp/.ui   # 主窗口，框架页的实现
+│                       # - 菜单栏、状态栏
+│                       # - 页面切换
+│
+├── core/               # 核心基础模块
+│   └── network         # Unix Domain Socket（UDS）
+│
+├── features            # 功能模块（具体页面的实现）
+│   ├── homePage              # 主页面，也即是股票行情页
+│   ├── pagelifecycleaware.h  # 页面生命周期
+│   ├── pagemsgmanager.cpp    # 页面间通信管理
+│   ├── pagemsgmanager.h
+│   ├── settingPage           # 设置页实现
+│   ├── sysinfoPage           # 系统信息页实现
+│   └── wifiPage              # Wi-Fi 配置页实现
+│
+├── services/           # 服务层抽象接口
+│                       # - 与 dev-service 的接口封装
+│
+├── utils/              # 通用工具
+│   ├── confirmDialog   # 确认弹窗
+│   ├── log             # 日志系统
+│   ├── qssload         # qss 加载
+│   └── stock           # 股票行情获取
+│
+├── res/                # 资源文件
+│                       # - 图标
+│                       # - 图片
+│                       # - 字体
+│
+├── res.qrc             # Qt 资源文件索引
+│
+└── Ticker.pro          # Qt 工程文件
+```
+
+## dev-service 目录
+```shell
+├── main.c              # 服务器入口程序
+├── core                # 服务器核心
+│                       # - 命令注册
+├── include             # 公共头文件
+├── Makefile            # 
+├── modules             # 接口模块
+│   ├── audio           # 音频接口
+│   ├── backlight       # 背光接口
+│   ├── sysinfo         # 系统信息接口
+│   └── wifi            # Wi-Fi 接口
+├── third_party         # 第 3 方库
+│                       # - cJSON、wpa_ctrl
+└── utils               # 插件
+│                       # - 链表、日志系统、队列
+├── test                # 客户端测试程序，用于测试服务器接口是否可以正常接收/返回数据
+├── build               # 编译输出目录
+```
+
+# 编译与运行
+
+## 编译
+
+```shell
+# build.sh 脚本使用
+# Usage: ./build.sh [platform] [options]
+#   Platforms:
+#     -t113          Build for t113 platform
+#     -linux         Build for Linux platform
+#   Options:
+#     -service       Build only the service
+#     -client        Build only the client test
+#     -qt            Build only the QT client
+#     -all           Build service, client test, and QT client (default)
+#     -clean         Clean build outputs for the specified platform
+#     -h, --help     Show this help message
+
+# 编译 T113 平台的服务端程序
+./build.sh -t113 -service
+# 编译 T113 平台的用于测试服务端程序的客户端测试程序
+./build.sh -t113 -client
+# 编译 T113 平台的 Qt 程序
+./build.sh -t113 -qt
+# 编译全部
+./build.sh -t113 all
+
+# 编译后的可执行程序在
+YunQue-Ticker/out
+├── Ticker-app          # Qt 程序
+└── Ticker-service      # 服务器
+└── Ticker-client-test  # 服务器测试
+```
+
+# 运行
+
+todo
+
+# 联系方式
+* vx：Cohen0415
+* qq：1033878279
+* 欢迎交流与 Issue 讨论
