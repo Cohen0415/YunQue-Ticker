@@ -28,15 +28,15 @@ YunQue-Ticker 是一款基于 Allwinner T113 + 嵌入式 Linux 的桌面型股�
 │   硬件层     │  T113 硬件设计
 └──────────────┘
 ```
+<div align="center"> <img src="docs/pic/frame-V020.png"> </div>
+
 
 # 本仓库说明（重要）
 
 ⚠️ 请务必阅读
-> 1、本仓库仅包含《云雀桌面股票看台》的应用层（APP）代码。
+> 1、本仓库仅包含《云雀桌面股票看台》的应用层（APP）代码；不包含 T113 Tina5 SDK。
 >
-> 2、不包含 T113 Tina5 SDK。
->
-> 3、完整的硬件设计可参考 [Bilibili 小智学长桌面智慧屏项目视频教程](https://www.bilibili.com/cheese/play/ep1811686?csource=Hp_searchresult&spm_id_from=333.337.0.0) 或 [小智学长硬件设计文档](https://x509p6c8to.feishu.cn/docx/A5xfd2VVeokJrkxf8M9cvJWCnXT)
+> 2、完整的硬件设计可参考 [Bilibili 小智学长桌面智慧屏项目视频教程](https://www.bilibili.com/cheese/play/ep1811686?csource=Hp_searchresult&spm_id_from=333.337.0.0) 或 [小智学长硬件设计文档](https://x509p6c8to.feishu.cn/docx/A5xfd2VVeokJrkxf8M9cvJWCnXT)
 
 # 技术栈
 
@@ -51,15 +51,6 @@ YunQue-Ticker 是一款基于 Allwinner T113 + 嵌入式 Linux 的桌面型股�
 * GUI：Qt 5.15.9（Qt Widgets）
 
 * 行情接口：[新浪财经](https://www.sinacloud.com/doc/api.html)
-
-# YunQue-Ticker APP 项目框架图
-
-<div align="center"> <img src="docs/pic/frame-V020.png"> </div>
-
-APP 大致可以分为服务器和 Qt UI 客户端两部分。服务器提供基础的硬件访问能力，Qt 注重 UI 的搭建。
-
-# 系统镜像下载
-todo
 
 # 目录结构说明
 
@@ -82,7 +73,7 @@ todo
 │
 ├── out/            # 可执行文件的编译输出目录
 │
-├── ota/            # OTA / 应用更新相关文件（预留或实验性功能）
+├── ota/            # OTA（预留）
 │
 ├── docs/           # 项目文档
 │                   # - 项目介绍
@@ -90,6 +81,8 @@ todo
 │                   # - 接口文档
 │                   # - 展示图片 / 演示素材
 │
+├── firmware/       # 提供可烧录的固件
+|
 ├── README.md       # 仓库入口说明（软链接至 docs/README.md）
 │   -> docs/README.md
 │
@@ -161,7 +154,13 @@ app/Ticker
 ├── build               # 编译输出目录
 ```
 
-# 编译与运行
+# 系统固件下载
+
+系统固件存放在 firmware 目录下，烧录后可直接正常使用。
+
+下面介绍如何单独编译 APP 并替换。
+
+# APP 编译与运行
 
 ## 编译
 
@@ -196,8 +195,18 @@ YunQue-Ticker/out
 ```
 
 # 运行
+```shell
+# 将编译出的 Ticker-app、Ticker-service 拷贝至板卡：
+root@YunQue: ls /opt/Ticker/current/bin
+Ticker-app      Ticker-service
 
-todo
+# 重启或者执行 APP 启动脚本：
+sh /etc/app-launcher.sh
+```
+
+# 后续
+
+目前还会持续优化...
 
 # 联系方式
 * vx：Cohen0415
