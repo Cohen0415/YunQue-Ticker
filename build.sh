@@ -27,6 +27,7 @@ BUILD_SERVICE=0
 BUILD_CLIENT=0
 BUILD_QT=0
 DO_CLEAN=0
+PACK_APP=0
 
 log_info() 
 {
@@ -148,6 +149,47 @@ build_client()
     log_info " =========================== Client Test built successfully for ${PLATFORM} ==========================="
 }
 
+build_pack()
+{
+    log_info " =========================== Packing Application... ==========================="
+
+    cd ${OUTDIR}
+
+    # 如果存在旧的源码目录，先删除
+    if ls app_* 1> /dev/null 2>&1; then
+        rm -rf app_*
+    fi
+
+    # 如果存在旧的打包文件，先删除
+    if ls app-*.tar 1> /dev/null 2>&1; then
+        rm -f app-*.tar
+    fi
+
+    # 获取当前的 Git 最新的 TAG 作为版本号
+    VERSION=$(git describe --tags --abbrev=0)
+
+    # 创建源码目录
+    APP_SRC_NAME="app_${VERSION}"
+    mkdir -p ${APP_SRC_NAME}/bin
+
+    # 如果不存在编译结果，退出
+    if [ ! -f Ticker-service ] || [ ! -f Ticker-app ]; then
+        log_error "Build outputs not found. Please build the application before packing."
+        exit 1
+    fi
+
+    # 复制编译结果到源码目录
+    cp -r Ticker-service ${APP_SRC_NAME}/bin
+    cp -r Ticker-app ${APP_SRC_NAME}/bin
+
+    TAR_NAME="app_${VERSION}.tar"
+    tar -cf ${TAR_NAME} ${APP_SRC_NAME}
+
+    rm -rf ${APP_SRC_NAME}
+    
+    log_info " =========================== Application packed successfully: ${TAR_NAME} ==========================="
+}
+
 show_help()
 {
     echo "Usage: ./build.sh [platform] [options]"
@@ -160,6 +202,7 @@ show_help()
     echo "    -client        Build only the client test"
     echo "    -qt            Build only the QT client"
     echo "    -all           Build service, client test, and QT client (default)"
+    echo "    -pack          Package the built application into a tar.gz file"
     echo "    -clean         Clean build outputs for the specified platform"
     echo "    -h, --help     Show this help message"
 }
@@ -189,6 +232,9 @@ while [ $# -gt 0 ]; do
             BUILD_CLIENT=1
             BUILD_QT=1
             ;;
+        -pack)
+            PACK_APP=1
+            ;;
         -clean)
             DO_CLEAN=1
             ;;
@@ -207,14 +253,6 @@ done
 if [ -z "${PLATFORM}" ]; then
     log_error "No platform specified. Use -t113 | -t527 | -linux"
     exit 1
-fi
-
-if [ ${BUILD_SERVICE} -eq 0 ] && \
-   [ ${BUILD_CLIENT} -eq 0 ] && \
-   [ ${BUILD_QT} -eq 0 ]; then
-    BUILD_SERVICE=1
-    BUILD_CLIENT=1
-    BUILD_QT=1
 fi
 
 # 目前 t527 不支持 QT 编译
@@ -247,3 +285,5 @@ fi
 [ ${BUILD_QT}      -eq 1 ] && build_qt
 
 log_info "Build finished successfully for ${PLATFORM}"
+
+[ ${PACK_APP}      -eq 1 ] && build_pack
