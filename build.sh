@@ -148,6 +148,22 @@ build_client()
     log_info " =========================== Client Test built successfully for ${PLATFORM} ==========================="
 }
 
+show_help()
+{
+    echo "Usage: ./build.sh [platform] [options]"
+    echo "  Platforms:"
+    echo "    -t113          Build for t113 platform"
+    echo "    -t527          Build for t527 platform"
+    echo "    -linux         Build for Linux platform"
+    echo "  Options:"
+    echo "    -service       Build only the service"
+    echo "    -client        Build only the client test"
+    echo "    -qt            Build only the QT client"
+    echo "    -all           Build service, client test, and QT client (default)"
+    echo "    -clean         Clean build outputs for the specified platform"
+    echo "    -h, --help     Show this help message"
+}
+
 while [ $# -gt 0 ]; do
     case "$1" in
         -t113)
