@@ -100,7 +100,7 @@ void Widget::uiInit()
     // 禁用标题栏
     // this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint);
     // 不显示鼠标
-    // QWidget::setCursor(QCursor(Qt::BlankCursor));
+    QWidget::setCursor(QCursor(Qt::BlankCursor));
 
     // 初始化菜单栏 UI
     menuBarUIInit();
