@@ -50,6 +50,7 @@ private:
     void uiInit();                  // UI 初始化
     void updateSysRunTime();        // 获取系统运行时间
     void updateAppVersion();        // 更新 app 版本号
+    QString normalizeVersion(const QString &gitDesc); // 版本号规范显示
 
     QString m_infoSysVerPrefixStr = QStringLiteral("系统固件版本：");      // 系统固件版本前缀字符串
     QString m_infoAppVerPrefixStr = QStringLiteral("APP 版本：");         // 应用程序版本前缀字符串

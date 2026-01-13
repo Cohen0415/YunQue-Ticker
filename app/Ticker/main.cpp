@@ -5,10 +5,28 @@
 #include <QFont>
 #include <QtGlobal>
 #include <QFile>
+#include <QRegularExpression>
 
 #include "widget.h"
 #include "utils/log/logger.h"
 #include "appcontext.h"
+
+static QString normalizeVersion(const QString &gitDesc)
+{
+    // 匹配：v0.5.0-9-gxxxx
+    static QRegularExpression re(
+        R"(^(v\d+\.\d+)\.\d+-(\d+)-g[0-9a-f]+)"
+    );
+
+    QRegularExpressionMatch m = re.match(gitDesc);
+    if (!m.hasMatch())
+        return gitDesc;   
+
+    QString base = m.captured(1);   
+    QString dist = m.captured(2);   
+
+    return base + "." + dist;
+}
 
 int main(int argc, char *argv[])
 {
@@ -23,9 +41,10 @@ int main(int argc, char *argv[])
 
         // 安装自定义日志系统
         installCustomLogger();
-        g_logLevel = LogLevel::DEBUG; // 设置日志等级
+        g_logLevel = LogLevel::INFO; // 设置日志等级
 
-        LOG_INFO("App Version: %s", APP_GIT_VERSION);
+        QString normalizedVersion = normalizeVersion(APP_GIT_VERSION);
+        LOG_INFO("Application Version: %s", normalizedVersion.toStdString().c_str());
         LOG_INFO("Starting application initialization...");
 
         // 初始化 AppContext

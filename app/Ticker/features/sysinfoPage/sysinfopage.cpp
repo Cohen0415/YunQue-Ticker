@@ -5,6 +5,7 @@
 #include "utils/log/logger.h"
 #include "utils/qssload/qssloader.h"
 #include <QFile>
+#include <QRegularExpression>
 
 SysinfoPage::SysinfoPage(QWidget *parent)
     : QWidget(parent)
@@ -175,14 +176,24 @@ void SysinfoPage::updateSysRunTime()
 // 更新 app 版本号
 void SysinfoPage::updateAppVersion()
 {
-    QString ver = QString::fromUtf8(APP_GIT_VERSION);
+    QString normalizedVersion = normalizeVersion(APP_GIT_VERSION);
+    ui->appVerLabel->setText(m_infoAppVerPrefixStr + normalizedVersion);
+}
 
-    int idx = ver.indexOf('-');
-    if (idx > 0)
-    {
-        ver = ver.left(idx);
-    }
+// 版本号规范显示
+QString SysinfoPage::normalizeVersion(const QString &gitDesc)
+{
+    // 从 v0.5.0-9-gxxxx 变成 v0.5.9
+    static QRegularExpression re(
+        R"(^(v\d+\.\d+)\.\d+-(\d+)-g[0-9a-f]+)"
+    );
 
-    LOG_DEBUG("App Version: %s", ver.toUtf8().constData());
-    ui->appVerLabel->setText(m_infoAppVerPrefixStr + ver);
+    QRegularExpressionMatch m = re.match(gitDesc);
+    if (!m.hasMatch())
+        return gitDesc;   
+
+    QString base = m.captured(1);   
+    QString dist = m.captured(2);   
+
+    return base + "." + dist;
 }
