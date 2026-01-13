@@ -149,44 +149,59 @@ build_client()
     log_info " =========================== Client Test built successfully for ${PLATFORM} ==========================="
 }
 
-build_pack()
+build_pack() 
 {
     log_info " =========================== Packing Application... ==========================="
 
-    cd ${OUTDIR}
+    cd ${OUTDIR} || exit 1
 
-    # 如果存在旧的源码目录，先删除
+    # 删除旧源码目录
     if ls app_* 1> /dev/null 2>&1; then
         rm -rf app_*
     fi
 
-    # 如果存在旧的打包文件，先删除
+    # 删除旧打包文件
     if ls app-*.tar 1> /dev/null 2>&1; then
         rm -f app-*.tar
     fi
 
-    # 获取当前的 Git 最新的 TAG 作为版本号
-    VERSION=$(git describe --tags --abbrev=0)
+    # 获取最近 tag
+    GIT_TAG=$(git describe --tags --abbrev=0)
+
+    # 获取当前提交到 tag 的提交数
+    DIST=$(git rev-list ${GIT_TAG}..HEAD --count)
+
+    # 去掉 tag 最后的 .0
+    TAG_BASE=${GIT_TAG%.*}
+
+    # 生成最终版本号 vX.Y.N
+    if [ "$DIST" -gt 0 ]; then
+        VERSION="${TAG_BASE}.${DIST}"
+    else
+        VERSION="${GIT_TAG}"
+    fi
+
+    log_info "Packing version: ${VERSION}"
 
     # 创建源码目录
     APP_SRC_NAME="app_${VERSION}"
     mkdir -p ${APP_SRC_NAME}/bin
 
-    # 如果不存在编译结果，退出
+    # 检查编译结果
     if [ ! -f Ticker-service ] || [ ! -f Ticker-app ]; then
         log_error "Build outputs not found. Please build the application before packing."
         exit 1
     fi
 
-    # 复制编译结果到源码目录
+    # 复制编译结果
     cp -r Ticker-service ${APP_SRC_NAME}/bin
     cp -r Ticker-app ${APP_SRC_NAME}/bin
 
+    # 打包
     TAR_NAME="app_${VERSION}.tar"
     tar -cf ${TAR_NAME} ${APP_SRC_NAME}
-
     rm -rf ${APP_SRC_NAME}
-    
+
     log_info " =========================== Application packed successfully: ${TAR_NAME} ==========================="
 }
 
