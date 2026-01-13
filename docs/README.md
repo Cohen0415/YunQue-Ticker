@@ -209,7 +209,7 @@ app_v0.4.0 app_v0.5.0.tar current dict
 
 # 后续
 
-目前还会持续优化...
+持续更新...
 
 # 联系方式
 * vx：Cohen0415
