@@ -176,6 +176,7 @@ app/Ticker
 #     -qt            Build only the QT client
 #     -all           Build service, client test, and QT client (default)
 #     -clean         Clean build outputs for the specified platform
+#     -pack          Package the built application into a tar.gz file
 #     -h, --help     Show this help message
 
 # 编译 T113 平台的服务端程序
@@ -186,22 +187,24 @@ app/Ticker
 ./build.sh -t113 -qt
 # 编译全部
 ./build.sh -t113 all
+# 将可执行程序打包成可更新的 APP 压缩包
+./build.sh -t113 -pack
 
-# 编译后的可执行程序在
+# 编译后的可执行程序和打包后的 APP 压缩包在
 YunQue-Ticker/out
 ├── Ticker-app          # Qt 程序
-└── Ticker-service      # 服务器
-└── Ticker-client-test  # 服务器测试
+├── Ticker-service      # 服务器
+├── Ticker-client-test  # 服务器测试
+└── app_v0.5.0.tar      # APP 压缩包
 ```
 
 # 运行
 ```shell
-# 将编译出的 Ticker-app、Ticker-service 拷贝至板卡：
-root@YunQue: ls /opt/Ticker/current/bin
-Ticker-app      Ticker-service
+# 将打包出的 app_v0.5.0.tar 拷贝至板卡如下目录：
+root@YunQue:/opt/Ticker# ls
+app_v0.4.0 app_v0.5.0.tar current dict 
 
-# 重启或者执行 APP 启动脚本：
-sh /etc/app-launcher.sh
+# 重启板卡即可完成 APP 更新
 ```
 
 # 后续
