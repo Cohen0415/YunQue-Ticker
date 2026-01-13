@@ -44,7 +44,7 @@ static int sysinfo_get_version(char *buf, int buf_size)
     /*
         cat /proc/cpuinfo
 
-        version : v1.0.0-dirty
+        version : v1.0.0-21-g66826ff-dirty
         processor       : 0
         BogoMIPS        : 48.00
         Features        : fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
@@ -63,36 +63,61 @@ static int sysinfo_get_version(char *buf, int buf_size)
     if (!fp)
         return -1;
 
-    char line[128];
+    char line[256];
     while (fgets(line, sizeof(line), fp))
     {
         if (strncmp(line, "version", 7) == 0)
         {
-            // v1.0.0-dirty
-            // v1.0.0-asbcdf-dirty
-            // 只提取版本号 v1.0.0
             char *colon = strchr(line, ':');
-            if (colon)
+            if (!colon)
+                continue;
+
+            char *p = colon + 1;
+            // 去掉前导空格
+            while (*p == ' ' || *p == '\t') p++;
+
+            char version_tag[32] = {0};
+            int distance = 0;
+
+            // 解析 vX.Y.Z-DIST-gHASH[-dirty]
+            // 先提取 tag
+            char *dash1 = strchr(p, '-');
+            if (dash1)
             {
-                char *version_start = colon + 1;
-                while (*version_start == ' ' || *version_start == '\t')
-                    version_start++;
-                char *version_end = version_start;
-                while (*version_end != '\0' && *version_end != '-' && *version_end != '\n')
-                    version_end++;
-                int version_length = version_end - version_start;
-                if (version_length > 0 && version_length < buf_size)
-                {
-                    strncpy(buf, version_start, version_length);
-                    buf[version_length] = '\0';
-                    fclose(fp);
-                    return 0;
-                }
+                int tag_len = dash1 - p;
+                if (tag_len >= (int)sizeof(version_tag))
+                    tag_len = sizeof(version_tag) - 1;
+                strncpy(version_tag, p, tag_len);
+                version_tag[tag_len] = '\0';
+
+                // 跳到 dash1 + 1
+                char *dash2 = dash1 + 1;
+                distance = atoi(dash2);  // 自动遇到非数字停止
             }
+            else
+            {
+                // 没有 dash，直接就是 tag
+                strncpy(version_tag, p, sizeof(version_tag) - 1);
+                version_tag[sizeof(version_tag) - 1] = '\0';
+            }
+            
+            char *last_dot = strrchr(version_tag, '.');
+            if (last_dot && strcmp(last_dot, ".0") == 0)
+                *last_dot = '\0';
+            
+            // 生成最终版本 vX.Y.N
+            if (distance > 0)
+                snprintf(buf, buf_size, "%s.%d", version_tag, distance);
+            else
+                snprintf(buf, buf_size, "%s", version_tag);
+
+            fclose(fp);
+            return 0;
         }
     }
 
-    return 0;
+    fclose(fp);
+    return -1;
 }
 
 static rpc_result_t rpc_sysinfo_get_bjtime(cJSON *params)
