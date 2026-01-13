@@ -134,7 +134,7 @@ app/Ticker
 └── Ticker.pro          # Qt 工程文件
 ```
 
-## dev-service 目录
+## dev-service 目录（服务器源码）
 ```shell
 ├── main.c              # 服务器入口程序
 ├── core                # 服务器核心
