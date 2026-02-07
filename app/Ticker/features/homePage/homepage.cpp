@@ -51,7 +51,7 @@ void HomePage::onPageEnter()
 {
     LOG_DEBUG("HomePage entered.");
 
-    onQuoteUpdateTimerTimeout(); // 立即请求一次
+    emitFetchQuotesInCurPortfolio(); // 立即请求一次
     if (!m_quoteUpdateTimer->isActive())
     {
         LOG_DEBUG("start m_quoteUpdateTimer");
